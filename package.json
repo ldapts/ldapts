@@ -1,0 +1,45 @@
+{
+  "name": "ldapts",
+  "version": "1.0.0",
+  "description": "LDAP client",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --fix -p tsconfig.json -c tslint.json -t stylish"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ldapts/ldapts.git"
+  },
+  "engines": {
+    "node": ">=8.11"
+  },
+  "keywords": [
+    "ldap",
+    "active",
+    "directory"
+  ],
+  "author": "jim@biacreations.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ldapts/ldapts/issues"
+  },
+  "homepage": "https://github.com/ldapts/ldapts#readme",
+  "dependencies": {
+    "asn1": "~0.2.4",
+    "strict-event-emitter-types": "~2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "~10.12.1",
+    "husky": "~1.1.2",
+    "tslint": "~5.11.0",
+    "tslint-config-airbnb": "~5.11.0",
+    "typescript": "~3.1.4"
+  }
+}
