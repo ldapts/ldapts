@@ -2,22 +2,20 @@
 import { Ber, BerReader, BerWriter } from 'asn1';
 import * as assert from 'assert';
 import StrictEventEmitter from 'strict-event-emitter-types';
-import { Message } from './messages/Message';
-import EventEmitter = NodeJS.EventEmitter;
+import { EventEmitter } from 'events';
 import { ProtocolOperation } from './ProtocolOperation';
-import { AbandonRequest } from './messages/AbandonRequest';
-import { BindRequest } from './messages/BindRequest';
-import { UnbindRequest } from './messages/UnbindRequest';
-import { CompareRequest } from './messages/CompareRequest';
-import { DeleteRequest } from './messages/DeleteRequest';
-import { ExtendedRequest } from './messages/ExtendedRequest';
-import { ModifyDNRequest } from './messages/ModifyDNRequest';
-import { SearchRequest } from './messages/SearchRequest';
+import { BindResponse } from './messages/BindResponse';
+import { CompareResponse } from './messages/CompareResponse';
+import { DeleteResponse } from './messages/DeleteResponse';
+import { ExtendedResponse } from './messages/ExtendedResponse';
+import { ModifyDNResponse } from './messages/ModifyDNResponse';
+import { MessageResponse } from './messages/MessageResponse';
+import { MessageParserError } from './errors/MessageParserError';
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
 interface MessageParserEvents {
-  message: (message: Message) => void;
+  message: (message: MessageResponse) => void;
   error: (error: Error) => void;
 }
 
@@ -73,64 +71,45 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
     }
   }
 
-  private _getMessageFromProtocolOperation(reader: BerReader): Message {
+  private _getMessageFromProtocolOperation(reader: BerReader): MessageResponse {
     const messageId = reader.readInt();
     const protocolOperation: ProtocolOperation = reader.readSequence();
 
-    let message: Message;
+    let message: MessageResponse;
     switch (protocolOperation) {
-      case ProtocolOperation.LDAP_REQ_ABANDON:
-        message = new AbandonRequest({
+      case ProtocolOperation.LDAP_RES_BIND:
+        message = new BindResponse({
           messageId,
         });
         break;
-      // case ProtocolOperation.LDAP_REQ_ADD:
-      //   message = new AddRequest({
-      //     messageId,
-      //   });
-      //   break;
-      case ProtocolOperation.LDAP_REQ_BIND:
-        message = new BindRequest({
+      case ProtocolOperation.LDAP_RES_COMPARE:
+        message = new CompareResponse({
           messageId,
         });
         break;
-      case ProtocolOperation.LDAP_REQ_COMPARE:
-        message = new CompareRequest({
+      case ProtocolOperation.LDAP_RES_DELETE:
+        message = new DeleteResponse({
           messageId,
         });
         break;
-      case ProtocolOperation.LDAP_REQ_DELETE:
-        message = new DeleteRequest({
+      case ProtocolOperation.LDAP_RES_EXTENSION:
+        message = new ExtendedResponse({
           messageId,
         });
         break;
-      case ProtocolOperation.LDAP_REQ_EXTENSION:
-        message = new ExtendedRequest({
-          messageId,
-        });
-        break;
-      // case ProtocolOperation.LDAP_REQ_MODIFY:
-      //   message = new ModifyRequest({
-      //     messageId,
-      //   });
-      //   break;
-      case ProtocolOperation.LDAP_REQ_MODRDN:
-        message = new ModifyDNRequest({
-          messageId,
-        });
-        break;
-      case ProtocolOperation.LDAP_REQ_SEARCH:
-        message = new SearchRequest({
-          messageId,
-        });
-        break;
-      case ProtocolOperation.LDAP_REQ_UNBIND:
-        message = new UnbindRequest({
+      case ProtocolOperation.LDAP_RES_MODRDN:
+        message = new ModifyDNResponse({
           messageId,
         });
         break;
       default:
-        throw new Error(`Protocol Operation not supported: 0x${protocolOperation.toString(16)}`);
+        const error = new MessageParserError(`Protocol Operation not supported: 0x${protocolOperation.toString(16)}`);
+        error.messageDetails = {
+          messageId,
+          protocolOperation,
+        };
+
+        throw error;
     }
 
     message.parse(reader);

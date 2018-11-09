@@ -1,5 +1,4 @@
-import { EventEmitter } from 'events';
-import strictEventEmitterTypes from 'strict-event-emitter-types';
+import debug from 'debug';
 import { parse as parseUrl } from 'url';
 import * as tls from 'tls';
 import Timer = NodeJS.Timer;
@@ -14,18 +13,24 @@ import { ExtendedRequest } from './messages/ExtendedRequest';
 import { ModifyDNRequest } from './messages/ModifyDNRequest';
 import { SearchRequest } from './messages/SearchRequest';
 import { Filter } from './filters/Filter';
+import { PagedResultsControl } from './controls/PagedResultsControl';
+import { MessageParser } from './MessageParser';
+import { BindResponse } from './messages/BindResponse';
+import { MessageResponse } from './messages/MessageResponse';
+import { MessageResponseStatus } from './MessageResponseStatus';
+import { InvalidCredentialsError } from './errors/InvalidCredentialsError';
+import { CompareResponse, CompareResult } from './messages/CompareResponse';
+import { CompareError } from './errors/CompareError';
+import { MessageParserError } from './errors/MessageParserError';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
+const logDebug = debug('ldapts');
 
 export interface ClientOptions {
   /**
    * A valid LDAP URL (proto/host/port only)
    */
   url: string;
-  /**
-   * Socket path if using AF_UNIX sockets
-   */
-  socketPath?: string;
   /**
    * Milliseconds client should let operations live for before timing out (Default: no timeout)
    */
@@ -46,9 +51,13 @@ export interface ClientOptions {
 
 interface MessageDetails {
   message: Message;
-  resolve: () => void;
+  resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
   timeoutTimer: Timer | null;
+}
+
+export interface SearchPageOptions {
+  pageSize?: number;
 }
 
 export interface SearchOptions {
@@ -58,6 +67,20 @@ export interface SearchOptions {
   returnAttributeValues?: boolean;
   sizeLimit?: number;
   timeLimit?: number;
+  paged?: SearchPageOptions | boolean;
+}
+
+export interface SearchEvents {
+  error: (err: Error) => void;
+  searchEntry: (searchEntryDN: string) => void;
+  searchReferral: (searchReferralUri: string) => void;
+  page: (cookie: string) => void;
+  end: () => void;
+}
+
+export interface SearchResult {
+  searchEntries: string[];
+  referralUris: string[];
 }
 
 export class Client {
@@ -69,6 +92,7 @@ export class Client {
   private connected: boolean = false;
   private socket!: tls.TLSSocket;
   private connectTimer!: Timer;
+  private readonly messageParser = new MessageParser();
   private readonly messageDetailsByMessageId: { [index: string]: MessageDetails } = {};
 
   constructor(options: ClientOptions) {
@@ -81,14 +105,13 @@ export class Client {
       this.clientOptions.connectTimeout = 0;
     }
 
-    if (this.clientOptions.strictDN !== false) {
-      this.clientOptions.strictDN = true;
-    }
+    this.clientOptions.strictDN = this.clientOptions.strictDN !== false;
 
     const parsedUrl = parseUrl(options.url);
     if (!parsedUrl.protocol || !(parsedUrl.protocol === 'ldap:' || parsedUrl.protocol === 'ldaps:')) {
       throw new Error(`${options.url} is an invalid LDAP URL (protocol)`);
     }
+
     this.secure = parsedUrl.protocol === 'ldaps:';
     this.host = parsedUrl.hostname || 'localhost';
     if (parsedUrl.port) {
@@ -98,6 +121,20 @@ export class Client {
     } else {
       this.port = 389;
     }
+
+    this.messageParser.on('error', (err: MessageParserError) => {
+      if (err.messageDetails && err.messageDetails.messageId) {
+        const messageDetails = this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
+        if (messageDetails) {
+          delete this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
+          return messageDetails.reject(err);
+        }
+      }
+
+      logDebug(err.stack);
+    });
+
+    this.messageParser.on('message', this._handleSendResponse.bind(this));
   }
 
   /**
@@ -106,7 +143,7 @@ export class Client {
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string, password?: string, controls?: Control|[Control]) {
+  public async bind(dn: string, password?: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -123,7 +160,10 @@ export class Client {
       controls,
     });
 
-    return this._send(req);
+    const result = await this._send<BindResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw new InvalidCredentialsError(`Bind DN or password is incorrect.`);
+    }
   }
 
   /**
@@ -134,7 +174,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    * @param controls
    */
-  public async compare(dn: string, attribute: string, value: string, controls?: Control|[Control]) {
+  public async compare(dn: string, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -152,7 +192,19 @@ export class Client {
       controls,
     });
 
-    return this._send(req);
+    const response = await this._send<CompareResponse>(req);
+    switch (response.status) {
+      case CompareResult.compareTrue:
+        return true;
+      case CompareResult.compareFalse:
+        return false;
+      case CompareResult.noSuchAttribute:
+        throw new CompareError('Attribute does not exist');
+      case CompareResult.noSuchObject:
+        throw new CompareError('Target entry does not exist');
+      default:
+        throw new CompareError(`Unknown error: 0x${response.status.toString(16)}`);
+    }
   }
 
   /**
@@ -161,7 +213,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    * @param controls
    */
-  public async del(dn: string, controls?: Control|[Control]) {
+  public async del(dn: string, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -187,7 +239,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    * @param controls
    */
-  public async exop(oid: string, value?: string, controls?: Control|[Control]) {
+  public async exop(oid: string, value?: string, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -220,7 +272,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    * @param controls
    */
-  public async modifyDN(dn: string, newDN: string, controls?: Control|[Control]) {
+  public async modifyDN(dn: string, newDN: string, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -254,18 +306,45 @@ export class Client {
    * @param {SearchOptions} options
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string, options: SearchOptions, controls?: Control|[Control]) {
+  public async search(baseDN: string, options: SearchOptions, controls?: Control|Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
 
-    if (controls && !Array.isArray(controls)) {
+    if (controls) {
+      if (Array.isArray(controls)) {
+        // tslint:disable-next-line:no-parameter-reassignment
+        controls = controls.slice(0);
+      } else {
+        // tslint:disable-next-line:no-parameter-reassignment
+        controls = [controls];
+      }
+
+      // Make sure PagedResultsControl is not specified since it's handled internally
+      for (const control of controls) {
+        if (control instanceof PagedResultsControl) {
+          throw new Error('Should not specify PagedResultsControl');
+        }
+      }
+    } else {
       // tslint:disable-next-line:no-parameter-reassignment
-      controls = [controls];
+      controls = [];
     }
 
+    let pageSize: number = 100;
+    if (typeof options.paged === 'object' && options.paged.pageSize) {
+      pageSize = options.paged.pageSize;
+    }
+
+    const pagedResultsControl = new PagedResultsControl({
+      value: {
+        size: pageSize,
+      },
+    });
+    controls.push(pagedResultsControl);
+
     const req = new SearchRequest({
-      messageId: this._nextMessageId(),
+      messageId: -1, // NOTE: This will be set from _sendRequest()
       baseDN,
       scope: options.scope,
       filter: options.filter || '(objectclass=*)',
@@ -276,15 +355,20 @@ export class Client {
       controls,
     });
 
-    // TODO: Handle paging and return results
-    return this._send(req);
+    const searchResult: SearchResult = {
+      searchEntries: [],
+      referralUris: [],
+    };
+
+
+    return searchResult;
   }
 
   /**
    * Unbinds this client from the LDAP server.
    * @returns {void|Promise} void if not connected; otherwise returns a promise to the request to disconnect
    */
-  public unbind(controls?: Control|[Control]) {
+  public async unbind(controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       return;
     }
@@ -293,7 +377,13 @@ export class Client {
       messageId: this._nextMessageId(),
     });
 
-    return this._send(req);
+    await this._send(req);
+  }
+
+  private _sendSearch(searchRequest: SearchRequest) {
+    searchRequest.messageId = this._nextMessageId();
+
+
   }
 
   private _nextMessageId() {
@@ -307,7 +397,7 @@ export class Client {
 
   /**
    * Open the socket connection
-   * @returns {Promise<boolean>} true if connected; otherwise throws
+   * @returns {Promise<void>}
    * @private
    */
   private _connect() {
@@ -316,43 +406,23 @@ export class Client {
     }
 
     return new Promise((resolve, reject) => {
-      this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions, () => {
-        clearTimeout(this.connectTimer);
-        this.connected = true;
-
-        this.socket.on('error', () => {
-          this.socket.destroy();
+      this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
+      if (this.secure) {
+        this.socket.once('secureConnect', () => {
+          this._onConnect(resolve);
         });
-        this.socket.on('close', () => {
-          this.socket.removeAllListeners('connect');
-          this.socket.removeAllListeners('data');
-          this.socket.removeAllListeners('drain');
-          this.socket.removeAllListeners('error');
-          this.socket.removeAllListeners('end');
-          this.socket.removeAllListeners('timeout');
-          this.socket.removeAllListeners('close');
-
-          delete this.socket;
-
-          // Clean up any pending messages
-          for (const messageDetails of Object.values(this.messageDetailsByMessageId)) {
-            if (messageDetails.message instanceof UnbindRequest) {
-              // Consider unbind as success since the connection is closed.
-              messageDetails.resolve();
-            } else {
-              messageDetails.reject(new Error('Connection closed.'));
-            }
-          }
+      } else {
+        this.socket.once('connect', () => {
+          this._onConnect(resolve);
         });
-        this.socket.on('end', () => {
-          // Acknowledge to other end of the connection that the connection is ended.
-          this.socket.end();
-        });
-        this.socket.on('timeout', () => {
-          this.socket.end();
-        });
+      }
+      this.socket.once('error', (err: Error) => {
+        if (this.connectTimer) {
+          clearTimeout(this.connectTimer);
+          delete this.connectTimer;
+        }
 
-        return resolve(true);
+        reject(err);
       });
 
       if (this.clientOptions.connectTimeout) {
@@ -368,41 +438,73 @@ export class Client {
     });
   }
 
+  private _onConnect(next: () => void) {
+    clearTimeout(this.connectTimer);
+
+    // Clear out event listeners from _connect()
+    this.socket.removeAllListeners('error');
+    this.socket.removeAllListeners('connect');
+    this.socket.removeAllListeners('secureConnect');
+
+    this.connected = true;
+
+    this.socket.on('error', () => {
+      this.socket.destroy();
+    });
+    this.socket.on('close', () => {
+      this.socket.removeAllListeners('connect');
+      this.socket.removeAllListeners('data');
+      this.socket.removeAllListeners('drain');
+      this.socket.removeAllListeners('error');
+      this.socket.removeAllListeners('end');
+      this.socket.removeAllListeners('timeout');
+      this.socket.removeAllListeners('close');
+
+      delete this.socket;
+
+      // Clean up any pending messages
+      for (const messageDetails of Object.values(this.messageDetailsByMessageId)) {
+        if (messageDetails.message instanceof UnbindRequest) {
+          // Consider unbind as success since the connection is closed.
+          messageDetails.resolve();
+        } else {
+          messageDetails.reject(new Error('Connection closed.'));
+        }
+      }
+    });
+    this.socket.on('data', (data: Buffer) => {
+      this.messageParser.read(data);
+    });
+    this.socket.on('end', () => {
+      // Acknowledge to other end of the connection that the connection is ended.
+      this.socket.end();
+    });
+    this.socket.on('timeout', () => {
+      this.socket.end();
+    });
+
+    return next();
+  }
+
   /**
    * Sends request message to the ldap server over the connected socket.
    * Each message request is given a unique id (messageId), used to identify the associated response when it is sent back over the socket.
-   * @returns {Promise}
+   * @returns {Promise<Message>}
    * @private
    */
-  private _send(message: Message) {
-    // let ee: StrictEventEmitter<EventEmitter, Events> = new EventEmitter;
+  private _send<TMessageResponse extends MessageResponse>(message: Message): Promise<TMessageResponse> {
     if (!this.connected || !this.socket) {
       throw new Error('Socket connection not established');
     }
 
-    // tslint:disable no-empty
-    let messageResolve: () => void = () => {};
+    /* tslint:disable:no-empty */
+    let messageResolve: (message?: MessageResponse) => void = () => {};
     let messageReject: (err: Error) => void = () => {};
-    // tslint:enable no-empty
-    const sendPromise = new Promise((resolve, reject) => {
+    /* tslint:enable:no-empty */
+    const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
+      // @ts-ignore
       messageResolve = resolve;
       messageReject = reject;
-
-      this.socket.write(message.write(), () => {
-        if (message instanceof AbandonRequest) {
-          delete this.messageDetailsByMessageId[message.messageId.toString()];
-          resolve();
-        } else if (message instanceof UnbindRequest) {
-          this.connected = false;
-          if (this.socket) {
-            // Ignore any error since the connection is being closed
-            this.socket.removeAllListeners('error');
-            // tslint:disable-next-line:no-empty
-            this.socket.on('error', () => {});
-            this.socket.end();
-          }
-        }
-      });
     });
 
     this.messageDetailsByMessageId[message.messageId.toString()] = {
@@ -414,6 +516,39 @@ export class Client {
       },                                                    this.clientOptions.timeout) : null,
     };
 
+    // Send the message to the socket
+    logDebug(`Sending message: ${message}`);
+    this.socket.write(message.write(), (...args: any[]) => {
+      if (message instanceof AbandonRequest) {
+        logDebug(`Abandoned message: ${message.messageId}`);
+        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        messageResolve();
+      } else if (message instanceof UnbindRequest) {
+        logDebug(`Unbind success. Ending socket`);
+        this.connected = false;
+        if (this.socket) {
+          // Ignore any error since the connection is being closed
+          this.socket.removeAllListeners('error');
+          // tslint:disable-next-line:no-empty
+          this.socket.on('error', () => {});
+          this.socket.end();
+        }
+      } else {
+        // NOTE: messageResolve will be called as 'data' events come from the socket
+        logDebug('Message sent successfully.');
+      }
+    });
+
     return sendPromise;
+  }
+
+  private _handleSendResponse(message: MessageResponse) {
+    const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
+    if (messageDetails) {
+      delete this.messageDetailsByMessageId[message.messageId.toString()];
+      messageDetails.resolve(message);
+    } else {
+      logDebug(`Unable to find details related to message response: ${message}`);
+    }
   }
 }

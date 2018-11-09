@@ -57,6 +57,13 @@ export abstract class Message {
     }
   }
 
+  public toString(): string {
+    return JSON.stringify({
+      messageId: this.messageId,
+      messageType: this.constructor.name,
+    },                    null, 2);
+  }
+
   // tslint:disable-next-line:no-empty
   protected parseMessage(reader: BerReader): void {
   }

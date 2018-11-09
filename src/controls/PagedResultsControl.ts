@@ -4,7 +4,7 @@ import { Control, ControlOptions } from './Control';
 
 export interface PagedResultsValue {
   size: number;
-  cookie: string;
+  cookie?: string;
 }
 
 export interface PagedResultsControlOptions extends ControlOptions {

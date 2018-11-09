@@ -27,6 +27,7 @@ export class CompareRequest extends Message {
     writer.startSequence();
     writer.writeString(this.attribute);
     writer.writeString(this.value);
+    writer.endSequence();
   }
 
   public parseMessage(reader: BerReader) {
