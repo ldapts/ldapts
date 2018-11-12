@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "lint": "tslint --fix -p tsconfig.json -c tslint.json -t stylish"
+    "lint": "tslint --fix -p tsconfig.lint.json -c tslint.json -t stylish"
   },
   "husky": {
     "hooks": {
