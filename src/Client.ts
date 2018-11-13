@@ -22,6 +22,9 @@ import { InvalidCredentialsError } from './errors/InvalidCredentialsError';
 import { CompareResponse, CompareResult } from './messages/CompareResponse';
 import { CompareError } from './errors/CompareError';
 import { MessageParserError } from './errors/MessageParserError';
+import { SearchResponse } from './messages/SearchResponse';
+import { SearchReference } from './messages/SearchReference';
+import { SearchEntry } from './messages/SearchEntry';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
 const logDebug = debug('ldapts');
@@ -51,6 +54,8 @@ export interface ClientOptions {
 
 interface MessageDetails {
   message: Message;
+  searchEntries?: SearchEntry[];
+  searchReferences?: SearchReference[];
   resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
   timeoutTimer: Timer | null;
@@ -61,26 +66,20 @@ export interface SearchPageOptions {
 }
 
 export interface SearchOptions {
-  scope?: 'base' | 'one' | 'sub';
-  filter?: string | Filter;
-  attributes?: string[];
+  scope?: 'base' | 'one' | 'sub' | 'children';
+  derefAliases?: 'never' | 'always' | 'search' | 'find';
   returnAttributeValues?: boolean;
   sizeLimit?: number;
   timeLimit?: number;
   paged?: SearchPageOptions | boolean;
-}
-
-export interface SearchEvents {
-  error: (err: Error) => void;
-  searchEntry: (searchEntryDN: string) => void;
-  searchReferral: (searchReferralUri: string) => void;
-  page: (cookie: string) => void;
-  end: () => void;
+  filter?: string | Filter;
+  attributes?: string[];
 }
 
 export interface SearchResult {
-  searchEntries: string[];
-  referralUris: string[];
+  // tslint:disable-next-line: array-type
+  searchEntries: { dn: string, [index: string]: string | string[] }[];
+  searchReferences: string[];
 }
 
 export class Client {
@@ -297,16 +296,11 @@ export class Client {
   /**
    * Performs an LDAP search against the server.
    *
-   * Note that the defaults for options are a 'base' search, if that's what
-   * you want you can just pass in a string for options and it will be treated
-   * as the search filter.  Also, you can either pass in programatic Filter
-   * objects or a filter string as the filter option.
-   *
    * @param {string} baseDN - The DN in the tree to start searching at
    * @param {SearchOptions} options
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string, options: SearchOptions, controls?: Control|Control[]): Promise<SearchResult> {
+  public async search(baseDN: string, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
@@ -343,11 +337,11 @@ export class Client {
     });
     controls.push(pagedResultsControl);
 
-    const req = new SearchRequest({
+    const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
       baseDN,
       scope: options.scope,
-      filter: options.filter || '(objectclass=*)',
+      filter: options.filter,
       attributes: options.attributes,
       returnAttributeValues: options.returnAttributeValues,
       sizeLimit: options.sizeLimit,
@@ -357,9 +351,10 @@ export class Client {
 
     const searchResult: SearchResult = {
       searchEntries: [],
-      referralUris: [],
+      searchReferences: [],
     };
 
+    await this._sendSearch(searchRequest, searchResult, (typeof options.paged !== 'undefined'), pageSize, pagedResultsControl);
 
     return searchResult;
   }
@@ -380,10 +375,38 @@ export class Client {
     await this._send(req);
   }
 
-  private _sendSearch(searchRequest: SearchRequest) {
+  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl: PagedResultsControl) {
     searchRequest.messageId = this._nextMessageId();
 
+    const result = await this._send<SearchResponse>(searchRequest);
 
+    for (const searchEntry of result.searchEntries) {
+      searchResult.searchEntries.push(searchEntry.toObject());
+    }
+
+    for (const searchReference of result.searchReferences) {
+      searchResult.searchReferences.push(...searchReference.uris);
+    }
+
+    // Recursively search if paging is specified
+    if (paged) {
+      let pagedResultsFromResponse: PagedResultsControl | null = null;
+      for (const control of (result.controls || [])) {
+        if (control instanceof PagedResultsControl) {
+          pagedResultsFromResponse = control;
+          break;
+        }
+      }
+
+      if (pagedResultsFromResponse && pagedResultsFromResponse.value && pagedResultsFromResponse.value.cookie) {
+        // Recursively keep searching
+        pagedResultsControl.value = pagedResultsControl.value || {
+          size: pageSize,
+        };
+        pagedResultsControl.value.cookie = pagedResultsFromResponse.value.cookie;
+        await this._sendSearch(searchRequest, searchResult, paged, pageSize, pagedResultsControl);
+      }
+    }
   }
 
   private _nextMessageId() {
@@ -518,7 +541,7 @@ export class Client {
 
     // Send the message to the socket
     logDebug(`Sending message: ${message}`);
-    this.socket.write(message.write(), (...args: any[]) => {
+    this.socket.write(message.write(), () => {
       if (message instanceof AbandonRequest) {
         logDebug(`Abandoned message: ${message.messageId}`);
         delete this.messageDetailsByMessageId[message.messageId.toString()];
@@ -542,11 +565,33 @@ export class Client {
     return sendPromise;
   }
 
-  private _handleSendResponse(message: MessageResponse) {
+  private _handleSendResponse(message: Message) {
     const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
     if (messageDetails) {
-      delete this.messageDetailsByMessageId[message.messageId.toString()];
-      messageDetails.resolve(message);
+      // When performing a search, an arbitrary number of SearchEntry and SearchReference messages come through with the
+      // same messageId as the SearchRequest. Finally, a SearchResponse will come through to complete the request.
+      if (message instanceof SearchEntry) {
+        messageDetails.searchEntries = messageDetails.searchEntries || [];
+        messageDetails.searchEntries.push(message);
+      } else if (message instanceof SearchReference) {
+        messageDetails.searchReferences = messageDetails.searchReferences || [];
+        messageDetails.searchReferences.push(message);
+      } else if (message instanceof SearchResponse) {
+        // Assign any previously collected entries & references
+        if (messageDetails.searchEntries) {
+          message.searchEntries.push(...messageDetails.searchEntries);
+        }
+
+        if (messageDetails.searchReferences) {
+          message.searchReferences.push(...messageDetails.searchReferences);
+        }
+
+        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        messageDetails.resolve(message as MessageResponse);
+      } else {
+        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        messageDetails.resolve(message as MessageResponse);
+      }
     } else {
       logDebug(`Unable to find details related to message response: ${message}`);
     }

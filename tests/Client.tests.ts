@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
 import { InvalidCredentialsError } from '../src/errors/InvalidCredentialsError';
 import { CompareError } from '../src/errors/CompareError';
+import { PagedResultsControl } from '../src/controls/PagedResultsControl';
 
 describe('Client', () => {
   before(() => {
@@ -135,6 +136,41 @@ describe('Client', () => {
         (ex instanceof CompareError).should.equal(true);
         (ex.message).should.equal('Unknown error: 0x11');
       }
+    });
+  });
+  describe('#search()', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should return search entries with (objectclass=*) if no filter is specified', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(objectclass=*)"
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com');
+
+      searchResult.searchEntries.length.should.be.greaterThan(0);
+    });
+    it('should return search entries if filter="(objectclass=*)"', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(objectclass=*)"
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: '(objectclass=*)',
+      });
+
+      searchResult.searchEntries.length.should.be.greaterThan(0);
+    });
+    it('should throw if a PagedResultsControl is specified', () => {
+      const pagedResultsControl = new PagedResultsControl({});
+      client.search('cn=test', {}, pagedResultsControl).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
+    });
+    it('should throw if a PagedResultsControl is specified in the controls array', () => {
+      const pagedResultsControl = new PagedResultsControl({});
+      client.search('cn=test', {}, [pagedResultsControl]).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
     });
   });
 });

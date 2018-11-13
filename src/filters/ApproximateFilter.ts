@@ -1,7 +1,7 @@
 // @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface ApproximateFilterOptions {
   attribute?: string;
@@ -9,7 +9,7 @@ export interface ApproximateFilterOptions {
 }
 
 export class ApproximateFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_APPROX;
+  public type: SearchFilter = SearchFilter.approxMatch;
   public attribute: string;
   public value: string;
 

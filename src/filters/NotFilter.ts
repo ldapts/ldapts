@@ -1,14 +1,14 @@
 // @ts-ignore
 import { BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface NotFilterOptions {
   filter: Filter;
 }
 
 export class NotFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_NOT;
+  public type: SearchFilter = SearchFilter.not;
   public filter: Filter;
 
   constructor(options: NotFilterOptions) {

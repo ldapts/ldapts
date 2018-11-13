@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface LessThanEqualsFilterOptions {
   attribute?: string;
@@ -9,7 +9,7 @@ export interface LessThanEqualsFilterOptions {
 }
 
 export class LessThanEqualsFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_LE;
+  public type: SearchFilter = SearchFilter.lessOrEqual;
   public attribute: string;
   public value: string;
 

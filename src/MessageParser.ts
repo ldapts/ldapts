@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import * as assert from 'assert';
-import StrictEventEmitter from 'strict-event-emitter-types';
+import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
 import { ProtocolOperation } from './ProtocolOperation';
 import { BindResponse } from './messages/BindResponse';
@@ -11,6 +11,9 @@ import { ExtendedResponse } from './messages/ExtendedResponse';
 import { ModifyDNResponse } from './messages/ModifyDNResponse';
 import { MessageResponse } from './messages/MessageResponse';
 import { MessageParserError } from './errors/MessageParserError';
+import { SearchResponse } from './messages/SearchResponse';
+import { SearchEntry } from './messages/SearchEntry';
+import { SearchReference } from './messages/SearchReference';
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
@@ -99,6 +102,21 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
         break;
       case ProtocolOperation.LDAP_RES_MODRDN:
         message = new ModifyDNResponse({
+          messageId,
+        });
+        break;
+      case ProtocolOperation.LDAP_RES_SEARCH:
+        message = new SearchResponse({
+          messageId,
+        });
+        break;
+      case ProtocolOperation.LDAP_RES_SEARCH_ENTRY:
+        message = new SearchEntry({
+          messageId,
+        });
+        break;
+      case ProtocolOperation.LDAP_RES_SEARCH_REF:
+        message = new SearchReference({
           messageId,
         });
         break;

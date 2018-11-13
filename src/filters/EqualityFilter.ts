@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface EqualityFilterOptions {
   attribute?: string;
@@ -9,7 +9,7 @@ export interface EqualityFilterOptions {
 }
 
 export class EqualityFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_EQUALITY;
+  public type: SearchFilter = SearchFilter.equalityMatch;
   public attribute: string;
   public value: string;
 

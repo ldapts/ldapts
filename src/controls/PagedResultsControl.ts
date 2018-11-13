@@ -49,7 +49,7 @@ export class PagedResultsControl extends Control {
     const controlWriter = new BerWriter();
     controlWriter.startSequence();
     controlWriter.writeInt(this.value.size);
-    controlWriter.writeBuffer(this.value.cookie || '', Ber.OctetString);
+    controlWriter.writeString(this.value.cookie || '');
     controlWriter.endSequence();
 
     writer.writeBuffer(controlWriter.buffer, 0x04);

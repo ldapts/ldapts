@@ -1,14 +1,14 @@
 // @ts-ignore
 import { BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface OrFilterOptions {
   filters: Filter[];
 }
 
 export class OrFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_OR;
+  public type: SearchFilter = SearchFilter.or;
   public filters: Filter[];
 
   constructor(options: OrFilterOptions) {

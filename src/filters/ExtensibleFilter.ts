@@ -1,17 +1,20 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface ExtensibleFilterOptions {
   rule?: string;
   matchType?: string;
   value?: string;
   dnAttributes?: boolean;
+  initial?: string;
+  any?: string[];
+  final?: string;
 }
 
 export class ExtensibleFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_EXT;
+  public type: SearchFilter = SearchFilter.extensibleMatch;
   public value: string;
   public rule: string;
   public matchType: string;

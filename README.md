@@ -11,6 +11,7 @@ const { Client } = require('ldapts');
 const url = 'ldap://127.0.0.1:1389';
 const bindDN = 'uid=foo,dc=example,dc=com';
 const password = 'bar';
+const searchDN = 'ou=Users,dc=example,dc=com';
 
 const client = new Client({
   url,
@@ -24,15 +25,15 @@ try {
 
   const {
     searchEntries,
-    searchReferralUris,
+    searchReferences,
   } = await client.search(searchDN, {
-    paged: {
-      pageSize: 200,
-    },
+    scope: 'sub',
+    filter: 'cn=Foobar',
   });
 } catch (ex) {
-  await client.unbind();
   throw ex;
+} finally {
+  await client.unbind();
 }
 
 ```

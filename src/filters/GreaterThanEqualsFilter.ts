@@ -1,7 +1,7 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface GreaterThanEqualsFilterOptions {
   attribute?: string;
@@ -9,7 +9,7 @@ export interface GreaterThanEqualsFilterOptions {
 }
 
 export class GreaterThanEqualsFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_GE;
+  public type: SearchFilter = SearchFilter.greaterOrEqual;
   public attribute: string;
   public value: string;
 

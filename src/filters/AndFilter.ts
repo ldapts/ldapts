@@ -1,14 +1,14 @@
 // @ts-ignore
 import { BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface AndFilterOptions {
   filters: Filter[];
 }
 
 export class AndFilter extends Filter {
-  public type: ProtocolOperation = ProtocolOperation.FILTER_AND;
+  public type: SearchFilter = SearchFilter.and;
   public filters: Filter[];
 
   constructor(options: AndFilterOptions) {

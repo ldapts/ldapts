@@ -5,22 +5,16 @@ import { ProtocolOperation } from '../ProtocolOperation';
 import { PresenceFilter } from '../filters/PresenceFilter';
 import { FilterParser } from '../FilterParser';
 import { Filter } from '../filters/Filter';
+import { SearchOptions } from '../Client';
 
-export interface SearchRequestMessageOptions extends MessageOptions {
+export interface SearchRequestMessageOptions extends MessageOptions, SearchOptions {
   baseDN?: string;
-  scope?: 'base' | 'one' | 'sub';
-  derefAliases?: ProtocolOperation.NEVER_DEREF_ALIASES | ProtocolOperation.DEREF_IN_SEARCHING | ProtocolOperation.DEREF_BASE_OBJECT | ProtocolOperation.DEREF_ALWAYS;
-  sizeLimit?: number;
-  timeLimit?: number;
-  returnAttributeValues?: boolean;
-  filter?: string | Filter;
-  attributes?: string[];
 }
 
 export class SearchRequest extends Message {
   public baseDN: string;
-  public scope: 'base' | 'one' | 'sub';
-  public derefAliases: ProtocolOperation.NEVER_DEREF_ALIASES | ProtocolOperation.DEREF_IN_SEARCHING | ProtocolOperation.DEREF_BASE_OBJECT | ProtocolOperation.DEREF_ALWAYS;
+  public scope: 'base' | 'one' | 'sub' | 'children';
+  public derefAliases: 'never' | 'always' | 'search' | 'find';
   public sizeLimit: number;
   public timeLimit: number;
   public returnAttributeValues: boolean;
@@ -29,11 +23,11 @@ export class SearchRequest extends Message {
 
   constructor(options: SearchRequestMessageOptions) {
     super(options);
-    this.protocolOperation = ProtocolOperation.LDAP_REQ_MODRDN;
+    this.protocolOperation = ProtocolOperation.LDAP_REQ_SEARCH;
 
     this.baseDN = options.baseDN || '';
-    this.scope = options.scope || 'base';
-    this.derefAliases = options.derefAliases || ProtocolOperation.NEVER_DEREF_ALIASES;
+    this.scope = options.scope || 'sub';
+    this.derefAliases = options.derefAliases || 'never';
     this.sizeLimit = options.sizeLimit || 0;
     this.timeLimit = options.timeLimit || 10;
     this.returnAttributeValues = options.returnAttributeValues !== false;
@@ -42,22 +36,53 @@ export class SearchRequest extends Message {
   }
 
   public writeMessage(writer: BerWriter): void {
-    writer.writeString(this.baseDN.toString());
-    writer.writeEnumeration(this.scope);
-    writer.writeEnumeration(this.derefAliases);
+    writer.writeString(this.baseDN);
+
+    switch (this.scope) {
+      case 'base':
+        writer.writeEnumeration(0);
+        break;
+      case 'one':
+        writer.writeEnumeration(1);
+        break;
+      case 'sub':
+        writer.writeEnumeration(2);
+        break;
+      case 'children':
+        writer.writeEnumeration(3);
+        break;
+      default:
+        throw new Error(`Invalid search scope: ${this.scope}`);
+    }
+
+    switch (this.derefAliases) {
+      case 'never':
+        writer.writeEnumeration(0);
+        break;
+      case 'search':
+        writer.writeEnumeration(1);
+        break;
+      case 'find':
+        writer.writeEnumeration(2);
+        break;
+      case 'always':
+        writer.writeEnumeration(3);
+        break;
+      default:
+        throw new Error(`Invalid deref alias: ${this.derefAliases}`);
+    }
+
     writer.writeInt(this.sizeLimit);
     writer.writeInt(this.timeLimit);
     writer.writeBoolean(this.returnAttributeValues);
 
-    if (!this.filter) {
+    if (this.filter && typeof this.filter === 'string') {
+      this.filter = FilterParser.parseString(this.filter as string);
+    } else if (!this.filter) {
       this.filter = new PresenceFilter({ attribute: 'objectclass' });
     }
 
-    if (this.filter instanceof Filter) {
-      this.filter.write(writer);
-    } else {
-      writer.writeString(this.filter);
-    }
+    (this.filter as Filter).write(writer);
 
     // tslint:disable-next-line:no-bitwise
     writer.startSequence(writer.Sequence | writer.Constructor);

@@ -1,7 +1,7 @@
 // @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export interface SubstringFilterOptions {
   attribute?: string;
@@ -15,7 +15,7 @@ export class SubstringFilter extends Filter {
   private static _escapeRegExp(str: string): string {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
   }
-  public type: ProtocolOperation = ProtocolOperation.FILTER_PRESENT;
+  public type: SearchFilter = SearchFilter.substrings;
   public attribute: string;
   public initial: string;
   public any: string[];

@@ -1,9 +1,9 @@
 // @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { SearchFilter } from '../SearchFilter';
 
 export abstract class Filter {
-  public abstract type: ProtocolOperation;
+  public abstract type: SearchFilter;
 
   public write(writer: BerWriter): void {
     writer.startSequence(this.type);
