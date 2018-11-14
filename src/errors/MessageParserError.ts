@@ -2,7 +2,7 @@ import { ProtocolOperation } from '../ProtocolOperation';
 
 export interface MessageParserErrorDetails {
   messageId: number;
-  protocolOperation: ProtocolOperation;
+  protocolOperation?: ProtocolOperation;
 }
 
 export class MessageParserError extends Error {

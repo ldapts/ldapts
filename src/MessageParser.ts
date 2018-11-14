@@ -58,15 +58,29 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
     // at the next sequence of data (if it exists)
     delete this.buffer;
 
+    let messageId: number | undefined;
+    let protocolOperation: ProtocolOperation | undefined;
     try {
-      const message = this._getMessageFromProtocolOperation(reader);
+      messageId = reader.readInt() as number;
+      protocolOperation = reader.readSequence() as ProtocolOperation;
+
+      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader);
 
       if (message) {
         this.emit('message', message);
       }
     } catch (ex) {
-      this.emit('error', ex);
-      return;
+      if (messageId) {
+        const errorWithMessageDetails = ex as MessageParserError;
+        errorWithMessageDetails.messageDetails = {
+          messageId,
+          protocolOperation,
+        };
+
+        return this.emit('error', errorWithMessageDetails);
+      }
+
+      return this.emit('error', ex);
     }
 
     if (nextMessage) {
@@ -74,10 +88,7 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
     }
   }
 
-  private _getMessageFromProtocolOperation(reader: BerReader): MessageResponse {
-    const messageId = reader.readInt();
-    const protocolOperation: ProtocolOperation = reader.readSequence();
-
+  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperation, reader: BerReader): MessageResponse {
     let message: MessageResponse;
     switch (protocolOperation) {
       case ProtocolOperation.LDAP_RES_BIND:
