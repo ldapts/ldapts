@@ -328,6 +328,11 @@ export class Client {
     let pageSize: number = 100;
     if (typeof options.paged === 'object' && options.paged.pageSize) {
       pageSize = options.paged.pageSize;
+    } else if (options.sizeLimit && options.sizeLimit > 1) {
+      // According to the RFC, servers should ignore the paging control if
+      // pageSize >= sizelimit.  Some might still send results, but it's safer
+      // to stay under that figure when assigning a default value.
+      pageSize = options.sizeLimit - 1;
     }
 
     const pagedResultsControl = new PagedResultsControl({
@@ -354,7 +359,7 @@ export class Client {
       searchReferences: [],
     };
 
-    await this._sendSearch(searchRequest, searchResult, (typeof options.paged !== 'undefined'), pageSize, pagedResultsControl);
+    await this._sendSearch(searchRequest, searchResult, (typeof options.paged !== 'undefined') && options.paged !== false, pageSize, pagedResultsControl);
 
     return searchResult;
   }
@@ -389,8 +394,8 @@ export class Client {
     }
 
     // Recursively search if paging is specified
-    if (paged) {
-      let pagedResultsFromResponse: PagedResultsControl | null = null;
+    if (paged && (result.searchEntries.length || result.searchReferences.length)) {
+      let pagedResultsFromResponse: PagedResultsControl | undefined;
       for (const control of (result.controls || [])) {
         if (control instanceof PagedResultsControl) {
           pagedResultsFromResponse = control;
@@ -398,7 +403,7 @@ export class Client {
         }
       }
 
-      if (pagedResultsFromResponse && pagedResultsFromResponse.value && pagedResultsFromResponse.value.cookie) {
+      if (pagedResultsFromResponse && pagedResultsFromResponse.value && pagedResultsFromResponse.value.cookie && pagedResultsFromResponse.value.cookie.length) {
         // Recursively keep searching
         pagedResultsControl.value = pagedResultsControl.value || {
           size: pageSize,

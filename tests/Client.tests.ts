@@ -164,6 +164,17 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.be.greaterThan(0);
     });
+    it('should page search entries if paging is specified"', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: 'objectClass=jumpcloudUser',
+        paged: {
+          pageSize: 2,
+        },
+      });
+
+      searchResult.searchEntries.length.should.be.greaterThan(2);
+    });
     it('should throw if a PagedResultsControl is specified', () => {
       const pagedResultsControl = new PagedResultsControl({});
       client.search('cn=test', {}, pagedResultsControl).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
