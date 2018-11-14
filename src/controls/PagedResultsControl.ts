@@ -4,11 +4,11 @@ import { Control, ControlOptions } from './Control';
 
 export interface PagedResultsValue {
   size: number;
-  cookie?: string;
+  cookie?: Buffer;
 }
 
 export interface PagedResultsControlOptions extends ControlOptions {
-  value?: Buffer | PagedResultsValue;
+  value?: PagedResultsValue;
 }
 
 export class PagedResultsControl extends Control {
@@ -16,20 +16,13 @@ export class PagedResultsControl extends Control {
   public type: string = PagedResultsControl.type;
   public value?: PagedResultsValue;
 
-  constructor(options: PagedResultsControlOptions) {
+  constructor(options: PagedResultsControlOptions = {}) {
     super(options);
 
-    if (options.value) {
-      if (Buffer.isBuffer(options.value)) {
-        this.parse(options.value);
-      } else if (typeof options.value === 'object') {
-        this.value = options.value;
-      }
-    }
+    this.value = options.value;
   }
 
-  public parse(buffer: Buffer): void {
-    const reader = new BerReader(buffer);
+  public parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const size = reader.readInt();
       const cookie = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);

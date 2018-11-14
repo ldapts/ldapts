@@ -9,35 +9,30 @@ export interface ServerSideSortingRequestValue {
 }
 
 export interface ServerSideSortingRequestControlOptions extends ControlOptions {
-  value?: Buffer | ServerSideSortingRequestValue | ServerSideSortingRequestValue[];
+  value?: ServerSideSortingRequestValue | ServerSideSortingRequestValue[];
 }
 
 export class ServerSideSortingRequestControl extends Control {
   public static type: string = '2.16.840.1.113730.3.4.3';
   public type: string = ServerSideSortingRequestControl.type;
-  public values?: ServerSideSortingRequestValue[];
+  public values: ServerSideSortingRequestValue[];
 
-  constructor(options: ServerSideSortingRequestControlOptions) {
+  constructor(options: ServerSideSortingRequestControlOptions = {}) {
     super(options);
 
-    if (options.value) {
-      if (Buffer.isBuffer(options.value)) {
-        this.values = [];
-        this.parse(options.value);
-      } else if (Array.isArray(options.value)) {
-        this.values = options.value;
-      } else if (typeof options.value === 'object') {
-        this.values = [options.value];
-      }
+    if (Array.isArray(options.value)) {
+      this.values = options.value;
+    } else if (typeof options.value === 'object') {
+      this.values = [options.value];
+    } else {
+      this.values = [];
     }
   }
 
-  public parse(buffer: Buffer): void {
-    const reader = new BerReader(buffer);
+  public parseControl(reader: BerReader): void {
     if (reader.readSequence(0x30)) {
-      this.values = [];
       while (reader.readSequence(0x30)) {
-        const attributeType: string = reader.readString(Ber.OctetString);
+        const attributeType: string = reader.readString();
         let orderingRule: string = '';
         let reverseOrder: boolean = false;
         if (reader.peek() === 0x80) {
@@ -58,7 +53,7 @@ export class ServerSideSortingRequestControl extends Control {
   }
 
   public writeControl(writer: BerWriter): void {
-    if (!this.values || !this.values.length) {
+    if (!this.values.length) {
       return;
     }
 

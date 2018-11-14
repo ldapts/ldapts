@@ -9,7 +9,7 @@ export interface PersistentSearchValue {
 }
 
 export interface PersistentSearchControlOptions extends ControlOptions {
-  value?: Buffer | PersistentSearchValue;
+  value?: PersistentSearchValue;
 }
 
 export class PersistentSearchControl extends Control {
@@ -17,20 +17,13 @@ export class PersistentSearchControl extends Control {
   public type: string = PersistentSearchControl.type;
   public value?: PersistentSearchValue;
 
-  constructor(options: PersistentSearchControlOptions) {
+  constructor(options: PersistentSearchControlOptions = {}) {
     super(options);
 
-    if (options.value) {
-      if (Buffer.isBuffer(options.value)) {
-        this.parse(options.value);
-      } else if (typeof options.value === 'object') {
-        this.value = options.value;
-      }
-    }
+    this.value = options.value;
   }
 
-  public parse(buffer: Buffer): void {
-    const reader = new BerReader(buffer);
+  public parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const changeTypes = reader.readInt();
       const changesOnly = reader.readBoolean();

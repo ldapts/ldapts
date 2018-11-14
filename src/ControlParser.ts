@@ -30,29 +30,34 @@ export class ControlParser {
       }
     }
 
+    let control: Control;
     switch (type) {
       case EntryChangeNotificationControl.type:
-        return new EntryChangeNotificationControl({
+        control = new EntryChangeNotificationControl({
           critical,
-          value,
         });
+        break;
       case PagedResultsControl.type:
-        return new PagedResultsControl({
+        control = new PagedResultsControl({
           critical,
-          value,
         });
+        break;
       case PersistentSearchControl.type:
-        return new PersistentSearchControl({
+        control = new PersistentSearchControl({
           critical,
-          value,
         });
+        break;
       case ServerSideSortingRequestControl.type:
-        return new ServerSideSortingRequestControl({
+        control = new ServerSideSortingRequestControl({
           critical,
-          value,
         });
+        break;
       default:
         return null;
     }
+
+    const controlReader = new BerReader(value);
+    control.parse(controlReader);
+    return control;
   }
 }

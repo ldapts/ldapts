@@ -9,7 +9,7 @@ export interface EntryChangeNotificationControlValue {
 }
 
 export interface EntryChangeNotificationControlOptions extends ControlOptions {
-  value?: Buffer | EntryChangeNotificationControlValue;
+  value?: EntryChangeNotificationControlValue;
 }
 
 export class EntryChangeNotificationControl extends Control {
@@ -17,20 +17,13 @@ export class EntryChangeNotificationControl extends Control {
   public type: string = EntryChangeNotificationControl.type;
   public value?: EntryChangeNotificationControlValue;
 
-  constructor(options: EntryChangeNotificationControlOptions) {
+  constructor(options: EntryChangeNotificationControlOptions = {}) {
     super(options);
 
-    if (options.value) {
-      if (Buffer.isBuffer(options.value)) {
-        this.parse(options.value);
-      } else if (typeof options.value === 'object') {
-        this.value = options.value;
-      }
-    }
+    this.value = options.value;
   }
 
-  public parse(buffer: Buffer): void {
-    const reader = new BerReader(buffer);
+  public parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const changeType = reader.readInt();
       let previousDN;
