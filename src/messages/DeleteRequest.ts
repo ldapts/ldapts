@@ -17,7 +17,7 @@ export class DeleteRequest extends Message {
   }
 
   public writeMessage(writer: BerWriter): void {
-    const buffer = new Buffer(this.dn);
+    const buffer = Buffer.from(this.dn);
     for (const byte of buffer) {
       writer.writeByte(byte);
     }

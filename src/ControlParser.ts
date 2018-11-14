@@ -14,7 +14,7 @@ export class ControlParser {
 
     let type: string = '';
     let critical: boolean = false;
-    let value: Buffer = new Buffer(0);
+    let value: Buffer = Buffer.alloc(0);
     if (reader.length) {
       const end = reader.offset + reader.length;
 
@@ -26,7 +26,7 @@ export class ControlParser {
       }
 
       if (reader.offset < end) {
-        value = reader.readBuffer();
+        value = reader.readString(Ber.OctetString, true);
       }
     }
 

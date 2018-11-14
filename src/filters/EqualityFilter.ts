@@ -22,7 +22,7 @@ export class EqualityFilter extends Filter {
 
   public parseFilter(reader: BerReader): void {
     this.attribute = (reader.readString() || '').toLowerCase();
-    this.value = reader.readString(Ber.OctetString, true);
+    this.value = reader.readString();
 
     if (this.attribute === 'objectclass') {
       this.value = this.value.toLowerCase();

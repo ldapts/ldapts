@@ -1,6 +1,5 @@
 // @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
-import { ProtocolOperation } from './ProtocolOperation';
 import { Filter } from './filters/Filter';
 import { PresenceFilter } from './filters/PresenceFilter';
 import { AndFilter } from './filters/AndFilter';

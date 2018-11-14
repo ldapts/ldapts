@@ -46,7 +46,7 @@ export class Attribute {
       if (reader.readSequence(ProtocolOperation.LBER_SET)) {
         const end = reader.offset + reader.length;
         while (reader.offset < end) {
-          this.values.push(reader.readString(Ber.OctetString, true));
+          this.values.push(reader.readString());
         }
       }
     }

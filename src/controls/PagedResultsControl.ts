@@ -32,7 +32,7 @@ export class PagedResultsControl extends Control {
     const reader = new BerReader(buffer);
     if (reader.readSequence()) {
       const size = reader.readInt();
-      const cookie = reader.readString(Ber.OctetString, true) || '';
+      const cookie = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);
 
       this.value = {
         size,
@@ -49,7 +49,12 @@ export class PagedResultsControl extends Control {
     const controlWriter = new BerWriter();
     controlWriter.startSequence();
     controlWriter.writeInt(this.value.size);
-    controlWriter.writeString(this.value.cookie || '');
+    if (this.value.cookie && this.value.cookie.length) {
+      controlWriter.writeBuffer(this.value.cookie, Ber.OctetString);
+    } else {
+      controlWriter.writeString('');
+    }
+
     controlWriter.endSequence();
 
     writer.writeBuffer(controlWriter.buffer, 0x04);

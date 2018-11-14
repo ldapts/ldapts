@@ -363,7 +363,7 @@ export class Client {
    * Unbinds this client from the LDAP server.
    * @returns {void|Promise} void if not connected; otherwise returns a promise to the request to disconnect
    */
-  public async unbind(controls?: Control|Control[]): Promise<void> {
+  public async unbind(): Promise<void> {
     if (!this.connected) {
       return;
     }
