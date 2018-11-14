@@ -16,7 +16,7 @@ export class SearchReference extends MessageResponse {
     this.uris = options.uris || [];
   }
 
-  public parse(reader: BerReader): void {
+  public parseMessage(reader: BerReader): void {
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
       const url = reader.readString();

@@ -20,7 +20,7 @@ export class SearchEntry extends MessageResponse {
     this.attributes = options.attributes || [];
   }
 
-  public parse(reader: BerReader): void {
+  public parseMessage(reader: BerReader): void {
     this.name = reader.readString();
     reader.readSequence();
     const end = reader.offset + reader.length;

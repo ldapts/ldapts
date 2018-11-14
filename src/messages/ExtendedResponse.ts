@@ -25,8 +25,8 @@ export class ExtendedResponse extends MessageResponse {
     this.value = options.value;
   }
 
-  public parse(reader: BerReader): void {
-    super.parse(reader);
+  public parseMessage(reader: BerReader): void {
+    super.parseMessage(reader);
 
     if (reader.peek() === ExtendedResponseProtocolOperations.oid) {
       this.oid = reader.readString(ExtendedResponseProtocolOperations.oid);

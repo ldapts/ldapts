@@ -20,7 +20,7 @@ export abstract class MessageResponse extends Message {
     this.errorMessage = options.errorMessage || '';
   }
 
-  public parse(reader: BerReader): void {
+  public parseMessage(reader: BerReader): void {
     this.status = reader.readEnumeration();
     this.matchedDN = reader.readString();
     this.errorMessage = reader.readString();
