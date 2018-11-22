@@ -26,10 +26,10 @@ export abstract class Control {
   }
 
   // tslint:disable-next-line:no-empty
-  protected writeControl(writer: BerWriter): void {
+  protected writeControl(_: BerWriter): void {
   }
 
   // tslint:disable-next-line:no-empty
-  protected parseControl(reader: BerReader): void {
+  protected parseControl(_: BerReader): void {
   }
 }

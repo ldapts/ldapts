@@ -65,10 +65,10 @@ export abstract class Message {
   }
 
   // tslint:disable-next-line:no-empty
-  protected parseMessage(reader: BerReader): void {
+  protected parseMessage(_: BerReader): void {
   }
 
   // tslint:disable-next-line:no-empty
-  protected writeMessage(writer: BerWriter): void {
+  protected writeMessage(_: BerWriter): void {
   }
 }

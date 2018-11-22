@@ -15,15 +15,15 @@ export abstract class Filter {
     return this.parseFilter(reader);
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean|void {
+  public matches(_: { [index: string]: string } = {}, __: boolean): boolean|void {
     return true;
   }
 
   // tslint:disable-next-line:no-empty
-  protected parseFilter(reader: BerReader): void {
+  protected parseFilter(_: BerReader): void {
   }
   // tslint:disable-next-line:no-empty
-  protected writeFilter(writer: BerWriter): void {
+  protected writeFilter(_: BerWriter): void {
   }
 
   /**

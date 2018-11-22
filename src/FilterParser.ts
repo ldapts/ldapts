@@ -266,13 +266,13 @@ export class FilterParser {
     }
 
     if (remainingExpression[0] === ':') {
-      return FilterParser._parseExtensibleFilterFromString(attribute, remainingExpression);
+      return FilterParser._parseExtensibleFilterFromString(remainingExpression);
     }
 
     throw new Error(`Invalid expression: ${filterString}`);
   }
 
-  private static _parseExtensibleFilterFromString(attribute: string, filterString: string): ExtensibleFilter {
+  private static _parseExtensibleFilterFromString(filterString: string): ExtensibleFilter {
     let dnAttributes: boolean = false;
     let rule: string | undefined;
 

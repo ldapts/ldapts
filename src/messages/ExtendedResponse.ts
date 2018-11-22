@@ -2,9 +2,8 @@
 import { BerReader, BerWriter } from 'asn1';
 import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
-import { MessageOptions } from './Message';
 
-export interface ExtendedResponseOptions extends MessageOptions {
+export interface ExtendedResponseOptions extends MessageResponseOptions {
   oid?: string;
   value?: string;
 }

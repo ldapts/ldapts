@@ -68,7 +68,7 @@ export class ExtensibleFilter extends Filter {
     }
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): void {
+  public matches(_: { [index: string]: string } = {}, __: boolean): void {
     throw new Error(`Approximate match implementation unknown`);
   }
 

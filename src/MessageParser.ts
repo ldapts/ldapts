@@ -44,7 +44,7 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
 
     if (!foundSequence || reader.remain < reader.length) {
       // Have not received enough data to successfully parse
-      return false;
+      return;
     }
 
     if (reader.remain > reader.length) {
@@ -77,10 +77,12 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
           protocolOperation,
         };
 
-        return this.emit('error', errorWithMessageDetails);
+        this.emit('error', errorWithMessageDetails);
+        return;
       }
 
-      return this.emit('error', ex);
+      this.emit('error', ex);
+      return;
     }
 
     if (nextMessage) {

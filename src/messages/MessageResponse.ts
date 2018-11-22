@@ -13,7 +13,7 @@ export abstract class MessageResponse extends Message {
   public matchedDN: string;
   public errorMessage: string;
 
-  constructor(options: MessageResponseOptions) {
+  protected constructor(options: MessageResponseOptions) {
     super(options);
     this.status = options.status || 0; // LDAP Success
     this.matchedDN = options.matchedDN || '';
