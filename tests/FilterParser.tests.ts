@@ -1,3 +1,4 @@
+// @ts-ignore
 import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { FilterParser } from '../src/FilterParser';
