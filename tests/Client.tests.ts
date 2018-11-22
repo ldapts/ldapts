@@ -2,9 +2,10 @@
 import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
-import { InvalidCredentialsError } from '../src/errors/InvalidCredentialsError';
-import { CompareError } from '../src/errors/CompareError';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
+import { InvalidCredentialsError } from '../src/errors/resultCodeErrors/InvalidCredentialsError';
+import { UndefinedTypeError } from '../src/errors/resultCodeErrors/UndefinedTypeError';
+import { NoSuchObjectError } from '../src/errors/resultCodeErrors/NoSuchObjectError';
 
 describe('Client', () => {
   before(() => {
@@ -116,7 +117,7 @@ describe('Client', () => {
         false.should.equal(true);
       } catch (ex) {
         // tslint:disable-next-line:no-unused-expression
-        (ex instanceof CompareError).should.equal(true);
+        (ex instanceof UndefinedTypeError).should.equal(true);
       }
     });
     it('should throw if target dn does not exist', async () => {
@@ -125,7 +126,7 @@ describe('Client', () => {
         false.should.equal(true);
       } catch (ex) {
         // tslint:disable-next-line:no-unused-expression
-        (ex instanceof CompareError).should.equal(true);
+        (ex instanceof NoSuchObjectError).should.equal(true);
       }
     });
     it('should throw on unknown error', async () => {
@@ -134,8 +135,7 @@ describe('Client', () => {
         false.should.equal(true);
       } catch (ex) {
         // tslint:disable-next-line:no-unused-expression
-        (ex instanceof CompareError).should.equal(true);
-        (ex.message).should.equal('Unknown error: 0x11');
+        (ex instanceof UndefinedTypeError).should.equal(true);
       }
     });
   });

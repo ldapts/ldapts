@@ -18,13 +18,15 @@ import { MessageParser } from './MessageParser';
 import { BindResponse } from './messages/BindResponse';
 import { MessageResponse } from './messages/MessageResponse';
 import { MessageResponseStatus } from './MessageResponseStatus';
-import { InvalidCredentialsError } from './errors/InvalidCredentialsError';
 import { CompareResponse, CompareResult } from './messages/CompareResponse';
-import { CompareError } from './errors/CompareError';
 import { MessageParserError } from './errors/MessageParserError';
 import { SearchResponse } from './messages/SearchResponse';
 import { SearchReference } from './messages/SearchReference';
 import { SearchEntry } from './messages/SearchEntry';
+import { DeleteResponse } from './messages/DeleteResponse';
+import { StatusCodeParser } from './StatusCodeParser';
+import { ExtendedResponse } from './messages/ExtendedResponse';
+import { ModifyDNResponse } from './messages/ModifyDNResponse';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
 const logDebug = debug('ldapts');
@@ -161,7 +163,7 @@ export class Client {
 
     const result = await this._send<BindResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw new InvalidCredentialsError(`Bind DN or password is incorrect.`);
+      throw StatusCodeParser.parse(result.status);
     }
   }
 
@@ -197,12 +199,8 @@ export class Client {
         return true;
       case CompareResult.compareFalse:
         return false;
-      case CompareResult.noSuchAttribute:
-        throw new CompareError('Attribute does not exist');
-      case CompareResult.noSuchObject:
-        throw new CompareError('Target entry does not exist');
       default:
-        throw new CompareError(`Unknown error: 0x${response.status.toString(16)}`);
+        throw StatusCodeParser.parse(response.status);
     }
   }
 
@@ -228,7 +226,10 @@ export class Client {
       controls,
     });
 
-    return this._send(req);
+    const result = await this._send<DeleteResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
   }
 
   /**
@@ -255,7 +256,15 @@ export class Client {
       controls,
     });
 
-    return this._send(req);
+    const result = await this._send<ExtendedResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
+
+    return {
+      oid: result.oid,
+      value: result.value,
+    };
   }
 
   /**
@@ -290,7 +299,10 @@ export class Client {
       controls,
     });
 
-    return this._send(req);
+    const result = await this._send<ModifyDNResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
   }
 
   /**
@@ -384,6 +396,10 @@ export class Client {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
+
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
 
     for (const searchEntry of result.searchEntries) {
       searchResult.searchEntries.push(searchEntry.toObject());
