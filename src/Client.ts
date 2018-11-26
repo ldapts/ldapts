@@ -484,7 +484,6 @@ export class Client {
 
   private _onConnect(next: () => void) {
     clearTimeout(this.connectTimer);
-
     // Clear out event listeners from _connect()
     this.socket.removeAllListeners('error');
     this.socket.removeAllListeners('connect');
@@ -492,17 +491,34 @@ export class Client {
 
     this.connected = true;
 
-    this.socket.on('error', () => {
+    // region Socket events handlers
+    const socketError = () => {
       this.socket.destroy();
-    });
-    this.socket.on('close', () => {
-      this.socket.removeAllListeners('connect');
-      this.socket.removeAllListeners('data');
-      this.socket.removeAllListeners('drain');
-      this.socket.removeAllListeners('error');
-      this.socket.removeAllListeners('end');
-      this.socket.removeAllListeners('timeout');
-      this.socket.removeAllListeners('close');
+    };
+    const socketEnd = () => {
+      if (this.socket) {
+        // Acknowledge to other end of the connection that the connection is ended.
+        this.socket.end();
+      }
+    };
+    const socketTimeout = () => {
+      if (this.socket) {
+        this.socket.end();
+      }
+    };
+    const socketData = (data: Buffer) => {
+      if (this.messageParser) {
+        this.messageParser.read(data);
+      }
+    };
+    const socketClose = () => {
+      if (this.socket) {
+        this.socket.removeListener('error', socketError);
+        this.socket.removeListener('close', socketClose);
+        this.socket.removeListener('data', socketData);
+        this.socket.removeListener('end', socketEnd);
+        this.socket.removeListener('timeout', socketTimeout);
+      }
 
       delete this.socket;
 
@@ -515,17 +531,17 @@ export class Client {
           messageDetails.reject(new Error('Connection closed.'));
         }
       }
-    });
-    this.socket.on('data', (data: Buffer) => {
-      this.messageParser.read(data);
-    });
-    this.socket.on('end', () => {
-      // Acknowledge to other end of the connection that the connection is ended.
-      this.socket.end();
-    });
-    this.socket.on('timeout', () => {
-      this.socket.end();
-    });
+
+      // Cleanup handlers
+    };
+    // endregion
+
+    // Hook up event listeners
+    this.socket.on('error', socketError);
+    this.socket.on('close', socketClose);
+    this.socket.on('data', socketData);
+    this.socket.on('end', socketEnd);
+    this.socket.on('timeout', socketTimeout);
 
     return next();
   }
