@@ -381,7 +381,7 @@ export class Client {
    * @returns {void|Promise} void if not connected; otherwise returns a promise to the request to disconnect
    */
   public async unbind(): Promise<void> {
-    if (!this.connected) {
+    if (!this.connected || !this.socket) {
       return;
     }
 

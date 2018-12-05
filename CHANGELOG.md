@@ -1,3 +1,7 @@
+### 1.0.3
+
+  * Verify the socket exists before sending unbind message
+
 ### 1.0.2
 
   * Setup prepublish to always build.
