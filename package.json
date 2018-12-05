@@ -6,8 +6,9 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "mocha -r ts-node/register tests/**/*.test.ts",
-    "lint": "tslint --fix -p tsconfig.lint.json -c tslint.json -t stylish"
+    "test": "mocha -r ts-node/register tests/**/*.tests.ts",
+    "lint": "tslint --fix -p tsconfig.lint.json -c tslint.json -t stylish",
+    "prepublishOnly": "npm run lint && npm run test"
   },
   "husky": {
     "hooks": {
