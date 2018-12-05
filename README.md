@@ -1,6 +1,10 @@
 LDAPts
 ======
 
+[![NPM version](https://img.shields.io/npm/v/ldapts.svg?style=flat)](https://npmjs.org/package/ldapts)
+[![node version](https://img.shields.io/node/v/ldapts.svg?style=flat)](https://nodejs.org)
+[![Known Vulnerabilities](https://snyk.io/test/npm/ldapts/badge.svg)](https://snyk.io/test/npm/ldapts)
+
 LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
 
 ## Usage Examples
