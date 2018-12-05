@@ -74,7 +74,7 @@ export class SearchRequest extends Message {
 
     writer.writeInt(this.sizeLimit);
     writer.writeInt(this.timeLimit);
-    writer.writeBoolean(this.returnAttributeValues);
+    writer.writeBoolean(!this.returnAttributeValues);
 
     if (this.filter && typeof this.filter === 'string') {
       this.filter = FilterParser.parseString(this.filter as string);
