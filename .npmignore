@@ -9,6 +9,10 @@
 tests
 src
 
+tsconfig.json
+tsconfig.lint.json
+tslint.json
+
 node_modules
 npm-debug.log
 .node_history
