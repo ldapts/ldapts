@@ -1,3 +1,8 @@
+### 1.0.6
+
+  * Use hex for message type code in closed message error message
+  * Add additional test for calling unbind() multiple times
+
 ### 1.0.5
 
   * Add message name to error message when socket is closed before message response

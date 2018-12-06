@@ -91,6 +91,20 @@ describe('Client', () => {
 
       await client.unbind();
     });
+    it('should allow unbind to be called multiple times without error', async () => {
+      const client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      await client.bind(bindDN, bindPassword);
+
+      await Promise.all([
+        client.unbind(),
+        client.unbind(),
+      ]);
+
+      await client.unbind();
+    });
   });
   describe('#compare()', () => {
     const client: Client = new Client({
@@ -157,6 +171,25 @@ describe('Client', () => {
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com');
 
       searchResult.searchEntries.length.should.be.greaterThan(0);
+    });
+    it('should throw error if an operation is performed after the client has closed connection', async () => {
+      const testClient = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      try {
+        await testClient.bind(bindDN, bindPassword);
+
+        const unbindRequest = testClient.unbind();
+        const searchRequest = testClient.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com');
+        await unbindRequest;
+        await searchRequest;
+        false.should.equal(true);
+      } catch (ex) {
+        ex.message.should.equal('Connection closed before message response was received. Message type: SearchRequest (0x63)');
+      } finally {
+        await testClient.unbind();
+      }
     });
     it('should return full search entries if filter="(mail=peter.parker@marvel.com)"', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
