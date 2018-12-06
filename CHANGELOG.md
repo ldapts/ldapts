@@ -1,3 +1,7 @@
+### 1.1.0
+
+  * Add client.add() and client.modify() 
+
 ### 1.0.6
 
   * Use hex for message type code in closed message error message

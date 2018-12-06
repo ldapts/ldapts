@@ -27,6 +27,12 @@ import { DeleteResponse } from './messages/DeleteResponse';
 import { StatusCodeParser } from './StatusCodeParser';
 import { ExtendedResponse } from './messages/ExtendedResponse';
 import { ModifyDNResponse } from './messages/ModifyDNResponse';
+import { Attribute } from './Attribute';
+import { AddRequest } from './messages/AddRequest';
+import { AddResponse } from './messages/AddResponse';
+import { Change } from './Change';
+import { ModifyRequest } from './messages/ModifyRequest';
+import { ModifyResponse } from './messages/ModifyResponse';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
 const logDebug = debug('ldapts');
@@ -168,12 +174,60 @@ export class Client {
   }
 
   /**
+   * Used to create a new entry in the directory
+   * @param {string} dn - DN of the entry to add
+   * @param {Attribute[]|Object} attributes - Array of attributes or object where keys are the name of each attribute
+   * @param {Control|Control[]} [controls]
+   */
+  public async add(dn: string, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
+    if (!this.connected) {
+      await this._connect();
+    }
+
+    if (controls && !Array.isArray(controls)) {
+      // tslint:disable-next-line:no-parameter-reassignment
+      controls = [controls];
+    }
+
+    let attributesToAdd;
+    if (Array.isArray(attributes)) {
+      attributesToAdd = attributes;
+    } else {
+      attributesToAdd = [];
+      for (const [key, value] of Object.entries(attributes)) {
+        let values;
+        if (Array.isArray(value)) {
+          values = value;
+        } else {
+          values = [value];
+        }
+
+        attributesToAdd.push(new Attribute({
+          type: key,
+          values,
+        }));
+      }
+    }
+
+    const req = new AddRequest({
+      messageId: this._nextMessageId(),
+      dn,
+      attributes: attributesToAdd,
+      controls,
+    });
+
+    const result = await this._send<AddResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
+  }
+
+  /**
    * Compares an attribute/value pair with an entry on the LDAP server.
    * @param {string} dn - The DN of the entry to compare attributes with
    * @param {string} attribute
    * @param {string} value
    * @param {Control|Control[]} [controls]
-   * @param controls
    */
   public async compare(dn: string, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
     if (!this.connected) {
@@ -208,9 +262,8 @@ export class Client {
    * Deletes an entry from the LDAP server.
    * @param {string} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
-   * @param controls
    */
-  public async del(dn: string, controls?: Control|Control[]) {
+  public async del(dn: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -237,7 +290,6 @@ export class Client {
    * @param {string} oid - The object identifier (OID) of the extended operation to perform
    * @param {string} [value]
    * @param {Control|Control[]} [controls]
-   * @param controls
    */
   public async exop(oid: string, value?: string, controls?: Control|Control[]) {
     if (!this.connected) {
@@ -268,17 +320,44 @@ export class Client {
   }
 
   /**
+   * Performs an LDAP modify against the server.
+   * @param {string} dn - The DN of the entry to modify
+   * @param {Change|Change[]} changes
+   * @param {Control|Control[]} [controls]
+   */
+  public async modify(dn: string, changes: Change | Change[], controls?: Control|Control[]) {
+    if (!this.connected) {
+      await this._connect();
+    }
+
+    if (changes && !Array.isArray(changes)) {
+      // tslint:disable-next-line:no-parameter-reassignment
+      changes = [changes];
+    }
+
+    if (controls && !Array.isArray(controls)) {
+      // tslint:disable-next-line:no-parameter-reassignment
+      controls = [controls];
+    }
+
+    const req = new ModifyRequest({
+      messageId: this._nextMessageId(),
+      dn,
+      changes,
+      controls,
+    });
+
+    const result = await this._send<ModifyResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status);
+    }
+  }
+
+  /**
    * Performs an LDAP modifyDN against the server.
-   *
-   * This does not allow you to keep the old DN, as while the LDAP protocol
-   * has a facility for that, it's stupid. Just Search/Add.
-   *
-   * This will automatically deal with "new superior" logic.
-   *
    * @param {string} dn - The DN of the entry to modify
    * @param {string} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
-   * @param controls
    */
   public async modifyDN(dn: string, newDN: string, controls?: Control|Control[]) {
     if (!this.connected) {
