@@ -1,6 +1,12 @@
+### 1.0.5
+
+  * Add message name to error message when socket is closed before message response
+
 ### 1.0.4
 
   * Add type definitions for asn1
+  * Add message type id to error when cleaning pending messages.
+  * Force protocolOperation to be defined for Message types
 
 ### 1.0.3
 

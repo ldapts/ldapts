@@ -528,7 +528,7 @@ export class Client {
           // Consider unbind as success since the connection is closed.
           messageDetails.resolve();
         } else {
-          messageDetails.reject(new Error(`Connection closed. Message type: ${messageDetails.message.protocolOperation}`));
+          messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (${messageDetails.message.protocolOperation})`));
         }
       }
 
