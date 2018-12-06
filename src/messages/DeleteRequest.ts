@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -8,6 +7,7 @@ export interface DeleteRequestMessageOptions extends MessageOptions {
 }
 
 export class DeleteRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public dn: string;
 
   constructor(options: DeleteRequestMessageOptions) {
@@ -25,7 +25,7 @@ export class DeleteRequest extends Message {
 
   public parseMessage(reader: BerReader) {
     const length = reader.length;
-    this.dn = reader.buffer.slic(0, length).toString('utf8');
+    this.dn = reader.buffer.slice(0, length).toString('utf8');
     reader._offset += reader.length;
   }
 }

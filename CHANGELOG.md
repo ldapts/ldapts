@@ -1,3 +1,7 @@
+### 1.0.4
+
+  * Add type definitions for asn1
+
 ### 1.0.3
 
   * Verify the socket exists before sending unbind message

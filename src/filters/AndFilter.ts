@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerWriter } from 'asn1';
 import { Filter } from './Filter';
 import { SearchFilter } from '../SearchFilter';

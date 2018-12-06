@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
 import { SearchFilter } from '../SearchFilter';
@@ -35,7 +34,7 @@ export class SubstringFilter extends Filter {
     const end = reader.offset + reader.length;
 
     while (reader.offset < end) {
-      const tag: number = reader.peek();
+      const tag: number | null = reader.peek();
       switch (tag) {
         case 0x80:
           this.initial = reader.readString(tag);
@@ -58,8 +57,14 @@ export class SubstringFilter extends Filter {
             this.final = this.final.toLowerCase();
           }
           break;
-        default:
-          throw new Error(`Invalid substring filter type: 0x${tag.toString(16)}`);
+        default: {
+          let type = '<null>';
+          if (tag) {
+            type = `0x${tag.toString(16)}`;
+          }
+
+          throw new Error(`Invalid substring filter type: ${type}`);
+        }
       }
     }
   }

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Control, ControlOptions } from './Control';
 
@@ -68,7 +67,7 @@ export class ServerSideSortingRequestControl extends Control {
       }
 
       if (typeof value.reverseOrder !== 'undefined') {
-        controlWriter.writeString(value.reverseOrder, 0x81);
+        controlWriter.writeBoolean(value.reverseOrder, 0x81);
       }
 
       controlWriter.endSequence();

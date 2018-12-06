@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -9,6 +8,7 @@ export interface AbandonRequestMessageOptions extends MessageOptions {
 }
 
 export class AbandonRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public abandonId: number;
 
   constructor(options: AbandonRequestMessageOptions) {

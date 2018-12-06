@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -10,6 +9,7 @@ export interface CompareRequestMessageOptions extends MessageOptions {
 }
 
 export class CompareRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public dn: string;
   public attribute: string;
   public value: string;

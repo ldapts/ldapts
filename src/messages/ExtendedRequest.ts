@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -9,6 +8,7 @@ export interface ExtendedRequestMessageOptions extends MessageOptions {
 }
 
 export class ExtendedRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public oid: string;
   public value: string | Buffer;
 
@@ -35,7 +35,7 @@ export class ExtendedRequest extends Message {
       try {
         this.value = reader.readString(0x81);
       } catch (ex) {
-        this.value = reader.readBuffer(0x81);
+        this.value = reader.readString(0x81, true);
       }
     }
   }

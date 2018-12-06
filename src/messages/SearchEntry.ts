@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader } from 'asn1';
 import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -10,6 +9,7 @@ export interface SearchEntryOptions extends MessageResponseOptions {
 }
 
 export class SearchEntry extends MessageResponse {
+  public protocolOperation: ProtocolOperation;
   public name: string;
   public attributes: Attribute[];
 

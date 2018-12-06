@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -11,6 +10,7 @@ export interface ModifyDNRequestMessageOptions extends MessageOptions {
 }
 
 export class ModifyDNRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public deleteOldRdn: boolean;
   public dn: string;
   public newRdn: string;

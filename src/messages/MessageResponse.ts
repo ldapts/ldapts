@@ -1,5 +1,4 @@
-// @ts-ignore
-import { BerReader, BerWriter } from 'asn1';
+import { BerReader } from 'asn1';
 import { Message, MessageOptions } from './Message';
 
 export interface MessageResponseOptions extends MessageOptions {

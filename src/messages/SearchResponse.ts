@@ -9,6 +9,7 @@ export interface SearchResponseOptions extends MessageResponseOptions {
 }
 
 export class SearchResponse extends MessageResponse {
+  public protocolOperation: ProtocolOperation;
   public searchEntries: SearchEntry[];
   public searchReferences: SearchReference[];
 

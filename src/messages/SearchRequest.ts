@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -12,6 +11,7 @@ export interface SearchRequestMessageOptions extends MessageOptions, SearchOptio
 }
 
 export class SearchRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public baseDN: string;
   public scope: 'base' | 'one' | 'sub' | 'children';
   public derefAliases: 'never' | 'always' | 'search' | 'find';
@@ -84,8 +84,7 @@ export class SearchRequest extends Message {
 
     (this.filter as Filter).write(writer);
 
-    // tslint:disable-next-line:no-bitwise
-    writer.startSequence(writer.Sequence | writer.Constructor);
+    writer.startSequence();
 
     if (this.attributes && this.attributes.length) {
       for (const attribute of this.attributes) {
@@ -98,8 +97,42 @@ export class SearchRequest extends Message {
 
   public parseMessage(reader: BerReader) {
     this.baseDN = reader.readString();
-    this.scope = reader.readEnumeration();
-    this.derefAliases = reader.readEnumeration();
+    const scope = reader.readEnumeration();
+    switch (scope) {
+      case 0:
+        this.scope = 'base';
+        break;
+      case 1:
+        this.scope = 'one';
+        break;
+      case 2:
+        this.scope = 'sub';
+        break;
+      case 3:
+        this.scope = 'children';
+        break;
+      default:
+        throw new Error(`Invalid search scope: ${scope}`);
+    }
+
+    const derefAliases = reader.readEnumeration();
+    switch (scope) {
+      case 0:
+        this.derefAliases = 'never';
+        break;
+      case 1:
+        this.derefAliases = 'search';
+        break;
+      case 2:
+        this.derefAliases = 'find';
+        break;
+      case 3:
+        this.derefAliases = 'always';
+        break;
+      default:
+        throw new Error(`Invalid deref alias: ${derefAliases}`);
+    }
+
     this.sizeLimit = reader.readInt();
     this.timeLimit = reader.readInt();
     this.returnAttributeValues = !reader.readBoolean();

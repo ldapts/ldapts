@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Ber, BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -9,6 +8,7 @@ export interface BindRequestMessageOptions extends MessageOptions {
 }
 
 export class BindRequest extends Message {
+  public protocolOperation: ProtocolOperation;
   public dn: string;
   public password: string;
 
@@ -29,9 +29,14 @@ export class BindRequest extends Message {
     this.version = reader.readInt();
     this.dn = reader.readString();
 
-    const contextCheck: number = reader.peek();
+    const contextCheck: number | null = reader.peek();
     if (contextCheck !== Ber.Context) {
-      throw new Error(`Authentication type not supported: 0x${contextCheck.toString(16)}`);
+      let type = '<null>';
+      if (contextCheck) {
+        type = `0x${contextCheck.toString(16)}`;
+      }
+
+      throw new Error(`Authentication type not supported: ${type}`);
     }
 
     this.password = reader.readString(Ber.Context);

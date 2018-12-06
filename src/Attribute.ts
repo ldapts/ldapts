@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader, BerWriter } from 'asn1';
 import { ProtocolOperation } from './ProtocolOperation';
 
 export interface AttributeOptions {
@@ -23,11 +22,7 @@ export class Attribute {
 
     if (this.values.length) {
       for (const value of this.values) {
-        writer.writeByte(Ber.OctetString);
-        writer.writeLength(value.length);
-        for (const valueByte of value) {
-          writer.writeByte(valueByte);
-        }
+        writer.writeString(value);
       }
     } else {
       writer.writeStringArray([]);

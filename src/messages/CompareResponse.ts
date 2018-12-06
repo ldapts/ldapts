@@ -1,5 +1,3 @@
-// @ts-ignore
-import { BerReader, BerWriter } from 'asn1';
 import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
 
@@ -23,6 +21,8 @@ export enum CompareResult {
 }
 
 export class CompareResponse extends MessageResponse {
+  public protocolOperation: ProtocolOperation;
+
   constructor(options: MessageResponseOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_COMPARE;

@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader, BerWriter } from 'asn1';
 import { Control } from '../controls/Control';
 import { ProtocolOperation } from '../ProtocolOperation';
 import { ControlParser } from '../ControlParser';
@@ -12,7 +11,7 @@ export interface MessageOptions {
 export abstract class Message {
   public version: ProtocolOperation = ProtocolOperation.LDAP_VERSION_3;
   public messageId: number = 0;
-  public protocolOperation?: ProtocolOperation;
+  public abstract protocolOperation: ProtocolOperation;
   public controls?: Control[];
 
   protected constructor(options: MessageOptions) {

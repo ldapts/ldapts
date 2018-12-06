@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader } from 'asn1';
 import { Filter } from './filters/Filter';
 import { PresenceFilter } from './filters/PresenceFilter';
 import { AndFilter } from './filters/AndFilter';
@@ -78,7 +77,7 @@ export class FilterParser {
    *      }
    */
   public static parse(reader: BerReader): Filter {
-    const type: SearchFilter = reader.readSequence();
+    const type: number | null = reader.readSequence();
 
     let filter: Filter;
     switch (type) {

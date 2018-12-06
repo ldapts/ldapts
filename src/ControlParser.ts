@@ -1,4 +1,3 @@
-// @ts-ignore
 import { Ber, BerReader } from 'asn1';
 import { Control } from './controls/Control';
 import { EntryChangeNotificationControl } from './controls/EntryChangeNotificationControl';

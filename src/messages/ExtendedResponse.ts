@@ -1,5 +1,4 @@
-// @ts-ignore
-import { BerReader, BerWriter } from 'asn1';
+import { BerReader } from 'asn1';
 import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
 
@@ -14,6 +13,7 @@ export enum ExtendedResponseProtocolOperations {
 }
 
 export class ExtendedResponse extends MessageResponse {
+  public protocolOperation: ProtocolOperation;
   public oid?: string;
   public value?: string;
 

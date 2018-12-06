@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
 import { SearchFilter } from '../SearchFilter';
 
@@ -32,7 +31,7 @@ export class ExtensibleFilter extends Filter {
   public parseFilter(reader: BerReader): void {
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
-      const tag: number = reader.peek();
+      const tag: number | null = reader.peek();
       switch (tag) {
         case 0x81:
           this.rule = reader.readString(tag);
@@ -44,10 +43,16 @@ export class ExtensibleFilter extends Filter {
           this.value = reader.readString(tag);
           break;
         case 0x84:
-          this.dnAttributes = reader.readBoolean(tag);
+          this.dnAttributes = reader.readBoolean();
           break;
-        default:
-          throw new Error(`Invalid ext_match filter type: 0x${tag.toString(16)}`);
+        default: {
+          let type = '<null>';
+          if (tag) {
+            type = `0x${tag.toString(16)}`;
+          }
+
+          throw new Error(`Invalid ext_match filter type: ${type}`);
+        }
       }
     }
   }

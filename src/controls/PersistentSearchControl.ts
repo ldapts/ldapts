@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader, BerWriter } from 'asn1';
 import { Control, ControlOptions } from './Control';
 
 export interface PersistentSearchValue {

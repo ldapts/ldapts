@@ -1,5 +1,4 @@
-// @ts-ignore
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader } from 'asn1';
 import * as assert from 'assert';
 import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
@@ -35,7 +34,7 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
     }
 
     const reader = new BerReader(this.buffer);
-    let foundSequence = false;
+    let foundSequence: number | null = null;
     try {
       foundSequence = reader.readSequence();
     } catch (ex) {

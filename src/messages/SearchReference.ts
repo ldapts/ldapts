@@ -1,4 +1,3 @@
-// @ts-ignore
 import { BerReader } from 'asn1';
 import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
@@ -8,6 +7,7 @@ export interface SearchReferenceOptions extends MessageResponseOptions {
 }
 
 export class SearchReference extends MessageResponse {
+  public protocolOperation: ProtocolOperation;
   public uris: string[];
 
   constructor(options: SearchReferenceOptions) {
