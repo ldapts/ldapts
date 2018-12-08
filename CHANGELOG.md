@@ -1,3 +1,9 @@
+### 1.1.1
+
+  * Add original string to error message when parsing filters
+  * Adjust parsing & and | in filters
+  * Add more filter parsing tests 
+
 ### 1.1.0
 
   * Add client.add() and client.modify() 

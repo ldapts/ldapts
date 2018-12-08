@@ -29,15 +29,16 @@ export class FilterParser {
       throw new Error('Filter cannot be empty');
     }
 
+    // Wrap input in parens if it wasn't already
     if (filterString.charAt(0) !== '(') {
       // tslint:disable-next-line:no-parameter-reassignment
       filterString = `(${filterString})`;
     }
 
-    const parseResult = FilterParser._parseString(filterString, 0);
+    const parseResult = FilterParser._parseString(filterString, 0, filterString);
     const end = filterString.length - 1;
     if (parseResult.end < end) {
-      throw new Error('Unbalanced parens');
+      throw new Error(`Unbalanced parens in filter string: ${filterString}`);
     }
 
     return parseResult.filter;
@@ -134,13 +135,13 @@ export class FilterParser {
     return filter;
   }
 
-  private static _parseString(filterString: string, start: number): ParseStringResult {
+  private static _parseString(filterString: string, start: number, fullString: string): ParseStringResult {
     let cursor = start;
     const length = filterString.length;
     let filter: Filter;
 
     if (filterString[cursor] !== '(') {
-      throw new Error(`Missing paren: ${filterString}`);
+      throw new Error(`Missing paren: ${filterString}. Full string: ${fullString}`);
     }
 
     cursor += 1;
@@ -148,11 +149,11 @@ export class FilterParser {
       case '&': {
         cursor += 1;
         const children: Filter[] = [];
-        while (cursor < length && filterString[cursor] !== ')') {
-          const childResult = FilterParser._parseString(filterString, cursor);
+        do {
+          const childResult = FilterParser._parseString(filterString, cursor, fullString);
           children.push(childResult.filter);
           cursor = childResult.end + 1;
-        }
+        } while (cursor < length && filterString[cursor] !== ')');
 
         filter = new AndFilter({
           filters: children,
@@ -163,11 +164,11 @@ export class FilterParser {
       case '|': {
         cursor += 1;
         const children: Filter[] = [];
-        while (cursor < length && filterString[cursor] !== ')') {
-          const childResult = FilterParser._parseString(filterString, cursor);
+        do {
+          const childResult = FilterParser._parseString(filterString, cursor, fullString);
           children.push(childResult.filter);
           cursor = childResult.end + 1;
-        }
+        } while (cursor < length && filterString[cursor] !== ')');
 
         filter = new OrFilter({
           filters: children,
@@ -176,7 +177,7 @@ export class FilterParser {
         break;
       }
       case '!': {
-        const childResult = FilterParser._parseString(filterString, cursor + 1);
+        const childResult = FilterParser._parseString(filterString, cursor + 1, fullString);
         filter = new NotFilter({
           filter: childResult.filter,
         });
@@ -187,7 +188,7 @@ export class FilterParser {
       default: {
         const end = filterString.indexOf(')', cursor);
         if (end === -1) {
-          throw new Error(`Unbalanced parens: ${filterString}`);
+          throw new Error(`Unbalanced parens: ${filterString}. Full string: ${fullString}`);
         }
 
         filter = FilterParser._parseExpressionFilterFromString(filterString.substr(cursor, end - cursor));
@@ -324,11 +325,11 @@ export class FilterParser {
       const char = input[index];
       switch (char) {
         case '(':
-          throw new Error(`Illegal unescaped character: ${char}`);
+          throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
         case '\\': {
           const value = input.substr(index + 1, 2);
           if (value.match(/^[a-fA-F0-9]{2}$/) === null) {
-            throw new Error(`Invalid escaped hex character: ${value}`);
+            throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
           }
 
           result += String.fromCharCode(Number.parseInt(value, 16));

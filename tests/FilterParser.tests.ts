@@ -70,436 +70,802 @@ describe('FilterParser', () => {
           value: 'uuid=930896af-bf8c-48d4-885c-6573a94b1853, ou=users, o=smartdc',
         }));
       });
-      it('should allow ( in filter string', () => {
-        const result = FilterParser.parseString('foo=bar\\28');
-        result.should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar(',
-        }));
+      describe('paren in value', () => {
+        it('should allow ( in filter string', () => {
+          const result = FilterParser.parseString('foo=bar\\28');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar(',
+          }));
+        });
+        it('should allow ) in filter string', () => {
+          const result = FilterParser.parseString('foo=bar\\29');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar)',
+          }));
+        });
+        it('should allow () in filter string', () => {
+          const result = FilterParser.parseString('foo=bar\\28\\29');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar()',
+          }));
+        });
+        it('should allow )( in filter string', () => {
+          const result = FilterParser.parseString('foo=bar\\29\\28');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar)(',
+          }));
+        });
+        it('should allow )( in filter string', () => {
+          const result = FilterParser.parseString('foo=bar\\29\\28');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar)(',
+          }));
+        });
       });
-      it('should allow ) in filter string', () => {
-        const result = FilterParser.parseString('foo=bar\\29');
-        result.should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar)',
-        }));
+      describe('newline in value', () => {
+        it('should allow newline as attribute value', () => {
+          FilterParser.parseString('(foo=\n)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+          FilterParser.parseString('(foo<=\n)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+          FilterParser.parseString('(foo>=\n)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+          FilterParser.parseString('(foo=\\0a)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+          FilterParser.parseString('(foo<=\\0a)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+          FilterParser.parseString('(foo>=\\0a)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\n',
+          }));
+        });
+        it('should allow newline after attribute value', () => {
+          FilterParser.parseString('(foo=bar\n)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+          FilterParser.parseString('(foo<=bar\n)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+          FilterParser.parseString('(foo>=bar\n)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+          FilterParser.parseString('(foo=bar\\0a)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+          FilterParser.parseString('(foo<=bar\\0a)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+          FilterParser.parseString('(foo>=bar\\0a)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\n',
+          }));
+        });
+        it('should allow newline before attribute value', () => {
+          FilterParser.parseString('(foo=\nbar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+          FilterParser.parseString('(foo<=\nbar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+          FilterParser.parseString('(foo>=\nbar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+          FilterParser.parseString('(foo=\\0abar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+          FilterParser.parseString('(foo<=\\0abar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+          FilterParser.parseString('(foo>=\\0abar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\nbar',
+          }));
+        });
+        it('should allow carriage return as attribute value', () => {
+          FilterParser.parseString('(foo=\r)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+          FilterParser.parseString('(foo<=\r)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+          FilterParser.parseString('(foo>=\r)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+          FilterParser.parseString('(foo=\\0d)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+          FilterParser.parseString('(foo<=\\0d)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+          FilterParser.parseString('(foo>=\\0d)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\r',
+          }));
+        });
+        it('should allow carriage return after attribute value', () => {
+          FilterParser.parseString('(foo=bar\r)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+          FilterParser.parseString('(foo<=bar\r)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+          FilterParser.parseString('(foo>=bar\r)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+          FilterParser.parseString('(foo=bar\\0d)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+          FilterParser.parseString('(foo<=bar\\0d)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+          FilterParser.parseString('(foo>=bar\\0d)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\r',
+          }));
+        });
+        it('should allow carriage return before attribute value', () => {
+          FilterParser.parseString('(foo=\rbar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+          FilterParser.parseString('(foo<=\rbar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+          FilterParser.parseString('(foo>=\rbar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+          FilterParser.parseString('(foo=\\0dbar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+          FilterParser.parseString('(foo<=\\0dbar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+          FilterParser.parseString('(foo>=\\0dbar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\rbar',
+          }));
+        });
       });
-      it('should allow () in filter string', () => {
-        const result = FilterParser.parseString('foo=bar\\28\\29');
-        result.should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar()',
-        }));
+      describe('tab in value', () => {
+        it('should allow tab as attribute value', () => {
+          FilterParser.parseString('(foo=\t)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+          FilterParser.parseString('(foo<=\t)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+          FilterParser.parseString('(foo>=\t)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+          FilterParser.parseString('(foo=\\09)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+          FilterParser.parseString('(foo<=\\09)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+          FilterParser.parseString('(foo>=\\09)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\t',
+          }));
+        });
+        it('should allow tab after attribute value', () => {
+          FilterParser.parseString('(foo=bar\t)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+          FilterParser.parseString('(foo<=bar\t)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+          FilterParser.parseString('(foo>=bar\t)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+          FilterParser.parseString('(foo=bar\\09)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+          FilterParser.parseString('(foo<=bar\\09)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+          FilterParser.parseString('(foo>=bar\\09)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\t',
+          }));
+        });
+        it('should allow tab before attribute value', () => {
+          FilterParser.parseString('(foo=\tbar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+          FilterParser.parseString('(foo<=\tbar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+          FilterParser.parseString('(foo>=\tbar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+          FilterParser.parseString('(foo=\\09bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+          FilterParser.parseString('(foo<=\\09bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+          FilterParser.parseString('(foo>=\\09bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\tbar',
+          }));
+        });
       });
-      it('should allow )( in filter string', () => {
-        const result = FilterParser.parseString('foo=bar\\29\\28');
-        result.should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar)(',
-        }));
+      describe('space in value', () => {
+        it('should allow space as attribute value', () => {
+          FilterParser.parseString('(foo= )').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+          FilterParser.parseString('(foo<= )').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+          FilterParser.parseString('(foo>= )').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+          FilterParser.parseString('(foo=\\20)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+          FilterParser.parseString('(foo<=\\20)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+          FilterParser.parseString('(foo>=\\20)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: ' ',
+          }));
+        });
+        it('should allow space after attribute value', () => {
+          FilterParser.parseString('(foo=bar )').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+          FilterParser.parseString('(foo<=bar )').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+          FilterParser.parseString('(foo>=bar )').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+          FilterParser.parseString('(foo=bar\\20)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+          FilterParser.parseString('(foo<=bar\\20)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+          FilterParser.parseString('(foo>=bar\\20)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar ',
+          }));
+        });
+        it('should allow space before attribute value', () => {
+          FilterParser.parseString('(foo= bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+          FilterParser.parseString('(foo<= bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+          FilterParser.parseString('(foo>= bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+          FilterParser.parseString('(foo=\\20bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+          FilterParser.parseString('(foo<=\\20bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+          FilterParser.parseString('(foo>=\\20bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: ' bar',
+          }));
+        });
       });
-      it('should allow )( in filter string', () => {
-        const result = FilterParser.parseString('foo=bar\\29\\28');
-        result.should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar)(',
-        }));
+      describe('\\ in value', () => {
+        it('should allow \\ as attribute value', () => {
+          FilterParser.parseString('(foo=\\5c)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\\',
+          }));
+          FilterParser.parseString('(foo<=\\5c)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\',
+          }));
+          FilterParser.parseString('(foo>=\\5c)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\',
+          }));
+        });
+        it('should allow \\ after attribute value', () => {
+          FilterParser.parseString('(foo=bar\\5c)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\\',
+          }));
+          FilterParser.parseString('(foo<=bar\\5c)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\\',
+          }));
+          FilterParser.parseString('(foo>=bar\\5c)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar\\',
+          }));
+        });
+        it('should allow \\ before attribute value', () => {
+          FilterParser.parseString('(foo=\\5cbar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\\bar',
+          }));
+          FilterParser.parseString('(foo<=\\5cbar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\bar',
+          }));
+          FilterParser.parseString('(foo>=\\5cbar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\bar',
+          }));
+        });
+        it('should allow \\ in attribute value', () => {
+          FilterParser.parseString('(foo=\\5cbar\\5cbaz\\5c)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '\\bar\\baz\\',
+          }));
+          FilterParser.parseString('(foo<=\\5cbar\\5cbaz\\5c)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\bar\\baz\\',
+          }));
+          FilterParser.parseString('(foo>=\\5cbar\\5cbaz\\5c)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '\\bar\\baz\\',
+          }));
+        });
+        it('should allow null (\\00) value in attribute value', () => {
+          FilterParser.parseString('(foo=bar\\00)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar\u0000',
+          }));
+        });
       });
-      it('should allow newline as attribute value', () => {
-        FilterParser.parseString('(foo=\n)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
-        FilterParser.parseString('(foo<=\n)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
-        FilterParser.parseString('(foo>=\n)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
-        FilterParser.parseString('(foo=\\0a)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
-        FilterParser.parseString('(foo<=\\0a)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
-        FilterParser.parseString('(foo>=\\0a)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\n',
-        }));
+      describe('* in value', () => {
+        it('should allow * as attribute value', () => {
+          FilterParser.parseString('(foo=\\2a)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '*',
+          }));
+          FilterParser.parseString('(foo<=\\2a)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '*',
+          }));
+          FilterParser.parseString('(foo>=\\2a)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '*',
+          }));
+        });
+        it('should allow * after attribute value', () => {
+          FilterParser.parseString('(foo=bar\\2a)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar*',
+          }));
+          FilterParser.parseString('(foo<=bar\\2a)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar*',
+          }));
+          FilterParser.parseString('(foo>=bar\\2a)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar*',
+          }));
+        });
+        it('should allow * before attribute value', () => {
+          FilterParser.parseString('(foo=\\2abar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '*bar',
+          }));
+          FilterParser.parseString('(foo<=\\2abar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '*bar',
+          }));
+          FilterParser.parseString('(foo>=\\2abar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '*bar',
+          }));
+        });
+        it('should allow * in attribute value', () => {
+          FilterParser.parseString('(foo=\\2abar\\2abaz\\2a)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '*bar*baz*',
+          }));
+          FilterParser.parseString('(foo<=\\2abar\\2abaz\\2a)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '*bar*baz*',
+          }));
+          FilterParser.parseString('(foo>=\\2abar\\2abaz\\2a)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '*bar*baz*',
+          }));
+        });
       });
-      it('should allow newline after attribute value', () => {
-        FilterParser.parseString('(foo=bar\n)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
-        FilterParser.parseString('(foo<=bar\n)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
-        FilterParser.parseString('(foo>=bar\n)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
-        FilterParser.parseString('(foo=bar\\0a)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
-        FilterParser.parseString('(foo<=bar\\0a)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
-        FilterParser.parseString('(foo>=bar\\0a)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\n',
-        }));
+      describe('<= in value', () => {
+        it('should allow <= as attribute value', () => {
+          FilterParser.parseString('(foo=<=)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '<=',
+          }));
+          FilterParser.parseString('(foo<=<=)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '<=',
+          }));
+          FilterParser.parseString('(foo>=<=)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '<=',
+          }));
+        });
+        it('should allow <= after attribute value', () => {
+          FilterParser.parseString('(foo=bar<=)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar<=',
+          }));
+          FilterParser.parseString('(foo<=bar<=)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar<=',
+          }));
+          FilterParser.parseString('(foo>=bar<=)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar<=',
+          }));
+        });
+        it('should allow <= before attribute value', () => {
+          FilterParser.parseString('(foo=<=bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '<=bar',
+          }));
+          FilterParser.parseString('(foo<=<=bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '<=bar',
+          }));
+          FilterParser.parseString('(foo>=<=bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '<=bar',
+          }));
+        });
+        it('should allow <= in attribute value', () => {
+          FilterParser.parseString('(foo=bar<=baz)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar<=baz',
+          }));
+          FilterParser.parseString('(foo<=bar<=baz)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar<=baz',
+          }));
+          FilterParser.parseString('(foo>=bar<=baz)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar<=baz',
+          }));
+        });
       });
-      it('should allow newline before attribute value', () => {
-        FilterParser.parseString('(foo=\nbar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
-        FilterParser.parseString('(foo<=\nbar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
-        FilterParser.parseString('(foo>=\nbar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
-        FilterParser.parseString('(foo=\\0abar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
-        FilterParser.parseString('(foo<=\\0abar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
-        FilterParser.parseString('(foo>=\\0abar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\nbar',
-        }));
+      describe('>= in value', () => {
+        it('should allow >= as attribute value', () => {
+          FilterParser.parseString('(foo=>=)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '>=',
+          }));
+          FilterParser.parseString('(foo<=>=)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '>=',
+          }));
+          FilterParser.parseString('(foo>=>=)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '>=',
+          }));
+        });
+        it('should allow >= after attribute value', () => {
+          FilterParser.parseString('(foo=bar>=)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar>=',
+          }));
+          FilterParser.parseString('(foo<=bar>=)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar>=',
+          }));
+          FilterParser.parseString('(foo>=bar>=)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar>=',
+          }));
+        });
+        it('should allow >= before attribute value', () => {
+          FilterParser.parseString('(foo=>=bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '>=bar',
+          }));
+          FilterParser.parseString('(foo<=>=bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '>=bar',
+          }));
+          FilterParser.parseString('(foo>=>=bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '>=bar',
+          }));
+        });
+        it('should allow >= in attribute value', () => {
+          FilterParser.parseString('(foo=bar>=baz)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar>=baz',
+          }));
+          FilterParser.parseString('(foo<=bar>=baz)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar>=baz',
+          }));
+          FilterParser.parseString('(foo>=bar>=baz)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar>=baz',
+          }));
+        });
       });
-      it('should allow carriage return as attribute value', () => {
-        FilterParser.parseString('(foo=\r)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
-        FilterParser.parseString('(foo<=\r)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
-        FilterParser.parseString('(foo>=\r)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
-        FilterParser.parseString('(foo=\\0d)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
-        FilterParser.parseString('(foo<=\\0d)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
-        FilterParser.parseString('(foo>=\\0d)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\r',
-        }));
+      describe('& in value', () => {
+        it('should allow & as attribute value', () => {
+          FilterParser.parseString('(foo=&)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '&',
+          }));
+          FilterParser.parseString('(foo<=&)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '&',
+          }));
+          FilterParser.parseString('(foo>=&)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '&',
+          }));
+        });
+        it('should allow & after attribute value', () => {
+          FilterParser.parseString('(foo=bar&)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar&',
+          }));
+          FilterParser.parseString('(foo<=bar&)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar&',
+          }));
+          FilterParser.parseString('(foo>=bar&)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar&',
+          }));
+        });
+        it('should allow & before attribute value', () => {
+          FilterParser.parseString('(foo=&bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '&bar',
+          }));
+          FilterParser.parseString('(foo<=&bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '&bar',
+          }));
+          FilterParser.parseString('(foo>=&bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '&bar',
+          }));
+        });
+        it('should allow & in attribute value', () => {
+          FilterParser.parseString('(foo=&bar&baz&)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '&bar&baz&',
+          }));
+          FilterParser.parseString('(foo<=&bar&baz&)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '&bar&baz&',
+          }));
+          FilterParser.parseString('(foo>=&bar&baz&)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '&bar&baz&',
+          }));
+        });
       });
-      it('should allow carriage return after attribute value', () => {
-        FilterParser.parseString('(foo=bar\r)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
-        FilterParser.parseString('(foo<=bar\r)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
-        FilterParser.parseString('(foo>=bar\r)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
-        FilterParser.parseString('(foo=bar\\0d)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
-        FilterParser.parseString('(foo<=bar\\0d)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
-        FilterParser.parseString('(foo>=bar\\0d)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\r',
-        }));
+      describe('| in value', () => {
+        it('should allow | as attribute value', () => {
+          FilterParser.parseString('(foo=|)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '|',
+          }));
+          FilterParser.parseString('(foo<=|)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '|',
+          }));
+          FilterParser.parseString('(foo>=|)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '|',
+          }));
+        });
+        it('should allow | after attribute value', () => {
+          FilterParser.parseString('(foo=bar|)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar|',
+          }));
+          FilterParser.parseString('(foo<=bar|)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar|',
+          }));
+          FilterParser.parseString('(foo>=bar|)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar|',
+          }));
+        });
+        it('should allow | before attribute value', () => {
+          FilterParser.parseString('(foo=|bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '|bar',
+          }));
+          FilterParser.parseString('(foo<=|bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '|bar',
+          }));
+          FilterParser.parseString('(foo>=|bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '|bar',
+          }));
+        });
+        it('should allow | in attribute value', () => {
+          FilterParser.parseString('(foo=|bar|baz|)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '|bar|baz|',
+          }));
+          FilterParser.parseString('(foo<=|bar|baz|)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '|bar|baz|',
+          }));
+          FilterParser.parseString('(foo>=|bar|baz|)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '|bar|baz|',
+          }));
+        });
       });
-      it('should allow carriage return before attribute value', () => {
-        FilterParser.parseString('(foo=\rbar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
-        FilterParser.parseString('(foo<=\rbar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
-        FilterParser.parseString('(foo>=\rbar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
-        FilterParser.parseString('(foo=\\0dbar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
-        FilterParser.parseString('(foo<=\\0dbar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
-        FilterParser.parseString('(foo>=\\0dbar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\rbar',
-        }));
+      describe('! in value', () => {
+        it('should allow ! as attribute value', () => {
+          FilterParser.parseString('(foo=!)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '!',
+          }));
+          FilterParser.parseString('(foo<=!)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '!',
+          }));
+          FilterParser.parseString('(foo>=!)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '!',
+          }));
+        });
+        it('should allow ! after attribute value', () => {
+          FilterParser.parseString('(foo=bar!)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'bar!',
+          }));
+          FilterParser.parseString('(foo<=bar!)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar!',
+          }));
+          FilterParser.parseString('(foo>=bar!)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'bar!',
+          }));
+        });
+        it('should allow ! before attribute value', () => {
+          FilterParser.parseString('(foo=!bar)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '!bar',
+          }));
+          FilterParser.parseString('(foo<=!bar)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '!bar',
+          }));
+          FilterParser.parseString('(foo>=!bar)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '!bar',
+          }));
+        });
+        it('should allow ! in attribute value', () => {
+          FilterParser.parseString('(foo=!bar!baz!)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '!bar!baz!',
+          }));
+          FilterParser.parseString('(foo<=!bar!baz!)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '!bar!baz!',
+          }));
+          FilterParser.parseString('(foo>=!bar!baz!)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '!bar!baz!',
+          }));
+        });
       });
-      it('should allow tab as attribute value', () => {
-        FilterParser.parseString('(foo=\t)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-        FilterParser.parseString('(foo<=\t)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-        FilterParser.parseString('(foo>=\t)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-        FilterParser.parseString('(foo=\\09)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-        FilterParser.parseString('(foo<=\\09)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-        FilterParser.parseString('(foo>=\\09)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\t',
-        }));
-      });
-      it('should allow tab after attribute value', () => {
-        FilterParser.parseString('(foo=bar\t)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-        FilterParser.parseString('(foo<=bar\t)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-        FilterParser.parseString('(foo>=bar\t)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-        FilterParser.parseString('(foo=bar\\09)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-        FilterParser.parseString('(foo<=bar\\09)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-        FilterParser.parseString('(foo>=bar\\09)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\t',
-        }));
-      });
-      it('should allow tab before attribute value', () => {
-        FilterParser.parseString('(foo=\tbar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-        FilterParser.parseString('(foo<=\tbar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-        FilterParser.parseString('(foo>=\tbar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-        FilterParser.parseString('(foo=\\09bar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-        FilterParser.parseString('(foo<=\\09bar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-        FilterParser.parseString('(foo>=\\09bar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\tbar',
-        }));
-      });
-      it('should allow space as attribute value', () => {
-        FilterParser.parseString('(foo= )').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-        FilterParser.parseString('(foo<= )').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-        FilterParser.parseString('(foo>= )').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-        FilterParser.parseString('(foo=\\20)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-        FilterParser.parseString('(foo<=\\20)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-        FilterParser.parseString('(foo>=\\20)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: ' ',
-        }));
-      });
-      it('should allow space after attribute value', () => {
-        FilterParser.parseString('(foo=bar )').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-        FilterParser.parseString('(foo<=bar )').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-        FilterParser.parseString('(foo>=bar )').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-        FilterParser.parseString('(foo=bar\\20)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-        FilterParser.parseString('(foo<=bar\\20)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-        FilterParser.parseString('(foo>=bar\\20)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar ',
-        }));
-      });
-      it('should allow space before attribute value', () => {
-        FilterParser.parseString('(foo= bar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-        FilterParser.parseString('(foo<= bar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-        FilterParser.parseString('(foo>= bar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-        FilterParser.parseString('(foo=\\20bar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-        FilterParser.parseString('(foo<=\\20bar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-        FilterParser.parseString('(foo>=\\20bar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: ' bar',
-        }));
-      });
-      it('should allow \\ as attribute value', () => {
-        FilterParser.parseString('(foo=\\5c)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\\',
-        }));
-        FilterParser.parseString('(foo<=\\5c)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\\',
-        }));
-        FilterParser.parseString('(foo>=\\5c)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\\',
-        }));
-      });
-      it('should allow \\ after attribute value', () => {
-        FilterParser.parseString('(foo=bar\\5c)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar\\',
-        }));
-        FilterParser.parseString('(foo<=bar\\5c)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\\',
-        }));
-        FilterParser.parseString('(foo>=bar\\5c)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar\\',
-        }));
-      });
-      it('should allow \\ before attribute value', () => {
-        FilterParser.parseString('(foo=\\5cbar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '\\bar',
-        }));
-        FilterParser.parseString('(foo<=\\5cbar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '\\bar',
-        }));
-        FilterParser.parseString('(foo>=\\5cbar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '\\bar',
-        }));
-      });
-      it('should allow * as attribute value', () => {
-        FilterParser.parseString('(foo=\\2a)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '*',
-        }));
-        FilterParser.parseString('(foo<=\\2a)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '*',
-        }));
-        FilterParser.parseString('(foo>=\\2a)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '*',
-        }));
-      });
-      it('should allow * after attribute value', () => {
-        FilterParser.parseString('(foo=bar\\2a)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: 'bar*',
-        }));
-        FilterParser.parseString('(foo<=bar\\2a)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar*',
-        }));
-        FilterParser.parseString('(foo>=bar\\2a)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: 'bar*',
-        }));
-      });
-      it('should allow * before attribute value', () => {
-        FilterParser.parseString('(foo=\\2abar)').should.deep.equal(new EqualityFilter({
-          attribute: 'foo',
-          value: '*bar',
-        }));
-        FilterParser.parseString('(foo<=\\2abar)').should.deep.equal(new LessThanEqualsFilter({
-          attribute: 'foo',
-          value: '*bar',
-        }));
-        FilterParser.parseString('(foo>=\\2abar)').should.deep.equal(new GreaterThanEqualsFilter({
-          attribute: 'foo',
-          value: '*bar',
-        }));
+      describe('unicode in value', () => {
+        it('should allow ☕⛵ᄨ as attribute value', () => {
+          FilterParser.parseString('(foo=☕⛵ᄨ)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: '☕⛵ᄨ',
+          }));
+          FilterParser.parseString('(foo<=☕⛵ᄨ)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: '☕⛵ᄨ',
+          }));
+          FilterParser.parseString('(foo>=☕⛵ᄨ)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: '☕⛵ᄨ',
+          }));
+        });
+        it('should allow ᎢᏣᎵᏍᎠᏁᏗ as attribute value', () => {
+          FilterParser.parseString('(foo=ᎢᏣᎵᏍᎠᏁᏗ)').should.deep.equal(new EqualityFilter({
+            attribute: 'foo',
+            value: 'ᎢᏣᎵᏍᎠᏁᏗ',
+          }));
+          FilterParser.parseString('(foo<=ᎢᏣᎵᏍᎠᏁᏗ)').should.deep.equal(new LessThanEqualsFilter({
+            attribute: 'foo',
+            value: 'ᎢᏣᎵᏍᎠᏁᏗ',
+          }));
+          FilterParser.parseString('(foo>=ᎢᏣᎵᏍᎠᏁᏗ)').should.deep.equal(new GreaterThanEqualsFilter({
+            attribute: 'foo',
+            value: 'ᎢᏣᎵᏍᎠᏁᏗ',
+          }));
+        });
       });
     });
     describe('SubstringFilter', () => {
