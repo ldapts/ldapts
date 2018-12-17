@@ -1,3 +1,7 @@
+### 1.1.3
+
+  * Update dev dependencies
+
 ### 1.1.2
 
   * Fix ECONNRESET issue connecting to non-secure endpoint
