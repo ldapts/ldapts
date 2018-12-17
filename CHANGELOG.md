@@ -1,3 +1,8 @@
+### 1.1.2
+
+  * Fix ECONNRESET issue connecting to non-secure endpoint
+  * Throw an error for each message on socket error
+
 ### 1.1.1
 
   * Add original string to error message when parsing filters

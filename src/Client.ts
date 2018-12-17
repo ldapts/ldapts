@@ -1,5 +1,6 @@
 import debug from 'debug';
 import { parse as parseUrl } from 'url';
+import * as net from 'net';
 import * as tls from 'tls';
 import Timer = NodeJS.Timer;
 import { Control } from './controls/Control';
@@ -97,7 +98,7 @@ export class Client {
   private readonly port: number;
   private readonly secure: boolean;
   private connected: boolean = false;
-  private socket!: tls.TLSSocket;
+  private socket!: tls.TLSSocket | net.Socket;
   private connectTimer!: Timer;
   private readonly messageParser = new MessageParser();
   private readonly messageDetailsByMessageId: { [index: string]: MessageDetails } = {};
@@ -529,12 +530,13 @@ export class Client {
     }
 
     return new Promise((resolve, reject) => {
-      this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
       if (this.secure) {
+        this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
         this.socket.once('secureConnect', () => {
           this._onConnect(resolve);
         });
       } else {
+        this.socket = net.connect(this.port, this.host);
         this.socket.once('connect', () => {
           this._onConnect(resolve);
         });
@@ -571,7 +573,19 @@ export class Client {
     this.connected = true;
 
     // region Socket events handlers
-    const socketError = () => {
+    const socketError = (err: Error) => {
+      // Clean up any pending messages
+      for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
+        if (messageDetails.message instanceof UnbindRequest) {
+          // Consider unbind as success since the connection is closed.
+          messageDetails.resolve();
+        } else {
+          messageDetails.reject(new Error(`Socket error. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})\n${err.message || err.stack || 'Unknown'}`));
+        }
+
+        delete this.messageDetailsByMessageId[key];
+      }
+
       this.socket.destroy();
     };
     const socketEnd = () => {
@@ -602,13 +616,15 @@ export class Client {
       delete this.socket;
 
       // Clean up any pending messages
-      for (const messageDetails of Object.values(this.messageDetailsByMessageId)) {
+      for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
         if (messageDetails.message instanceof UnbindRequest) {
           // Consider unbind as success since the connection is closed.
           messageDetails.resolve();
         } else {
           messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
         }
+
+        delete this.messageDetailsByMessageId[key];
       }
 
       // Cleanup handlers

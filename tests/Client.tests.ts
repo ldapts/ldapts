@@ -74,6 +74,20 @@ describe('Client', () => {
         await client.unbind();
       }
     });
+    it('should succeed for non-secure bind', async () => {
+      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "objectclass=*"
+      const client = new Client({
+        url: 'ldap://ldap.forumsys.com:389',
+      });
+
+      await client.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+
+      try {
+        await client.unbind();
+      } catch {
+        // This can fail since it's not the part being tested
+      }
+    });
   });
   describe('#unbind()', () => {
     it('should succeed on basic unbind after successful bind', async () => {

@@ -14,9 +14,9 @@ LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
 ```javascript
 const { Client } = require('ldapts');
 
-const url = 'ldap://127.0.0.1:1389';
-const bindDN = 'uid=foo,dc=example,dc=com';
-const password = 'bar';
+const url = 'ldap://ldap.forumsys.com:389';
+const bindDN = 'cn=read-only-admin,dc=example,dc=com';
+const password = 'password';
 
 const client = new Client({
   url,
@@ -39,10 +39,10 @@ try {
 ```javascript
 const { Client } = require('ldapts');
 
-const url = 'ldap://127.0.0.1:1389';
-const bindDN = 'uid=foo,dc=example,dc=com';
-const password = 'bar';
-const searchDN = 'ou=Users,dc=example,dc=com';
+const url = 'ldaps://ldap.jumpcloud.com';
+const bindDN = 'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
+const password = 'MyRedSuitKeepsMeWarm';
+const searchDN = 'ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
 
 const client = new Client({
   url,
@@ -59,7 +59,7 @@ try {
     searchReferences,
   } = await client.search(searchDN, {
     scope: 'sub',
-    filter: 'cn=Foobar',
+    filter: '(mail=peter.parker@marvel.com)',
   });
 } catch (ex) {
   throw ex;
