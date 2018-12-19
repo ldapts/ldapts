@@ -226,6 +226,39 @@ describe('Client', () => {
         objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
       }]);
     });
+    it('should return search results for non-secure ldap server', async () => {
+      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
+      const testClient = new Client({
+        url: 'ldap://ldap.forumsys.com',
+      });
+
+      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      try {
+        const searchResult = await testClient.search('dc=example,dc=com', {
+          filter: '(uid=einstein)',
+        });
+
+        searchResult.searchEntries.should.deep.equal([{
+          cn: 'Albert Einstein',
+          dn: 'uid=einstein,dc=example,dc=com',
+          mail: 'einstein@ldap.forumsys.com',
+          objectClass: [
+            'inetOrgPerson',
+            'organizationalPerson',
+            'person',
+            'top',
+          ],
+          sn: 'Einstein',
+          telephoneNumber: '314-159-2653',
+          uid: 'einstein',
+        }]);
+      } catch (ex) {
+        // Shouldn't get here
+        ex.should.equal(false);
+      } finally {
+        await testClient.unbind();
+      }
+    });
     it('should restrict attributes returned if attributes are specified"', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
