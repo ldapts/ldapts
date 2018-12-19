@@ -10,6 +10,9 @@
     ]
   },
   "rules": {
+    "align": false,
+    "arrow-parens": true,
+    "ter-arrow-parens": [true, "always"],
     "quotemark": [true, "single"],
     "function-name": [true, {
       "method-regex": "^[a-z][\\w\\d]+$",
