@@ -4,6 +4,7 @@ import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
 import { ProtocolOperation } from './ProtocolOperation';
 import { BindResponse } from './messages/BindResponse';
+import { AddResponse } from './messages/AddResponse';
 import { CompareResponse } from './messages/CompareResponse';
 import { DeleteResponse } from './messages/DeleteResponse';
 import { ExtendedResponse } from './messages/ExtendedResponse';
@@ -94,6 +95,11 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
     switch (protocolOperation) {
       case ProtocolOperation.LDAP_RES_BIND:
         message = new BindResponse({
+          messageId,
+        });
+        break;
+      case ProtocolOperation.LDAP_RES_ADD:
+        message = new AddResponse({
           messageId,
         });
         break;
