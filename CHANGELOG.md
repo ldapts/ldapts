@@ -1,3 +1,7 @@
+### 1.1.4
+
+  * Fix Add and Modify to handle the response from the server. Thanks @adrianplavka!
+
 ### 1.1.3
 
   * Update dev dependencies

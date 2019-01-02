@@ -3,12 +3,13 @@ import * as assert from 'assert';
 import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
 import { ProtocolOperation } from './ProtocolOperation';
-import { BindResponse } from './messages/BindResponse';
 import { AddResponse } from './messages/AddResponse';
+import { BindResponse } from './messages/BindResponse';
 import { CompareResponse } from './messages/CompareResponse';
 import { DeleteResponse } from './messages/DeleteResponse';
 import { ExtendedResponse } from './messages/ExtendedResponse';
 import { ModifyDNResponse } from './messages/ModifyDNResponse';
+import { ModifyResponse } from './messages/ModifyResponse';
 import { MessageResponse } from './messages/MessageResponse';
 import { MessageParserError } from './errors/MessageParserError';
 import { SearchResponse } from './messages/SearchResponse';
@@ -120,6 +121,11 @@ export class MessageParser extends (EventEmitter as { new(): MessageParserEmitte
         break;
       case ProtocolOperation.LDAP_RES_MODRDN:
         message = new ModifyDNResponse({
+          messageId,
+        });
+        break;
+      case ProtocolOperation.LDAP_RES_MODIFY:
+        message = new ModifyResponse({
           messageId,
         });
         break;
