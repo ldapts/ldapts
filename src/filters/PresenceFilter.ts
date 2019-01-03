@@ -21,9 +21,10 @@ export class PresenceFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
+    const escapedAttribute = this.escape(this.attribute);
     // tslint:disable-next-line:no-increment-decrement
-    for (let i = 0; i < this.attribute.length; i++) {
-      writer.writeByte(this.attribute.charCodeAt(i));
+    for (let i = 0; i < escapedAttribute.length; i++) {
+      writer.writeByte(escapedAttribute.charCodeAt(i));
     }
   }
 

@@ -29,8 +29,8 @@ export class EqualityFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    writer.writeString(this.attribute);
-    writer.writeString(this.value, Ber.OctetString);
+    writer.writeString(this.escape(this.attribute));
+    writer.writeString(this.escape(this.value), Ber.OctetString);
   }
 
   public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {

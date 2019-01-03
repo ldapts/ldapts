@@ -1,3 +1,7 @@
+### 1.2.0
+
+  * Fix escaping filter attribute names and values
+
 ### 1.1.4
 
   * Fix Add and Modify to handle the response from the server. Thanks @adrianplavka!

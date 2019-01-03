@@ -25,8 +25,8 @@ export class LessThanEqualsFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    writer.writeString(this.attribute);
-    writer.writeString(this.value);
+    writer.writeString(this.escape(this.attribute));
+    writer.writeString(this.escape(this.value));
   }
 
   public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {

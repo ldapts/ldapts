@@ -226,6 +226,27 @@ describe('Client', () => {
         objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
       }]);
     });
+    it('should return full search entries if filter="(mail=peter.park*)"', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: '(mail=peter.park*)',
+      });
+
+      searchResult.searchEntries.should.deep.equal([{
+        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        gidNumber: '5004',
+        mail: 'peter.parker@marvel.com',
+        cn: 'Peter Parker',
+        jcLdapAdmin: 'TRUE',
+        uid: 'peter.parker',
+        uidNumber: '5004',
+        loginShell: '/bin/bash',
+        homeDirectory: '/home/peter.parker',
+        givenName: 'Peter',
+        sn: 'Parker',
+        objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+      }]);
+    });
     it('should return search results for non-secure ldap server', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
       const testClient = new Client({

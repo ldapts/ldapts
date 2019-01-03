@@ -229,7 +229,7 @@ export class FilterParser {
     if (remainingExpression[0] === '=') {
       remainingExpression = remainingExpression.substr(1);
       if (remainingExpression.indexOf('*') !== -1) {
-        const escapedExpression = FilterParser._escapeSubstring(remainingExpression);
+        const escapedExpression = FilterParser._unescapeSubstring(remainingExpression);
         return new SubstringFilter({
           attribute,
           initial: escapedExpression.initial,
@@ -240,28 +240,28 @@ export class FilterParser {
 
       return new EqualityFilter({
         attribute,
-        value: FilterParser._escapeValue(remainingExpression),
+        value: FilterParser._unescapeHexValues(remainingExpression),
       });
     }
 
     if (remainingExpression[0] === '>' && remainingExpression[1] === '=') {
       return new GreaterThanEqualsFilter({
         attribute,
-        value: FilterParser._escapeValue(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
     if (remainingExpression[0] === '<' && remainingExpression[1] === '=') {
       return new LessThanEqualsFilter({
         attribute,
-        value: FilterParser._escapeValue(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
     if (remainingExpression[0] === '~' && remainingExpression[1] === '=') {
       return new ApproximateFilter({
         attribute,
-        value: FilterParser._escapeValue(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
@@ -302,7 +302,7 @@ export class FilterParser {
     const options: ExtensibleFilterOptions = {
       dnAttributes,
       rule,
-      value: FilterParser._escapeValue(remainingExpression),
+      value: FilterParser._unescapeHexValues(remainingExpression),
     };
 
     // TODO: Enable this if it's useful
@@ -316,7 +316,7 @@ export class FilterParser {
     return new ExtensibleFilter(options);
   }
 
-  private static _escapeValue(input: string): string {
+  private static _unescapeHexValues(input: string): string {
     let index: number = 0;
     const end = input.length;
     let result: string = '';
@@ -347,16 +347,16 @@ export class FilterParser {
     return result;
   }
 
-  private static _escapeSubstring(input: string): Substring {
+  private static _unescapeSubstring(input: string): Substring {
     const fields = input.split('*');
     if (fields.length < 2) {
       throw new Error(`Wildcard missing: ${input}`);
     }
 
     return {
-      initial: FilterParser._escapeValue(fields.shift() || ''),
-      final: FilterParser._escapeValue(fields.pop() || ''),
-      any: fields.map(FilterParser._escapeValue),
+      initial: FilterParser._unescapeHexValues(fields.shift() || ''),
+      final: FilterParser._unescapeHexValues(fields.pop() || ''),
+      any: fields.map(FilterParser._unescapeHexValues),
     };
   }
 
