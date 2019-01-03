@@ -3,18 +3,20 @@ import * as assert from 'assert';
 import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
 import { ProtocolOperation } from './ProtocolOperation';
-import { AddResponse } from './messages/AddResponse';
-import { BindResponse } from './messages/BindResponse';
-import { CompareResponse } from './messages/CompareResponse';
-import { DeleteResponse } from './messages/DeleteResponse';
-import { ExtendedResponse } from './messages/ExtendedResponse';
-import { ModifyDNResponse } from './messages/ModifyDNResponse';
-import { ModifyResponse } from './messages/ModifyResponse';
+import {
+  AddResponse,
+  BindResponse,
+  CompareResponse,
+  DeleteResponse,
+  ExtendedResponse,
+  ModifyDNResponse,
+  ModifyResponse,
+  SearchResponse,
+  SearchEntry,
+  SearchReference,
+} from './messages';
 import { MessageResponse } from './messages/MessageResponse';
-import { MessageParserError } from './errors/MessageParserError';
-import { SearchResponse } from './messages/SearchResponse';
-import { SearchEntry } from './messages/SearchEntry';
-import { SearchReference } from './messages/SearchReference';
+import { MessageParserError } from './errors';
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 

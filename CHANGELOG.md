@@ -1,3 +1,7 @@
+### 1.2.1
+
+  * Provide exports for public classes: errors, filters, and messages (Fix #4)
+
 ### 1.2.0
 
   * Fix escaping filter attribute names and values

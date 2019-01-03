@@ -2,15 +2,17 @@
 import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { FilterParser } from '../src/FilterParser';
-import { EqualityFilter } from '../src/filters/EqualityFilter';
-import { AndFilter } from '../src/filters/AndFilter';
-import { SubstringFilter } from '../src/filters/SubstringFilter';
-import { LessThanEqualsFilter } from '../src/filters/LessThanEqualsFilter';
-import { GreaterThanEqualsFilter } from '../src/filters/GreaterThanEqualsFilter';
-import { NotFilter } from '../src/filters/NotFilter';
-import { PresenceFilter } from '../src/filters/PresenceFilter';
-import { OrFilter } from '../src/filters/OrFilter';
-import { ApproximateFilter } from '../src/filters/ApproximateFilter';
+import {
+  EqualityFilter,
+  AndFilter,
+  SubstringFilter,
+  LessThanEqualsFilter,
+  GreaterThanEqualsFilter,
+  NotFilter,
+  PresenceFilter,
+  OrFilter,
+  ApproximateFilter,
+} from '../src/filters';
 
 describe('FilterParser', () => {
   before(() => {

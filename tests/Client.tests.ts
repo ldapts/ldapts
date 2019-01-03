@@ -3,10 +3,12 @@ import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
-import { InvalidCredentialsError } from '../src/errors/resultCodeErrors/InvalidCredentialsError';
-import { UndefinedTypeError } from '../src/errors/resultCodeErrors/UndefinedTypeError';
-import { NoSuchObjectError } from '../src/errors/resultCodeErrors/NoSuchObjectError';
-import { InvalidDNSyntaxError } from '../src/errors/resultCodeErrors/InvalidDNSyntaxError';
+import {
+  InvalidCredentialsError,
+  UndefinedTypeError,
+  NoSuchObjectError,
+  InvalidDNSyntaxError,
+} from '../src/errors/resultCodeErrors';
 
 describe('Client', () => {
   before(() => {

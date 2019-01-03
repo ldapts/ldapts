@@ -1,41 +1,43 @@
-import { ResultCodeError } from './errors/resultCodeErrors/ResultCodeError';
-import { OperationsError } from './errors/resultCodeErrors/OperationsError';
-import { UnknownStatusCodeError } from './errors/resultCodeErrors/UnknownStatusCodeError';
-import { ProtocolError } from './errors/resultCodeErrors/ProtocolError';
-import { TimeLimitExceededError } from './errors/resultCodeErrors/TimeLimitExceededError';
-import { SizeLimitExceededError } from './errors/resultCodeErrors/SizeLimitExceededError';
-import { AuthMethodNotSupportedError } from './errors/resultCodeErrors/AuthMethodNotSupportedError';
-import { StrongAuthRequiredError } from './errors/resultCodeErrors/StrongAuthRequiredError';
-import { AdminLimitExceededError } from './errors/resultCodeErrors/AdminLimitExceededError';
-import { UnavailableCriticalExtensionError } from './errors/resultCodeErrors/UnavailableCriticalExtensionError';
-import { ConfidentialityRequiredError } from './errors/resultCodeErrors/ConfidentialityRequiredError';
-import { NoSuchAttributeError } from './errors/resultCodeErrors/NoSuchAttributeError';
-import { UndefinedTypeError } from './errors/resultCodeErrors/UndefinedTypeError';
-import { InappropriateMatchingError } from './errors/resultCodeErrors/InappropriateMatchingError';
-import { ConstraintViolationError } from './errors/resultCodeErrors/ConstraintViolationError';
-import { TypeOrValueExistsError } from './errors/resultCodeErrors/TypeOrValueExistsError';
-import { InvalidSyntaxError } from './errors/resultCodeErrors/InvalidSyntaxError';
-import { NoSuchObjectError } from './errors/resultCodeErrors/NoSuchObjectError';
-import { AliasProblemError } from './errors/resultCodeErrors/AliasProblemError';
-import { InvalidDNSyntaxError } from './errors/resultCodeErrors/InvalidDNSyntaxError';
-import { IsLeafError } from './errors/resultCodeErrors/IsLeafError';
-import { AliasDerefProblemError } from './errors/resultCodeErrors/AliasDerefProblemError';
-import { InappropriateAuthError } from './errors/resultCodeErrors/InappropriateAuthError';
-import { InsufficientAccessError } from './errors/resultCodeErrors/InsufficientAccessError';
-import { InvalidCredentialsError } from './errors/resultCodeErrors/InvalidCredentialsError';
-import { BusyError } from './errors/resultCodeErrors/BusyError';
-import { UnavailableError } from './errors/resultCodeErrors/UnavailableError';
-import { UnwillingToPerformError } from './errors/resultCodeErrors/UnwillingToPerformError';
-import { LoopDetectError } from './errors/resultCodeErrors/LoopDetectError';
-import { NamingViolationError } from './errors/resultCodeErrors/NamingViolationError';
-import { ObjectClassViolationError } from './errors/resultCodeErrors/ObjectClassViolationError';
-import { NotAllowedOnNonLeafError } from './errors/resultCodeErrors/NotAllowedOnNonLeafError';
-import { NotAllowedOnRDNError } from './errors/resultCodeErrors/NotAllowedOnRDNError';
-import { AlreadyExistsError } from './errors/resultCodeErrors/AlreadyExistsError';
-import { NoObjectClassModsError } from './errors/resultCodeErrors/NoObjectClassModsError';
-import { ResultsTooLargeError } from './errors/resultCodeErrors/ResultsTooLargeError';
-import { AffectsMultipleDSAsError } from './errors/resultCodeErrors/AffectsMultipleDSAsError';
-import { TLSNotSupportedError } from './errors/resultCodeErrors/TLSNotSupportedError';
+import {
+  ResultCodeError,
+  OperationsError,
+  UnknownStatusCodeError,
+  ProtocolError,
+  TimeLimitExceededError,
+  SizeLimitExceededError,
+  AuthMethodNotSupportedError,
+  StrongAuthRequiredError,
+  AdminLimitExceededError,
+  UnavailableCriticalExtensionError,
+  ConfidentialityRequiredError,
+  NoSuchAttributeError,
+  UndefinedTypeError,
+  InappropriateMatchingError,
+  ConstraintViolationError,
+  TypeOrValueExistsError,
+  InvalidSyntaxError,
+  NoSuchObjectError,
+  AliasProblemError,
+  InvalidDNSyntaxError,
+  IsLeafError,
+  AliasDerefProblemError,
+  InappropriateAuthError,
+  InsufficientAccessError,
+  InvalidCredentialsError,
+  BusyError,
+  UnavailableError,
+  UnwillingToPerformError,
+  LoopDetectError,
+  NamingViolationError,
+  ObjectClassViolationError,
+  NotAllowedOnNonLeafError,
+  NotAllowedOnRDNError,
+  AlreadyExistsError,
+  NoObjectClassModsError,
+  ResultsTooLargeError,
+  AffectsMultipleDSAsError,
+  TLSNotSupportedError,
+} from './errors/resultCodeErrors';
 
 export class StatusCodeParser {
   public static parse(code: number): ResultCodeError {

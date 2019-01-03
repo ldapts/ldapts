@@ -3,37 +3,40 @@ import { parse as parseUrl } from 'url';
 import * as net from 'net';
 import * as tls from 'tls';
 import Timer = NodeJS.Timer;
-import { Control } from './controls/Control';
-import { Message } from './messages/Message';
-import { BindRequest } from './messages/BindRequest';
-import { UnbindRequest } from './messages/UnbindRequest';
-import { AbandonRequest } from './messages/AbandonRequest';
-import { CompareRequest } from './messages/CompareRequest';
-import { DeleteRequest } from './messages/DeleteRequest';
-import { ExtendedRequest } from './messages/ExtendedRequest';
-import { ModifyDNRequest } from './messages/ModifyDNRequest';
-import { SearchRequest } from './messages/SearchRequest';
-import { Filter } from './filters/Filter';
-import { PagedResultsControl } from './controls/PagedResultsControl';
-import { MessageParser } from './MessageParser';
-import { BindResponse } from './messages/BindResponse';
-import { MessageResponse } from './messages/MessageResponse';
-import { MessageResponseStatus } from './MessageResponseStatus';
-import { CompareResponse, CompareResult } from './messages/CompareResponse';
-import { MessageParserError } from './errors/MessageParserError';
-import { SearchResponse } from './messages/SearchResponse';
-import { SearchReference } from './messages/SearchReference';
-import { SearchEntry } from './messages/SearchEntry';
-import { DeleteResponse } from './messages/DeleteResponse';
-import { StatusCodeParser } from './StatusCodeParser';
-import { ExtendedResponse } from './messages/ExtendedResponse';
-import { ModifyDNResponse } from './messages/ModifyDNResponse';
 import { Attribute } from './Attribute';
-import { AddRequest } from './messages/AddRequest';
-import { AddResponse } from './messages/AddResponse';
 import { Change } from './Change';
-import { ModifyRequest } from './messages/ModifyRequest';
-import { ModifyResponse } from './messages/ModifyResponse';
+import { MessageParser } from './MessageParser';
+import { MessageResponseStatus } from './MessageResponseStatus';
+import { StatusCodeParser } from './StatusCodeParser';
+import { MessageParserError } from './errors';
+import { Control } from './controls/Control';
+import { PagedResultsControl } from './controls/PagedResultsControl';
+import { Filter } from './filters/Filter';
+import { Message } from './messages/Message';
+import { MessageResponse } from './messages/MessageResponse';
+import {
+  BindRequest,
+  UnbindRequest,
+  AbandonRequest,
+  CompareRequest,
+  DeleteRequest,
+  ExtendedRequest,
+  ModifyDNRequest,
+  SearchRequest,
+  BindResponse,
+  CompareResponse,
+  CompareResult,
+  SearchResponse,
+  SearchReference,
+  SearchEntry,
+  DeleteResponse,
+  ExtendedResponse,
+  ModifyDNResponse,
+  AddRequest,
+  AddResponse,
+  ModifyRequest,
+  ModifyResponse,
+} from './messages';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
 const logDebug = debug('ldapts');

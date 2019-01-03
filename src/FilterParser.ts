@@ -1,15 +1,18 @@
 import { BerReader } from 'asn1';
 import { Filter } from './filters/Filter';
-import { PresenceFilter } from './filters/PresenceFilter';
-import { AndFilter } from './filters/AndFilter';
-import { GreaterThanEqualsFilter } from './filters/GreaterThanEqualsFilter';
-import { ExtensibleFilter, ExtensibleFilterOptions } from './filters/ExtensibleFilter';
-import { NotFilter } from './filters/NotFilter';
-import { SubstringFilter } from './filters/SubstringFilter';
-import { EqualityFilter } from './filters/EqualityFilter';
-import { ApproximateFilter } from './filters/ApproximateFilter';
-import { OrFilter } from './filters/OrFilter';
-import { LessThanEqualsFilter } from './filters/LessThanEqualsFilter';
+import {
+  PresenceFilter,
+  AndFilter,
+  GreaterThanEqualsFilter,
+  ExtensibleFilter,
+  ExtensibleFilterOptions,
+  NotFilter,
+  SubstringFilter,
+  EqualityFilter,
+  ApproximateFilter,
+  OrFilter,
+  LessThanEqualsFilter,
+} from './filters';
 import { SearchFilter } from './SearchFilter';
 
 interface ParseStringResult {
