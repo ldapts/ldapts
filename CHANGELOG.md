@@ -1,3 +1,7 @@
+### 1.2.2
+
+  * Fix error message for InvalidCredentialsError
+
 ### 1.2.1
 
   * Provide exports for public classes: errors, filters, and messages (Fix #4)
