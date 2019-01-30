@@ -1,3 +1,7 @@
+### 1.2.3
+
+  * Move asn1 type definitions to DefinitelyTyped
+
 ### 1.2.2
 
   * Fix error message for InvalidCredentialsError
