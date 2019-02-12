@@ -8,6 +8,11 @@ export interface SearchEntryOptions extends MessageResponseOptions {
   attributes?: Attribute[];
 }
 
+export interface Entry {
+  dn: string;
+  [index: string]: string | string[];
+}
+
 export class SearchEntry extends MessageResponse {
   public protocolOperation: ProtocolOperation;
   public name: string;
@@ -31,8 +36,8 @@ export class SearchEntry extends MessageResponse {
     }
   }
 
-  public toObject(): { dn: string, [index: string]: string | string[] } {
-    const result: { dn: string, [index: string]: string | string[] } = {
+  public toObject(): Entry {
+    const result: Entry = {
       dn: this.name,
     };
 

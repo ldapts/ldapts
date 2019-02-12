@@ -28,6 +28,7 @@ import {
   CompareResult,
   SearchResponse,
   SearchReference,
+  Entry,
   SearchEntry,
   DeleteResponse,
   ExtendedResponse,
@@ -90,7 +91,7 @@ export interface SearchOptions {
 
 export interface SearchResult {
   // tslint:disable-next-line: array-type
-  searchEntries: { dn: string, [index: string]: string | string[] }[];
+  searchEntries: Entry[];
   searchReferences: string[];
 }
 
