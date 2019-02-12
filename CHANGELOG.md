@@ -1,3 +1,7 @@
+### 1.3.0
+
+  * Add Entry interface for SearchEntry. Thanks @hikaru7719!
+
 ### 1.2.3
 
   * Move asn1 type definitions to DefinitelyTyped

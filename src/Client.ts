@@ -90,7 +90,6 @@ export interface SearchOptions {
 }
 
 export interface SearchResult {
-  // tslint:disable-next-line: array-type
   searchEntries: Entry[];
   searchReferences: string[];
 }
