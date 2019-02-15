@@ -33,7 +33,7 @@ export function escapeDN(input: DNMap): string {
     const value = object[1];
 
     if (typeof value === 'number') {
-      escapedResults.push(`${key.toString()}=${value}`);
+      escapedResults.push(`${key}=${value}`);
       continue;
     }
 
@@ -78,7 +78,7 @@ export function escapeDN(input: DNMap): string {
       .replace(/^(\u0020)/gm, '\\ ')
       .replace(/(\u0020)$/gm, '\\ ');
 
-    escapedResults.push(`${key.toString()}=${escapedValue}`);
+    escapedResults.push(`${key}=${escapedValue}`);
   }
 
   return escapedResults.join(',');
