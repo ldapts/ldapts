@@ -14,6 +14,7 @@ import { PagedResultsControl } from './controls/PagedResultsControl';
 import { Filter } from './filters/Filter';
 import { Message } from './messages/Message';
 import { MessageResponse } from './messages/MessageResponse';
+import { DNMap, escapeDN } from './DN';
 import {
   BindRequest,
   UnbindRequest,
@@ -150,11 +151,11 @@ export class Client {
 
   /**
    * Performs a simple authentication against the server.
-   * @param {string} dn
+   * @param {string|DNMap} dn
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string, password?: string, controls?: Control|Control[]): Promise<void> {
+  public async bind(dn: string | DNMap, password?: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -166,7 +167,7 @@ export class Client {
 
     const req = new BindRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       password,
       controls,
     });
@@ -179,11 +180,11 @@ export class Client {
 
   /**
    * Used to create a new entry in the directory
-   * @param {string} dn - DN of the entry to add
+   * @param {string|DNMap} dn - The DN of the entry to add
    * @param {Attribute[]|Object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: string, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
+  public async add(dn: string | DNMap, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -215,7 +216,7 @@ export class Client {
 
     const req = new AddRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       attributes: attributesToAdd,
       controls,
     });
@@ -228,12 +229,12 @@ export class Client {
 
   /**
    * Compares an attribute/value pair with an entry on the LDAP server.
-   * @param {string} dn - The DN of the entry to compare attributes with
+   * @param {string|DNMap} dn - The DN of the entry to compare attributes with
    * @param {string} attribute
    * @param {string} value
    * @param {Control|Control[]} [controls]
    */
-  public async compare(dn: string, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
+  public async compare(dn: string | DNMap, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -245,7 +246,7 @@ export class Client {
 
     const req = new CompareRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       attribute,
       value,
       controls,
@@ -264,10 +265,10 @@ export class Client {
 
   /**
    * Deletes an entry from the LDAP server.
-   * @param {string} dn - The DN of the entry to delete
+   * @param {string|DNMap} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
    */
-  public async del(dn: string, controls?: Control|Control[]): Promise<void> {
+  public async del(dn: string | DNMap, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -279,7 +280,7 @@ export class Client {
 
     const req = new DeleteRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       controls,
     });
 
@@ -325,11 +326,11 @@ export class Client {
 
   /**
    * Performs an LDAP modify against the server.
-   * @param {string} dn - The DN of the entry to modify
+   * @param {string|DNMap} dn - The DN of the entry to modify
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string, changes: Change | Change[], controls?: Control|Control[]) {
+  public async modify(dn: string | DNMap, changes: Change | Change[], controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -346,7 +347,7 @@ export class Client {
 
     const req = new ModifyRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       changes,
       controls,
     });
@@ -359,11 +360,11 @@ export class Client {
 
   /**
    * Performs an LDAP modifyDN against the server.
-   * @param {string} dn - The DN of the entry to modify
-   * @param {string} newDN - The new DN to move this entry to
+   * @param {string|DNMap} dn - The DN of the entry to modify
+   * @param {string|DNMap} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string, newDN: string, controls?: Control|Control[]) {
+  public async modifyDN(dn: string | DNMap, newDN: string | DNMap, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -376,9 +377,9 @@ export class Client {
     // TODO: parse newDN to determine if newSuperior should be specified
     const req = new ModifyDNRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : escapeDN(dn),
       deleteOldRdn: true,
-      newRdn: newDN,
+      newRdn: typeof newDN === 'string' ? newDN : escapeDN(newDN),
       controls,
     });
 
@@ -391,11 +392,11 @@ export class Client {
   /**
    * Performs an LDAP search against the server.
    *
-   * @param {string} baseDN - The DN in the tree to start searching at
+   * @param {string|DNMap} baseDN - The DN in the tree to start searching at
    * @param {SearchOptions} options
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
+  public async search(baseDN: string | DNMap, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
@@ -439,7 +440,7 @@ export class Client {
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
-      baseDN,
+      baseDN: typeof baseDN === 'string' ? baseDN : escapeDN(baseDN),
       scope: options.scope,
       filter: options.filter,
       attributes: options.attributes,

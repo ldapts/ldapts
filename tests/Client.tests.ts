@@ -9,6 +9,7 @@ import {
   NoSuchObjectError,
   InvalidDNSyntaxError,
 } from '../src/errors/resultCodeErrors';
+import { DNMap } from '../src/DN';
 
 describe('Client', () => {
   before(() => {
@@ -16,7 +17,7 @@ describe('Client', () => {
     chai.use(chaiAsPromised);
   });
 
-  const bindDN: string = 'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
+  const bindDN: DNMap = [['uid', 'tony.stark'], ['ou', 'Users'], ['o', '5be4c382c583e54de6a3ff52'], ['dc', 'jumpcloud'], ['dc', 'com']];
   const bindPassword: string = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
