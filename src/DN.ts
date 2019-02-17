@@ -11,11 +11,8 @@ type RDN = [string, string | number];
  * When this class is built, it returns an escaped string representation of a DN.
  */
 export class DNBuilder {
-  private readonly map: DNMap;
 
-  constructor(map?: DNMap) {
-    this.map = map ? map : [];
-  }
+  constructor(private readonly map: DNMap = []) { }
 
   /**
    * Add an RDN component to the DN map, consisting of key & value pair.
