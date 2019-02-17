@@ -14,7 +14,7 @@ import { PagedResultsControl } from './controls/PagedResultsControl';
 import { Filter } from './filters/Filter';
 import { Message } from './messages/Message';
 import { MessageResponse } from './messages/MessageResponse';
-import { DNMap, escapeDN } from './DN';
+import { DNMap, DNBuilder } from './DN';
 import {
   BindRequest,
   UnbindRequest,
@@ -167,7 +167,7 @@ export class Client {
 
     const req = new BindRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       password,
       controls,
     });
@@ -216,7 +216,7 @@ export class Client {
 
     const req = new AddRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       attributes: attributesToAdd,
       controls,
     });
@@ -246,7 +246,7 @@ export class Client {
 
     const req = new CompareRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       attribute,
       value,
       controls,
@@ -280,7 +280,7 @@ export class Client {
 
     const req = new DeleteRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       controls,
     });
 
@@ -347,7 +347,7 @@ export class Client {
 
     const req = new ModifyRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       changes,
       controls,
     });
@@ -377,9 +377,9 @@ export class Client {
     // TODO: parse newDN to determine if newSuperior should be specified
     const req = new ModifyDNRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : escapeDN(dn),
+      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
       deleteOldRdn: true,
-      newRdn: typeof newDN === 'string' ? newDN : escapeDN(newDN),
+      newRdn: typeof newDN === 'string' ? newDN : new DNBuilder(newDN).build(),
       controls,
     });
 
@@ -440,7 +440,7 @@ export class Client {
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
-      baseDN: typeof baseDN === 'string' ? baseDN : escapeDN(baseDN),
+      baseDN: typeof baseDN === 'string' ? baseDN : new DNBuilder(baseDN).build(),
       scope: options.scope,
       filter: options.filter,
       attributes: options.attributes,
