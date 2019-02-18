@@ -29,7 +29,7 @@ export class DNBuilder {
    * Build the DN map, returning escaped string representation of the DN.
    */
   public build() {
-    return this._escapeDN(this.map);
+    return this._escape(this.map);
   }
 
   /**
@@ -51,7 +51,7 @@ export class DNBuilder {
    * @param input DN object to be escaped
    * @returns Escaped string representation of DN
    */
-  private _escapeDN(input: DNMap): string {
+  private _escape(input: DNMap) {
     const escapedResults = [];
 
     for (const object of input) {
