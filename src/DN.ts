@@ -29,11 +29,17 @@ export class DNBuilder {
    * Build the DN map, returning escaped string representation of the DN.
    */
   public build() {
-    return this._escape(this.map);
+    const results = [];
+
+    for (const rdn of this.map) {
+      results.push(this._escape(rdn));
+    }
+
+    return results.join(',');
   }
 
   /**
-   * Parse an input DNMap, escape user-provided values & return a string representation.
+   * Parse an input RDN, escape user-provided values & return a string representation.
    *
    * RFC defines, that these characters should be escaped:
    *
@@ -48,65 +54,58 @@ export class DNBuilder {
    * Equal sign 	                  =
    * Leading or trailing spaces
    *
-   * @param input DN object to be escaped
-   * @returns Escaped string representation of DN
+   * @param input RDN object to be escaped
+   * @returns Escaped string representation of RDN
    */
-  private _escape(input: DNMap) {
-    const escapedResults = [];
+  private _escape(input: RDN) {
+    const key = input[0];
+    const value = input[1];
 
-    for (const object of input) {
-      const key = object[0];
-      const value = object[1];
-
-      if (typeof value === 'number') {
-        escapedResults.push(`${key}=${value}`);
-        continue;
-      }
-
-      let escapedValue = '';
-      for (const inputChar of value) {
-        switch (inputChar) {
-          case '"':
-            escapedValue += '\\22';
-            break;
-          case '#':
-            escapedValue += '\\23';
-            break;
-          case '+':
-            escapedValue += '\\2b';
-            break;
-          case ',':
-            escapedValue += '\\2c';
-            break;
-          case ';':
-            escapedValue += '\\3b';
-            break;
-          case '<':
-            escapedValue += '\\3c';
-            break;
-          case '=':
-            escapedValue += '\\3d';
-            break;
-          case '>':
-            escapedValue += '\\3e';
-            break;
-          case '\\':
-            escapedValue += '\\5c';
-            break;
-          default:
-            escapedValue += inputChar;
-            break;
-        }
-      }
-
-      // Replace existing trailing & leading whitespaces.
-      escapedValue
-        .replace(/^(\u0020)/gm, '\\ ')
-        .replace(/(\u0020)$/gm, '\\ ');
-
-      escapedResults.push(`${key}=${escapedValue}`);
+    if (typeof value === 'number') {
+      return `${key}=${value}`;
     }
 
-    return escapedResults.join(',');
+    let escapedValue = '';
+    for (const inputChar of value) {
+      switch (inputChar) {
+        case '"':
+          escapedValue += '\\22';
+          break;
+        case '#':
+          escapedValue += '\\23';
+          break;
+        case '+':
+          escapedValue += '\\2b';
+          break;
+        case ',':
+          escapedValue += '\\2c';
+          break;
+        case ';':
+          escapedValue += '\\3b';
+          break;
+        case '<':
+          escapedValue += '\\3c';
+          break;
+        case '=':
+          escapedValue += '\\3d';
+          break;
+        case '>':
+          escapedValue += '\\3e';
+          break;
+        case '\\':
+          escapedValue += '\\5c';
+          break;
+        default:
+          escapedValue += inputChar;
+          break;
+      }
+    }
+
+    // Replace existing trailing & leading whitespaces.
+    escapedValue
+      .replace(/^(\u0020)/gm, '\\ ')
+      .replace(/(\u0020)$/gm, '\\ ');
+
+    return `${key}=${escapedValue}`;
   }
 }
