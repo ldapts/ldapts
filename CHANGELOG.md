@@ -1,3 +1,7 @@
+### 1.4.0
+
+  * Support binary attribute values (Fix #11)
+
 ### 1.3.0
 
   * Add Entry interface for SearchEntry. Thanks @hikaru7719!
