@@ -10,7 +10,7 @@ export interface SearchEntryOptions extends MessageResponseOptions {
 
 export interface Entry {
   dn: string;
-  [index: string]: string | string[];
+  [index: string]: string | string[] | Buffer | Buffer[];
 }
 
 export class SearchEntry extends MessageResponse {

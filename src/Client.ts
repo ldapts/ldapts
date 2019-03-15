@@ -557,6 +557,7 @@ export class Client {
       if (this.clientOptions.connectTimeout) {
         this.connectTimer = setTimeout(() => {
           if (this.socket && (!this.socket.readable || !this.socket.writable)) {
+            this.connected = false;
             this.socket.destroy();
             delete this.socket;
           }
@@ -609,6 +610,7 @@ export class Client {
       }
     };
     const socketClose = () => {
+      this.connected = false;
       if (this.socket) {
         this.socket.removeListener('error', socketError);
         this.socket.removeListener('close', socketClose);

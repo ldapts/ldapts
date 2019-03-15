@@ -171,6 +171,29 @@ describe('Client', () => {
       }
     });
   });
+/*  describe('#modify()', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should allow updating binary attributes', async () => {
+      const thumbnailPhotoBuffer = await fs.readFile(path.join(__dirname, './groot_100.jpg'));
+      await client.modify('uid=groot,ou=Users,dc=foo,dc=com', new Change({
+        operation: 'replace',
+        modification: new Attribute({
+          type: 'thumbnailPhoto;binary',
+          values: [thumbnailPhotoBuffer]
+        }),
+      }));
+    });
+  });*/
   describe('#search()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',
