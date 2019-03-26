@@ -1,3 +1,8 @@
+### 1.4.2
+
+  * Update dependencies
+  * Add documentation for search options
+
 ### 1.4.1
 
   * Fix 'Socket connection not established' when server closes the connection (Fix #13). Thanks @trevh3!

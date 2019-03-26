@@ -75,17 +75,53 @@ interface MessageDetails {
 }
 
 export interface SearchPageOptions {
+  /**
+   * Number of SearchEntries to return per page for a search request. If the page size is greater than or equal to the
+   * sizeLimit value, the server should ignore the control as the request can be satisfied in a single page.
+   */
   pageSize?: number;
 }
 
 export interface SearchOptions {
+  /**
+   * Specifies how broad the search context is:
+   * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
+   * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
+   * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
+   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   */
   scope?: 'base' | 'one' | 'sub' | 'children';
+  /**
+   * Specifies how the server must treat references to other entries:
+   * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
+   * - always - Always returns the referenced entries, not the alias object.
+   * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
+   * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
+   */
   derefAliases?: 'never' | 'always' | 'search' | 'find';
+  /**
+   * If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
+   */
   returnAttributeValues?: boolean;
+  /**
+   * This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
+   */
   sizeLimit?: number;
+  /**
+   * This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
+   */
   timeLimit?: number;
+  /**
+   * Used to allow paging and specify the page size
+   */
   paged?: SearchPageOptions | boolean;
+  /**
+   * The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
+   */
   filter?: string | Filter;
+  /**
+   * A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
+   */
   attributes?: string[];
 }
 
@@ -391,8 +427,24 @@ export class Client {
   /**
    * Performs an LDAP search against the server.
    *
-   * @param {string} baseDN - The DN in the tree to start searching at
-   * @param {SearchOptions} options
+   * @param {string} baseDN - This specifies the base of the subtree in which the search is to be constrained.
+   * @param {SearchOptions} [options]
+   * @param {string|Filter} [options.filter=(objectclass=*)] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
+   * @param {string} [options.scope='sub'] - Specifies how broad the search context is:
+   * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
+   * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
+   * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
+   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   * @param {string} [options.derefAliases='never'] - Specifies how the server must treat references to other entries:
+   * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
+   * - always - Always returns the referenced entries, not the alias object.
+   * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
+   * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
+   * @param {boolean} [options.returnAttributeValues=true] - If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
+   * @param {number} [options.sizeLimit=0] - This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
+   * @param {number} [options.timeLimit=10] - This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
+   * @param {boolean|SearchPageOptions} [options.paged=false] - Used to allow paging and specify the page size
+   * @param {string[]} [options.attributes] - A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    * @param {Control|Control[]} [controls]
    */
   public async search(baseDN: string, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
