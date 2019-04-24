@@ -18,13 +18,6 @@ export abstract class Filter {
     return true;
   }
 
-  // tslint:disable-next-line:no-empty
-  protected parseFilter(_: BerReader): void {
-  }
-  // tslint:disable-next-line:no-empty
-  protected writeFilter(_: BerWriter): void {
-  }
-
   /**
    * RFC 2254 Escaping of filter strings
    *
@@ -33,7 +26,7 @@ export abstract class Filter {
    * (cn=star*)              (cn=star\2A)
    * (filename=C:\MyFile)    (filename=C:\5cMyFile)
    */
-  protected escape(input: string|Buffer): string {
+  public escape(input: string|Buffer): string {
     let escapedResult = '';
     if (Buffer.isBuffer(input)) {
       for (const inputChar of input) {
@@ -69,6 +62,13 @@ export abstract class Filter {
     }
 
     return escapedResult;
+  }
+
+  // tslint:disable-next-line:no-empty
+  protected parseFilter(_: BerReader): void {
+  }
+  // tslint:disable-next-line:no-empty
+  protected writeFilter(_: BerWriter): void {
   }
 
   protected getObjectValue(objectToCheck: { [index: string]: string } = {}, key: string, strictAttributeCase: boolean): string | undefined {
