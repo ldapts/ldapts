@@ -269,13 +269,13 @@ export class FilterParser {
     }
 
     if (remainingExpression[0] === ':') {
-      return FilterParser._parseExtensibleFilterFromString(remainingExpression);
+      return FilterParser._parseExtensibleFilterFromString(attribute, remainingExpression);
     }
 
     throw new Error(`Invalid expression: ${filterString}`);
   }
 
-  private static _parseExtensibleFilterFromString(filterString: string): ExtensibleFilter {
+  private static _parseExtensibleFilterFromString(attribute: string, filterString: string): ExtensibleFilter {
     let dnAttributes: boolean = false;
     let rule: string | undefined;
 
@@ -303,6 +303,7 @@ export class FilterParser {
     // Trim the leading = (from the :=) and reinsert any extra ':' characters
     const remainingExpression = fields.join(':').substr(1);
     const options: ExtensibleFilterOptions = {
+      matchType: attribute,
       dnAttributes,
       rule,
       value: FilterParser._unescapeHexValues(remainingExpression),

@@ -1,3 +1,9 @@
+### 1.5.0
+  * Update dependencies
+  * Only include PagedResultsControl if `searchOptions.paged` is specified. Fixes #17
+  * Make Filter.escape() public. Thanks @stiller-leser!
+  * Fix FilterParser parsing of ExtensibleFilters to include attribute type. Hopefully fixes #16
+
 ### 1.4.2
 
   * Update dependencies

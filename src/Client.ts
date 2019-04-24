@@ -482,12 +482,16 @@ export class Client {
       pageSize = options.sizeLimit - 1;
     }
 
-    const pagedResultsControl = new PagedResultsControl({
-      value: {
-        size: pageSize,
-      },
-    });
-    controls.push(pagedResultsControl);
+    let pagedResultsControl: PagedResultsControl | undefined;
+    const shouldPage = !!options.paged;
+    if (shouldPage) {
+      pagedResultsControl = new PagedResultsControl({
+        value: {
+          size: pageSize,
+        },
+      });
+      controls.push(pagedResultsControl);
+    }
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
@@ -506,7 +510,7 @@ export class Client {
       searchReferences: [],
     };
 
-    await this._sendSearch(searchRequest, searchResult, (typeof options.paged !== 'undefined') && options.paged !== false, pageSize, pagedResultsControl);
+    await this._sendSearch(searchRequest, searchResult, shouldPage, pageSize, pagedResultsControl);
 
     return searchResult;
   }
@@ -527,7 +531,7 @@ export class Client {
     await this._send(req);
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl: PagedResultsControl) {
+  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl) {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
@@ -545,7 +549,7 @@ export class Client {
     }
 
     // Recursively search if paging is specified
-    if (paged && (result.searchEntries.length || result.searchReferences.length)) {
+    if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
       let pagedResultsFromResponse: PagedResultsControl | undefined;
       for (const control of (result.controls || [])) {
         if (control instanceof PagedResultsControl) {
