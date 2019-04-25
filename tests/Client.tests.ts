@@ -367,17 +367,17 @@ describe('Client', () => {
         filters: [
           new EqualityFilter({
             attribute: 'objectCategory',
-            value: 'group'
+            value: 'group',
           }),
           new EqualityFilter({
             attribute: 'displayName',
-            value: 'Something (Special)'
-          })
-        ]
-      })
+            value: 'Something (Special)',
+          }),
+        ],
+      });
       const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-        filter: filter
-      })
+        filter,
+      });
 
       searchResult.searchEntries.should.deep.equal([{
         dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
@@ -393,6 +393,6 @@ describe('Client', () => {
         sn: [],
         objectClass: [],
       }]);
-    })
+    });
   });
 });
