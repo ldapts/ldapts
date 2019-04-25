@@ -9,6 +9,8 @@ import {
   NoSuchObjectError,
   InvalidDNSyntaxError,
 } from '../src/errors/resultCodeErrors';
+import { AndFilter } from '../src/filters/AndFilter';
+import { EqualityFilter } from '../src/filters/EqualityFilter';
 
 describe('Client', () => {
   before(() => {
@@ -360,5 +362,37 @@ describe('Client', () => {
       const pagedResultsControl = new PagedResultsControl({});
       client.search('cn=test', {}, [pagedResultsControl]).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
     });
+    it('should return results in the presence of parens', async () => {
+      const filter: AndFilter = new AndFilter({
+        filters: [
+          new EqualityFilter({
+            attribute: 'objectCategory',
+            value: 'group'
+          }),
+          new EqualityFilter({
+            attribute: 'displayName',
+            value: 'Something (Special)'
+          })
+        ]
+      })
+      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: filter
+      })
+
+      searchResult.searchEntries.should.deep.equal([{
+        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        gidNumber: [],
+        mail: [],
+        cn: [],
+        jcLdapAdmin: [],
+        uid: [],
+        uidNumber: [],
+        loginShell: [],
+        homeDirectory: [],
+        givenName: [],
+        sn: [],
+        objectClass: [],
+      }]);
+    })
   });
 });
