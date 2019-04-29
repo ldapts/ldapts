@@ -536,7 +536,7 @@ export class Client {
 
     const result = await this._send<SearchResponse>(searchRequest);
 
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result.status !== MessageResponseStatus.Success && !(result.status === MessageResponseStatus.SizeLimitExceeded && searchRequest.sizeLimit)) {
       throw StatusCodeParser.parse(result.status);
     }
 

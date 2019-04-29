@@ -1,3 +1,10 @@
+### 1.5.1
+  * Do not throw "Size limit exceeded" error if `sizeLimit` is defined and the server responds with `4` (Size limit exceeded).
+     - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded). 
+       
+       I'm not really sure what to do in that case. At this time, I decided against throwing an error and instead 
+       just returning the results returned thus far. That approach works with JumpCloud and forumsys' ldap servers
+
 ### 1.5.0
   * Update dependencies
   * Only include PagedResultsControl if `searchOptions.paged` is specified. Fixes #17
