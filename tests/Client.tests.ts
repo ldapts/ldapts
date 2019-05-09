@@ -9,6 +9,10 @@ import {
   NoSuchObjectError,
   InvalidDNSyntaxError,
 } from '../src/errors/resultCodeErrors';
+import {
+  AndFilter,
+  EqualityFilter,
+} from '../src/filters';
 
 describe('Client', () => {
   before(() => {
@@ -420,6 +424,61 @@ describe('Client', () => {
       } finally {
         await testClient.unbind();
       }
+    });
+    it('should return group contents with parenthesis in name - explicit filter controls', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: new AndFilter({
+          filters: [
+            new EqualityFilter({
+              attribute: 'objectClass',
+              value: 'groupOfNames',
+            }),
+            new EqualityFilter({
+              attribute: 'cn',
+              value: 'Something (Special)',
+            }),
+          ],
+        }),
+      });
+
+      searchResult.searchEntries.should.deep.equal([{
+        cn: 'Something (Special)',
+        ou: 'Something (Special)',
+        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        member: [
+          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        ],
+        objectClass: [
+          'top',
+          'groupOfNames',
+        ],
+        description: 'tagGroup',
+      }]);
+    });
+    it('should return group contents with parenthesis in name - string filter', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: '(&(objectClass=groupOfNames)(cn=Something \\28Special\\29))',
+      });
+
+      searchResult.searchEntries.should.deep.equal([{
+        cn: 'Something (Special)',
+        ou: 'Something (Special)',
+        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        member: [
+          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        ],
+        objectClass: [
+          'top',
+          'groupOfNames',
+        ],
+        description: 'tagGroup',
+      }]);
     });
     it('should throw if a PagedResultsControl is specified', () => {
       const pagedResultsControl = new PagedResultsControl({});

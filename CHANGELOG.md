@@ -1,3 +1,6 @@
+### 1.6.0
+  * Fix incorrectly escaping search filter names/values. Fix #18
+
 ### 1.5.1
   * Do not throw "Size limit exceeded" error if `sizeLimit` is defined and the server responds with `4` (Size limit exceeded).
      - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded). 

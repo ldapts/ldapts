@@ -70,20 +70,20 @@ export class SubstringFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    writer.writeString(this.escape(this.attribute));
+    writer.writeString(this.attribute);
     writer.startSequence();
     if (this.initial) {
-      writer.writeString(this.escape(this.initial), 0x80);
+      writer.writeString(this.initial, 0x80);
     }
 
     if (this.any && this.any.length) {
       for (const anyItem of this.any) {
-        writer.writeString(this.escape(anyItem), 0x81);
+        writer.writeString(anyItem, 0x81);
       }
     }
 
     if (this.final) {
-      writer.writeString(this.escape(this.final), 0x82);
+      writer.writeString(this.final, 0x82);
     }
 
     writer.endSequence();

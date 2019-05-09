@@ -59,14 +59,14 @@ export class ExtensibleFilter extends Filter {
 
   public writeFilter(writer: BerWriter): void {
     if (this.rule) {
-      writer.writeString(this.escape(this.rule), 0x81);
+      writer.writeString(this.rule, 0x81);
     }
 
     if (this.matchType) {
-      writer.writeString(this.escape(this.matchType), 0x82);
+      writer.writeString(this.matchType, 0x82);
     }
 
-    writer.writeString(this.escape(this.value), 0x83);
+    writer.writeString(this.value, 0x83);
 
     if (this.dnAttributes) {
       writer.writeBoolean(this.dnAttributes, 0x84);
