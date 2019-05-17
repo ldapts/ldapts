@@ -1,12 +1,12 @@
 {
   "name": "ldapts",
-  "version": "1.4.1",
+  "version": "1.6.0",
   "description": "LDAP client",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "mocha -r ts-node/register tests/**/*.tests.ts",
+    "test": "mocha -r ts-node/register tests/*.tests.ts tests/**/*.tests.ts",
     "lint": "tslint --fix -p tsconfig.lint.json -c tslint.json -t stylish",
     "prepublishOnly": "npm run build && npm run lint && npm run test"
   },
@@ -35,23 +35,24 @@
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
     "asn1": "~0.2.4",
-    "debug": "~4.1.0",
+    "debug": "~4.1.1",
     "strict-event-emitter-types": "~2.0.0"
   },
   "devDependencies": {
     "@types/asn1": "~0.2.0",
     "@types/chai": "~4.1.7",
     "@types/chai-as-promised": "~7.1.0",
-    "@types/debug": "0.0.31",
-    "@types/mocha": "~5.2.5",
-    "@types/node": "~10.12.15",
+    "@types/debug": "~4.1.4",
+    "@types/mocha": "~5.2.6",
+    "@types/node": "~11.13.7",
     "chai": "~4.2.0",
     "chai-as-promised": "~7.1.1",
-    "husky": "~1.2.1",
-    "mocha": "~5.2.0",
-    "ts-node": "~7.0.1",
-    "tslint": "~5.11.0",
+    "husky": "~2.0.0",
+    "mocha": "~6.1.4",
+    "ts-mockito": "~2.3.1",
+    "ts-node": "~8.1.0",
+    "tslint": "~5.16.0",
     "tslint-config-airbnb": "~5.11.1",
-    "typescript": "~3.2.2"
+    "typescript": "~3.4.5"
   }
 }

@@ -14,7 +14,6 @@ import { PagedResultsControl } from './controls/PagedResultsControl';
 import { Filter } from './filters/Filter';
 import { Message } from './messages/Message';
 import { MessageResponse } from './messages/MessageResponse';
-import { DNMap, DNBuilder } from './DN';
 import {
   BindRequest,
   UnbindRequest,
@@ -76,17 +75,53 @@ interface MessageDetails {
 }
 
 export interface SearchPageOptions {
+  /**
+   * Number of SearchEntries to return per page for a search request. If the page size is greater than or equal to the
+   * sizeLimit value, the server should ignore the control as the request can be satisfied in a single page.
+   */
   pageSize?: number;
 }
 
 export interface SearchOptions {
+  /**
+   * Specifies how broad the search context is:
+   * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
+   * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
+   * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
+   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   */
   scope?: 'base' | 'one' | 'sub' | 'children';
+  /**
+   * Specifies how the server must treat references to other entries:
+   * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
+   * - always - Always returns the referenced entries, not the alias object.
+   * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
+   * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
+   */
   derefAliases?: 'never' | 'always' | 'search' | 'find';
+  /**
+   * If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
+   */
   returnAttributeValues?: boolean;
+  /**
+   * This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
+   */
   sizeLimit?: number;
+  /**
+   * This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
+   */
   timeLimit?: number;
+  /**
+   * Used to allow paging and specify the page size
+   */
   paged?: SearchPageOptions | boolean;
+  /**
+   * The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
+   */
   filter?: string | Filter;
+  /**
+   * A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
+   */
   attributes?: string[];
 }
 
@@ -151,11 +186,11 @@ export class Client {
 
   /**
    * Performs a simple authentication against the server.
-   * @param {string|DNMap} dn
+   * @param {string} dn
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string | DNMap, password?: string, controls?: Control|Control[]): Promise<void> {
+  public async bind(dn: string, password?: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -167,7 +202,7 @@ export class Client {
 
     const req = new BindRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       password,
       controls,
     });
@@ -180,11 +215,11 @@ export class Client {
 
   /**
    * Used to create a new entry in the directory
-   * @param {string|DNMap} dn - The DN of the entry to add
+   * @param {string} dn - The DN of the entry to add
    * @param {Attribute[]|Object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: string | DNMap, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
+  public async add(dn: string, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -216,7 +251,7 @@ export class Client {
 
     const req = new AddRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       attributes: attributesToAdd,
       controls,
     });
@@ -229,12 +264,12 @@ export class Client {
 
   /**
    * Compares an attribute/value pair with an entry on the LDAP server.
-   * @param {string|DNMap} dn - The DN of the entry to compare attributes with
+   * @param {string} dn - The DN of the entry to compare attributes with
    * @param {string} attribute
    * @param {string} value
    * @param {Control|Control[]} [controls]
    */
-  public async compare(dn: string | DNMap, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
+  public async compare(dn: string, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -246,7 +281,7 @@ export class Client {
 
     const req = new CompareRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       attribute,
       value,
       controls,
@@ -265,10 +300,10 @@ export class Client {
 
   /**
    * Deletes an entry from the LDAP server.
-   * @param {string|DNMap} dn - The DN of the entry to delete
+   * @param {string} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
    */
-  public async del(dn: string | DNMap, controls?: Control|Control[]): Promise<void> {
+  public async del(dn: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -280,7 +315,7 @@ export class Client {
 
     const req = new DeleteRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       controls,
     });
 
@@ -326,11 +361,11 @@ export class Client {
 
   /**
    * Performs an LDAP modify against the server.
-   * @param {string|DNMap} dn - The DN of the entry to modify
+   * @param {string} dn - The DN of the entry to modify
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string | DNMap, changes: Change | Change[], controls?: Control|Control[]) {
+  public async modify(dn: string, changes: Change | Change[], controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -347,7 +382,7 @@ export class Client {
 
     const req = new ModifyRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       changes,
       controls,
     });
@@ -360,11 +395,11 @@ export class Client {
 
   /**
    * Performs an LDAP modifyDN against the server.
-   * @param {string|DNMap} dn - The DN of the entry to modify
-   * @param {string|DNMap} newDN - The new DN to move this entry to
+   * @param {string} dn - The DN of the entry to modify
+   * @param {string} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string | DNMap, newDN: string | DNMap, controls?: Control|Control[]) {
+  public async modifyDN(dn: string, newDN: string, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -377,9 +412,9 @@ export class Client {
     // TODO: parse newDN to determine if newSuperior should be specified
     const req = new ModifyDNRequest({
       messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : new DNBuilder(dn).build(),
+      dn,
       deleteOldRdn: true,
-      newRdn: typeof newDN === 'string' ? newDN : new DNBuilder(newDN).build(),
+      newRdn: newDN,
       controls,
     });
 
@@ -392,11 +427,27 @@ export class Client {
   /**
    * Performs an LDAP search against the server.
    *
-   * @param {string|DNMap} baseDN - The DN in the tree to start searching at
-   * @param {SearchOptions} options
+   * @param {string} baseDN - This specifies the base of the subtree in which the search is to be constrained.
+   * @param {SearchOptions} [options]
+   * @param {string|Filter} [options.filter=(objectclass=*)] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
+   * @param {string} [options.scope='sub'] - Specifies how broad the search context is:
+   * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
+   * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
+   * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
+   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   * @param {string} [options.derefAliases='never'] - Specifies how the server must treat references to other entries:
+   * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
+   * - always - Always returns the referenced entries, not the alias object.
+   * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
+   * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
+   * @param {boolean} [options.returnAttributeValues=true] - If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
+   * @param {number} [options.sizeLimit=0] - This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
+   * @param {number} [options.timeLimit=10] - This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
+   * @param {boolean|SearchPageOptions} [options.paged=false] - Used to allow paging and specify the page size
+   * @param {string[]} [options.attributes] - A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string | DNMap, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
+  public async search(baseDN: string, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
@@ -431,16 +482,20 @@ export class Client {
       pageSize = options.sizeLimit - 1;
     }
 
-    const pagedResultsControl = new PagedResultsControl({
-      value: {
-        size: pageSize,
-      },
-    });
-    controls.push(pagedResultsControl);
+    let pagedResultsControl: PagedResultsControl | undefined;
+    const shouldPage = !!options.paged;
+    if (shouldPage) {
+      pagedResultsControl = new PagedResultsControl({
+        value: {
+          size: pageSize,
+        },
+      });
+      controls.push(pagedResultsControl);
+    }
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
-      baseDN: typeof baseDN === 'string' ? baseDN : new DNBuilder(baseDN).build(),
+      baseDN,
       scope: options.scope,
       filter: options.filter,
       attributes: options.attributes,
@@ -455,7 +510,7 @@ export class Client {
       searchReferences: [],
     };
 
-    await this._sendSearch(searchRequest, searchResult, (typeof options.paged !== 'undefined') && options.paged !== false, pageSize, pagedResultsControl);
+    await this._sendSearch(searchRequest, searchResult, shouldPage, pageSize, pagedResultsControl);
 
     return searchResult;
   }
@@ -476,12 +531,12 @@ export class Client {
     await this._send(req);
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl: PagedResultsControl) {
+  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl) {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
 
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result.status !== MessageResponseStatus.Success && !(result.status === MessageResponseStatus.SizeLimitExceeded && searchRequest.sizeLimit)) {
       throw StatusCodeParser.parse(result.status);
     }
 
@@ -494,7 +549,7 @@ export class Client {
     }
 
     // Recursively search if paging is specified
-    if (paged && (result.searchEntries.length || result.searchReferences.length)) {
+    if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
       let pagedResultsFromResponse: PagedResultsControl | undefined;
       for (const control of (result.controls || [])) {
         if (control instanceof PagedResultsControl) {

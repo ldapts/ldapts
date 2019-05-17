@@ -9,7 +9,10 @@ import {
   NoSuchObjectError,
   InvalidDNSyntaxError,
 } from '../src/errors/resultCodeErrors';
-import { DNMap } from '../src/DN';
+import {
+  AndFilter,
+  EqualityFilter,
+} from '../src/filters';
 
 describe('Client', () => {
   before(() => {
@@ -17,7 +20,7 @@ describe('Client', () => {
     chai.use(chaiAsPromised);
   });
 
-  const bindDN: DNMap = [['uid', 'tony.stark'], ['ou', 'Users'], ['o', '5be4c382c583e54de6a3ff52'], ['dc', 'jumpcloud'], ['dc', 'com']];
+  const bindDN = 'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
   const bindPassword: string = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
@@ -241,6 +244,7 @@ describe('Client', () => {
         dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
         gidNumber: '5004',
         mail: 'peter.parker@marvel.com',
+        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
         cn: 'Peter Parker',
         jcLdapAdmin: 'TRUE',
         uid: 'peter.parker',
@@ -262,6 +266,7 @@ describe('Client', () => {
         dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
         gidNumber: '5004',
         mail: 'peter.parker@marvel.com',
+        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
         cn: 'Peter Parker',
         jcLdapAdmin: 'TRUE',
         uid: 'peter.parker',
@@ -306,7 +311,7 @@ describe('Client', () => {
         await testClient.unbind();
       }
     });
-    it('should restrict attributes returned if attributes are specified"', async () => {
+    it('should restrict attributes returned if attributes are specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
         scope: 'sub',
@@ -319,7 +324,7 @@ describe('Client', () => {
         cn: 'Peter Parker',
       }]);
     });
-    it('should not return attribute values if returnAttributeValues=false"', async () => {
+    it('should not return attribute values if returnAttributeValues=false', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
         scope: 'sub',
@@ -331,6 +336,7 @@ describe('Client', () => {
         dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
         gidNumber: [],
         mail: [],
+        memberOf: [],
         cn: [],
         jcLdapAdmin: [],
         uid: [],
@@ -342,7 +348,7 @@ describe('Client', () => {
         objectClass: [],
       }]);
     });
-    it('should page search entries if paging is specified"', async () => {
+    it('should page search entries if paging is specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
         filter: 'objectClass=jumpcloudUser',
@@ -352,6 +358,127 @@ describe('Client', () => {
       });
 
       searchResult.searchEntries.length.should.be.greaterThan(2);
+    });
+    it('should allow sizeLimit when no paging is specified - jumpcloud', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -z 6 'cn=*'
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: 'cn=*',
+        sizeLimit: 6,
+      });
+
+      searchResult.searchEntries.length.should.equal(6);
+    });
+    it('should allow sizeLimit when no paging is specified - forumsys', async () => {
+      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -z 3 'cn=*'
+      const testClient = new Client({
+        url: 'ldap://ldap.forumsys.com',
+      });
+
+      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      try {
+        const searchResult = await testClient.search('dc=example,dc=com', {
+          filter: 'cn=*',
+          sizeLimit: 3,
+        });
+
+        searchResult.searchEntries.length.should.equal(3);
+      } catch (ex) {
+        // Shouldn't get here
+        ex.should.equal(false);
+      } finally {
+        await testClient.unbind();
+      }
+    });
+    it('should allow sizeLimit when paging is specified - jumpcloud', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=3/noprompt -z 5 'cn=*'
+      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: 'cn=*',
+        sizeLimit: 5,
+        paged: {
+          pageSize: 3,
+        },
+      });
+
+      searchResult.searchEntries.length.should.equal(5);
+    });
+    it('should allow sizeLimit when paging is specified - forumsys', async () => {
+      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -E pr=3/noprompt -z 4 'cn=*'
+      const testClient = new Client({
+        url: 'ldap://ldap.forumsys.com',
+      });
+
+      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      try {
+        const searchResult = await testClient.search('dc=example,dc=com', {
+          filter: 'cn=*',
+          sizeLimit: 4,
+          paged: {
+            pageSize: 3,
+          },
+        });
+
+        searchResult.searchEntries.length.should.equal(4);
+      } catch (ex) {
+        // Shouldn't get here
+        ex.should.equal(false);
+      } finally {
+        await testClient.unbind();
+      }
+    });
+    it('should return group contents with parenthesis in name - explicit filter controls', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: new AndFilter({
+          filters: [
+            new EqualityFilter({
+              attribute: 'objectClass',
+              value: 'groupOfNames',
+            }),
+            new EqualityFilter({
+              attribute: 'cn',
+              value: 'Something (Special)',
+            }),
+          ],
+        }),
+      });
+
+      searchResult.searchEntries.should.deep.equal([{
+        cn: 'Something (Special)',
+        ou: 'Something (Special)',
+        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        member: [
+          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        ],
+        objectClass: [
+          'top',
+          'groupOfNames',
+        ],
+        description: 'tagGroup',
+      }]);
+    });
+    it('should return group contents with parenthesis in name - string filter', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: '(&(objectClass=groupOfNames)(cn=Something \\28Special\\29))',
+      });
+
+      searchResult.searchEntries.should.deep.equal([{
+        cn: 'Something (Special)',
+        ou: 'Something (Special)',
+        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        member: [
+          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        ],
+        objectClass: [
+          'top',
+          'groupOfNames',
+        ],
+        description: 'tagGroup',
+      }]);
     });
     it('should throw if a PagedResultsControl is specified', () => {
       const pagedResultsControl = new PagedResultsControl({});

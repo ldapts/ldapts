@@ -25,7 +25,7 @@ interface MessageParserEvents {
   error: (error: Error) => void;
 }
 
-export class MessageParser extends (EventEmitter as { new(): MessageParserEmitter }) {
+export class MessageParser extends (EventEmitter as new() => MessageParserEmitter) {
   private buffer?: Buffer;
 
   public read(data: Buffer) {

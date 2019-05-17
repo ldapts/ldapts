@@ -3,8 +3,9 @@ import chai, { should } from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { FilterParser } from '../src/FilterParser';
 import {
-  EqualityFilter,
   AndFilter,
+  EqualityFilter,
+  ExtensibleFilter,
   SubstringFilter,
   LessThanEqualsFilter,
   GreaterThanEqualsFilter,
@@ -869,6 +870,61 @@ describe('FilterParser', () => {
           }));
         });
       });
+      describe('Tests from RFC examples', () => {
+        it('should parse: (o=Parens R Us (for all your parenthetical needs))', () => {
+          const result = FilterParser.parseString('(o=Parens R Us \\28for all your parenthetical needs\\29)');
+          result.should.deep.equal(new EqualityFilter({
+            attribute: 'o',
+            value: 'Parens R Us (for all your parenthetical needs)',
+          }));
+        });
+        it('should parse: (cn=***)', () => {
+          const result = FilterParser.parseString('(cn=*\\2A*)');
+          result.should.deep.equal(new SubstringFilter({
+            attribute: 'cn',
+            any: ['*'],
+          }));
+        });
+        it('should parse: (&(objectCategory=group)(displayName=My group (something)))', () => {
+          const result = FilterParser.parseString('(&(objectCategory=group)(displayName=My group \\28something\\29))');
+          result.should.deep.equal(new AndFilter({
+            filters: [
+              new EqualityFilter({
+                attribute: 'objectCategory',
+                value: 'group',
+              }),
+              new EqualityFilter({
+                attribute: 'displayName',
+                value: 'My group (something)',
+              }),
+            ],
+          }));
+        });
+      });
+    });
+    describe('Github Issues', () => {
+      it('should parse: (&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))', () => {
+        const result = FilterParser.parseString('(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))');
+        result.should.deep.equal(new AndFilter({
+          filters: [
+            new EqualityFilter({
+              attribute: 'objectCategory',
+              value: 'person',
+            }),
+            new EqualityFilter({
+              attribute: 'objectClass',
+              value: 'user',
+            }),
+            new NotFilter({
+              filter: new ExtensibleFilter({
+                matchType: 'userAccountControl',
+                rule: '1.2.840.113556.1.4.803',
+                value: '2',
+              }),
+            }),
+          ],
+        }));
+      });
     });
     describe('SubstringFilter', () => {
       it('should support * with a prefix', () => {
@@ -947,6 +1003,55 @@ describe('FilterParser', () => {
         result.should.deep.equal(new ApproximateFilter({
           attribute: 'foo',
           value: 'bar',
+        }));
+      });
+    });
+    describe('ExtensibleFilter', () => {
+      it('should parse: (cn:caseExactMatch:=Fred Flintstone)', () => {
+        const result = FilterParser.parseString('(cn:caseExactMatch:=Fred Flintstone)');
+        result.should.deep.equal(new ExtensibleFilter({
+          matchType: 'cn',
+          rule: 'caseExactMatch',
+          value: 'Fred Flintstone',
+        }));
+      });
+      it('should parse: (cn:=Betty Rubble)', () => {
+        const result = FilterParser.parseString('(cn:=Betty Rubble)');
+        result.should.deep.equal(new ExtensibleFilter({
+          matchType: 'cn',
+          value: 'Betty Rubble',
+        }));
+      });
+      it('should parse: (sn:dn:2.4.6.8.10:=Barney Rubble)', () => {
+        const result = FilterParser.parseString('(sn:dn:2.4.6.8.10:=Barney Rubble)');
+        result.should.deep.equal(new ExtensibleFilter({
+          matchType: 'sn',
+          rule: '2.4.6.8.10',
+          dnAttributes: true,
+          value: 'Barney Rubble',
+        }));
+      });
+      it('should parse: (o:dn:=Ace Industry)', () => {
+        const result = FilterParser.parseString('(o:dn:=Ace Industry)');
+        result.should.deep.equal(new ExtensibleFilter({
+          matchType: 'o',
+          dnAttributes: true,
+          value: 'Ace Industry',
+        }));
+      });
+      it('should parse: (:1.2.3:=Wilma Flintstone)', () => {
+        const result = FilterParser.parseString('(:1.2.3:=Wilma Flintstone)');
+        result.should.deep.equal(new ExtensibleFilter({
+          rule: '1.2.3',
+          value: 'Wilma Flintstone',
+        }));
+      });
+      it('should parse: (:DN:2.4.6.8.10:=Dino)', () => {
+        const result = FilterParser.parseString('(:DN:2.4.6.8.10:=Dino)');
+        result.should.deep.equal(new ExtensibleFilter({
+          rule: '2.4.6.8.10',
+          dnAttributes: true,
+          value: 'Dino',
         }));
       });
     });

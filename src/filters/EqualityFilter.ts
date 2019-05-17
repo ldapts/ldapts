@@ -1,4 +1,4 @@
-import { Ber, BerReader, BerWriter } from 'asn1';
+import { BerReader, BerWriter } from 'asn1';
 import { Filter } from './Filter';
 import { SearchFilter } from '../SearchFilter';
 
@@ -29,8 +29,8 @@ export class EqualityFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    writer.writeString(this.escape(this.attribute));
-    writer.writeString(this.escape(this.value), Ber.OctetString);
+    writer.writeString(this.attribute);
+    writer.writeString(this.value);
   }
 
   public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {

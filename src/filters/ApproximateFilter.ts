@@ -24,8 +24,8 @@ export class ApproximateFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    writer.writeString(this.escape(this.attribute));
-    writer.writeString(this.escape(this.value));
+    writer.writeString(this.attribute);
+    writer.writeString(this.value);
   }
 
   public matches(_: { [index: string]: string } = {}, __: boolean): void {
