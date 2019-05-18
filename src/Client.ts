@@ -14,6 +14,7 @@ import { PagedResultsControl } from './controls/PagedResultsControl';
 import { Filter } from './filters/Filter';
 import { Message } from './messages/Message';
 import { MessageResponse } from './messages/MessageResponse';
+import { DN } from './dn';
 import {
   BindRequest,
   UnbindRequest,
@@ -186,11 +187,11 @@ export class Client {
 
   /**
    * Performs a simple authentication against the server.
-   * @param {string} dn
+   * @param {string|DN} dn
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string, password?: string, controls?: Control|Control[]): Promise<void> {
+  public async bind(dn: string | DN, password?: string, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -202,7 +203,7 @@ export class Client {
 
     const req = new BindRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       password,
       controls,
     });
@@ -215,11 +216,11 @@ export class Client {
 
   /**
    * Used to create a new entry in the directory
-   * @param {string} dn - The DN of the entry to add
+   * @param {string|DN} dn - The DN of the entry to add
    * @param {Attribute[]|Object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: string, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
+  public async add(dn: string | DN, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -251,7 +252,7 @@ export class Client {
 
     const req = new AddRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       attributes: attributesToAdd,
       controls,
     });
@@ -264,12 +265,12 @@ export class Client {
 
   /**
    * Compares an attribute/value pair with an entry on the LDAP server.
-   * @param {string} dn - The DN of the entry to compare attributes with
+   * @param {string|DN} dn - The DN of the entry to compare attributes with
    * @param {string} attribute
    * @param {string} value
    * @param {Control|Control[]} [controls]
    */
-  public async compare(dn: string, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
+  public async compare(dn: string | DN, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -281,7 +282,7 @@ export class Client {
 
     const req = new CompareRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       attribute,
       value,
       controls,
@@ -300,10 +301,10 @@ export class Client {
 
   /**
    * Deletes an entry from the LDAP server.
-   * @param {string} dn - The DN of the entry to delete
+   * @param {string|DN} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
    */
-  public async del(dn: string, controls?: Control|Control[]): Promise<void> {
+  public async del(dn: string | DN, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -315,7 +316,7 @@ export class Client {
 
     const req = new DeleteRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       controls,
     });
 
@@ -361,11 +362,11 @@ export class Client {
 
   /**
    * Performs an LDAP modify against the server.
-   * @param {string} dn - The DN of the entry to modify
+   * @param {string|DN} dn - The DN of the entry to modify
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string, changes: Change | Change[], controls?: Control|Control[]) {
+  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -382,7 +383,7 @@ export class Client {
 
     const req = new ModifyRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       changes,
       controls,
     });
@@ -395,11 +396,11 @@ export class Client {
 
   /**
    * Performs an LDAP modifyDN against the server.
-   * @param {string} dn - The DN of the entry to modify
-   * @param {string} newDN - The new DN to move this entry to
+   * @param {string|DN} dn - The DN of the entry to modify
+   * @param {string|DN} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string, newDN: string, controls?: Control|Control[]) {
+  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control|Control[]) {
     if (!this.connected) {
       await this._connect();
     }
@@ -412,9 +413,9 @@ export class Client {
     // TODO: parse newDN to determine if newSuperior should be specified
     const req = new ModifyDNRequest({
       messageId: this._nextMessageId(),
-      dn,
+      dn: typeof dn === 'string' ? dn : dn.toString(),
       deleteOldRdn: true,
-      newRdn: newDN,
+      newRdn: typeof newDN === 'string' ? newDN : newDN.toString(),
       controls,
     });
 
@@ -427,7 +428,7 @@ export class Client {
   /**
    * Performs an LDAP search against the server.
    *
-   * @param {string} baseDN - This specifies the base of the subtree in which the search is to be constrained.
+   * @param {string|DN} baseDN - This specifies the base of the subtree in which the search is to be constrained.
    * @param {SearchOptions} [options]
    * @param {string|Filter} [options.filter=(objectclass=*)] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
    * @param {string} [options.scope='sub'] - Specifies how broad the search context is:
@@ -447,7 +448,7 @@ export class Client {
    * @param {string[]} [options.attributes] - A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
+  public async search(baseDN: string | DN, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
@@ -495,7 +496,7 @@ export class Client {
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
-      baseDN,
+      baseDN: typeof baseDN === 'string' ? baseDN : baseDN.toString(),
       scope: options.scope,
       filter: options.filter,
       attributes: options.attributes,
