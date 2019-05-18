@@ -6,7 +6,8 @@ export interface DNAttributes {
 }
 
 /**
- * DN provides chain building of multiple RDNs.
+ * DN class provides chain building of multiple RDNs, which can be later build into
+ * escaped string representation.
  */
 export class DN {
   private rdns: RDN[] = [];

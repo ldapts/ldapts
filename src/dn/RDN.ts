@@ -3,6 +3,10 @@ export interface RDNAttributes {
   [name: string]: string;
 }
 
+/**
+ * RDN is a part of DN and it consists of key & value pair. This class also supports
+ * compound RDNs, meaning that one RDN can hold multiple key & value pairs.
+ */
 export class RDN {
   private attrs: RDNAttributes = {};
 
