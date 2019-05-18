@@ -23,6 +23,15 @@ describe('DN', () => {
 
       dn.toString().should.equal('cn=Smith\\, James K.,oa=eu,dc=domain,dc=gb,group=all');
     });
+
+    it('should handle values with the same key', () => {
+      const dn = new DN({
+        oa: 'eu',
+        dc: ['domain1', 'domain2'],
+      });
+
+      dn.toString().should.equal('oa=eu,dc=domain1,dc=domain2');
+    });
   });
 
   describe('#equals()', () => {

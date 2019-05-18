@@ -1,8 +1,14 @@
 
 import { RDN, RDNAttributes } from './RDN';
 
+/**
+ * DNAttributes is an interface, that maps every key & value to a specified RDN.
+ *
+ * Value can be either a string or a list of strings, where every value in the list will
+ * get applied to the same key of an RDN.
+ */
 export interface DNAttributes {
-  [name: string]: string;
+  [name: string]: string | string[];
 }
 
 /**
@@ -17,18 +23,26 @@ export class DN {
       if (Array.isArray(rdns)) {
         this.rdns = rdns;
       } else {
-        this.rdns = Object.keys(rdns).map((name) => new RDN({ [name]: rdns[name] }));
+        this.add(rdns);
       }
     }
   }
 
   /**
-   * Add an RDN component to the DN, where every key & value pair will create a new RDN.
+   * Add multiple RDN components to the DN, where every key & value pair will create a new RDN.
    *
    * @param attrs
    */
   public add(attrs: DNAttributes) {
-    this.rdns = [...this.rdns, ...Object.keys(attrs).map((name) => new RDN({ [name]: attrs[name] }))];
+    Object.keys(attrs).map((name) => {
+      const value = attrs[name];
+
+      if (Array.isArray(value)) {
+        value.forEach((v) => this.rdns.push(new RDN({ [name]: v })));
+      } else {
+        this.rdns.push(new RDN({ [name]: value }));
+      }
+    });
     return this;
   }
 
@@ -45,7 +59,7 @@ export class DN {
   }
 
   /**
-   * Add an RDN component to the DN.
+   * Add a single RDN component to the DN.
    *
    * Note, that this RDN can be compound (single RDN can have multiple key & value pairs).
    * @param rdn
@@ -56,6 +70,20 @@ export class DN {
       this.rdns.push(rdn);
     } else {
       this.rdns.push(new RDN(rdn));
+    }
+    return this;
+  }
+
+  /**
+   * Add multiple RDNs to the DN.
+   *
+   * @param other
+   */
+  public addRDNs(rdns: RDN[] | RDNAttributes[] | DN) {
+    if (rdns instanceof DN) {
+      this.rdns = [...this.rdns, ...rdns.rdns];
+    } else {
+      rdns.forEach((rdn: RDN | RDNAttributes) => this.addRDN(rdn));
     }
     return this;
   }

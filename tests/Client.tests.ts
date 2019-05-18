@@ -1,5 +1,5 @@
 // @ts-ignore
-import chai, { should } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
@@ -25,8 +25,8 @@ describe('Client', () => {
     uid: 'tony.stark',
     ou: 'Users',
     o: '5be4c382c583e54de6a3ff52',
-    dc: 'jumpcloud',
-  }).add({ dc: 'com' }).toString();
+    dc: ['jumpcloud', 'com'],
+  }).toString();
   const bindPassword: string = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
