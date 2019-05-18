@@ -13,6 +13,7 @@ import {
   AndFilter,
   EqualityFilter,
 } from '../src/filters';
+import { DN } from '../src/dn';
 
 describe('Client', () => {
   before(() => {
@@ -20,7 +21,12 @@ describe('Client', () => {
     chai.use(chaiAsPromised);
   });
 
-  const bindDN = 'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
+  const bindDN = new DN({
+    uid: 'tony.stark',
+    ou: 'Users',
+    o: '5be4c382c583e54de6a3ff52',
+    dc: 'jumpcloud',
+  }).add({ dc: 'com' }).toString();
   const bindPassword: string = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
