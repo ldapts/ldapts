@@ -2,12 +2,12 @@
 import { RDN, RDNAttributes } from './RDN';
 
 /**
- * DNAttributes is an interface, that maps every key & value to a specified RDN.
+ * RDNMap is an interface, that maps every key & value to a specified RDN.
  *
  * Value can be either a string or a list of strings, where every value in the list will
  * get applied to the same key of an RDN.
  */
-export interface DNAttributes {
+export interface RDNMap {
   [name: string]: string | string[];
 }
 
@@ -18,32 +18,14 @@ export interface DNAttributes {
 export class DN {
   private rdns: RDN[] = [];
 
-  constructor(rdns?: RDN[] | DNAttributes) {
+  constructor(rdns?: RDN[] | RDNMap) {
     if (rdns) {
       if (Array.isArray(rdns)) {
         this.rdns = rdns;
       } else {
-        this.add(rdns);
+        this.addRDNs(rdns);
       }
     }
-  }
-
-  /**
-   * Add multiple RDN components to the DN, where every key & value pair will create a new RDN.
-   *
-   * @param attrs
-   */
-  public add(attrs: DNAttributes) {
-    Object.keys(attrs).map((name) => {
-      const value = attrs[name];
-
-      if (Array.isArray(value)) {
-        value.forEach((v) => this.rdns.push(new RDN({ [name]: v })));
-      } else {
-        this.rdns.push(new RDN({ [name]: value }));
-      }
-    });
-    return this;
   }
 
   /**
@@ -53,8 +35,9 @@ export class DN {
    * @param value
    * @returns DN
    */
-  public addPair(key: string, value: string) {
+  public addPairRDN(key: string, value: string) {
     this.rdns.push(new RDN({ [key]: value }));
+
     return this;
   }
 
@@ -71,20 +54,39 @@ export class DN {
     } else {
       this.rdns.push(new RDN(rdn));
     }
+
     return this;
   }
 
   /**
-   * Add multiple RDNs to the DN.
+   * Add multiple RDN components to the DN.
    *
-   * @param other
+   * This method allows different interfaces to add RDNs into the DN.
+   * It can:
+   * - join other DN into this DN
+   * - join list of RDNs or RDNAttributes into this DN
+   * - create RDNs from object map, where every key & value will create a new RDN
+   *
+   * @param rdns
+   * @returns DN
    */
-  public addRDNs(rdns: RDN[] | RDNAttributes[] | DN) {
+  public addRDNs(rdns: RDN[] | RDNAttributes[] | RDNMap | DN) {
     if (rdns instanceof DN) {
       this.rdns = [...this.rdns, ...rdns.rdns];
-    } else {
+    } else if (Array.isArray(rdns)) {
       rdns.forEach((rdn: RDN | RDNAttributes) => this.addRDN(rdn));
+    } else {
+      Object.keys(rdns).map((name) => {
+        const value = rdns[name];
+
+        if (Array.isArray(value)) {
+          value.forEach((v) => this.rdns.push(new RDN({ [name]: v })));
+        } else {
+          this.rdns.push(new RDN({ [name]: value }));
+        }
+      });
     }
+
     return this;
   }
 
@@ -164,6 +166,7 @@ export class DN {
 
   public reverse() {
     this.rdns.reverse();
+
     return this;
   }
 

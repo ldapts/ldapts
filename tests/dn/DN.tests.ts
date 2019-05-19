@@ -6,9 +6,15 @@ describe('DN', () => {
   describe('#toString()', () => {
     it('should chain build & escape correctly', () => {
       const dn = new DN()
-        .addRDN({ cn: 'Smith, James K.', oa: 'eu' })
-        .addPair('dc', 'domain')
-        .add({ dc: 'gb', group: 'all' });
+        .addRDN({
+          cn: 'Smith, James K.',
+          oa: 'eu',
+        })
+        .addPairRDN('dc', 'domain')
+        .addRDNs({
+          dc: 'gb',
+          group: 'all',
+        });
 
       dn.toString().should.equal('cn=Smith\\, James K.+oa=eu,dc=domain,dc=gb,group=all');
     });
@@ -19,7 +25,10 @@ describe('DN', () => {
         oa: 'eu',
         dc: 'domain',
       })
-      .add({ dc: 'gb', group: 'all' });
+      .addRDNs({
+        dc: 'gb',
+        group: 'all',
+      });
 
       dn.toString().should.equal('cn=Smith\\, James K.,oa=eu,dc=domain,dc=gb,group=all');
     });
