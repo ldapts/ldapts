@@ -1,5 +1,5 @@
 // @ts-ignore
-import chai, { should } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
@@ -13,6 +13,7 @@ import {
   AndFilter,
   EqualityFilter,
 } from '../src/filters';
+import { DN } from '../src/dn';
 
 describe('Client', () => {
   before(() => {
@@ -20,7 +21,12 @@ describe('Client', () => {
     chai.use(chaiAsPromised);
   });
 
-  const bindDN: string = 'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
+  const bindDN = new DN({
+    uid: 'tony.stark',
+    ou: 'Users',
+    o: '5be4c382c583e54de6a3ff52',
+    dc: ['jumpcloud', 'com'],
+  }).toString();
   const bindPassword: string = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
