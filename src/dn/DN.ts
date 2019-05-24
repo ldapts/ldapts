@@ -1,4 +1,3 @@
-
 import { RDN, RDNAttributes } from './RDN';
 
 /**

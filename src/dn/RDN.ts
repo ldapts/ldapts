@@ -1,4 +1,3 @@
-
 export interface RDNAttributes {
   [name: string]: string;
 }

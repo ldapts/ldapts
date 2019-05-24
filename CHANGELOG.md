@@ -1,3 +1,7 @@
+### 1.7.0
+  * Add DN class as alternate option for specifying DNs. Thanks @adrianplavka!
+  * Update npms
+
 ### 1.6.0
   * Fix incorrectly escaping search filter names/values. Fix #18
 

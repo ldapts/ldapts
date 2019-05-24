@@ -1,4 +1,3 @@
-
 import { DN } from '../../src';
 
 describe('DN', () => {
