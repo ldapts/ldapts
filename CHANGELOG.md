@@ -1,3 +1,8 @@
+### 1.8.0
+  * Remove "dist" folder from published npm
+  * Include type definitions as "dependencies" instead of "devDependencies"
+  * Update npms
+
 ### 1.7.0
   * Add DN class as alternate option for specifying DNs. Thanks @adrianplavka!
   * Update npms

@@ -11,6 +11,7 @@
   },
   "rules": {
     "align": false,
+    "array-type": [true, "array"],
     "arrow-parens": true,
     "ter-arrow-parens": [true, "always"],
     "quotemark": [true, "single"],
@@ -27,6 +28,8 @@
     "ordered-imports": false,
     "object-literal-sort-keys": false,
     "object-shorthand-properties-first": false,
-    "no-consecutive-blank-lines": false
+    "no-consecutive-blank-lines": false,
+    "prefer-array-literal": false,
+    "variable-name": [true, "check-format", "allow-leading-underscore"]
   }
 }
