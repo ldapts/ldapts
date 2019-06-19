@@ -709,6 +709,18 @@ export class Client {
     return next();
   }
 
+  private _endSocketConnection(socketToEnd: net.Socket) {
+    logDebug('Ending socket');
+    if (socketToEnd === this.socket) {
+      this.connected = false;
+    }
+    // Ignore any error since the connection is being closed
+    socketToEnd.removeAllListeners('error');
+    // tslint:disable-next-line:no-empty
+    socketToEnd.on('error', () => {});
+    socketToEnd.end();
+  }
+
   /**
    * Sends request message to the ldap server over the connected socket.
    * Each message request is given a unique id (messageId), used to identify the associated response when it is sent back over the socket.
@@ -736,8 +748,12 @@ export class Client {
       resolve: messageResolve,
       reject: messageReject,
       timeoutTimer: this.clientOptions.timeout ? setTimeout(() => {
-        return messageReject(new Error(`${message.constructor.name}: Operation timed out`));
-      },                                                    this.clientOptions.timeout) : null,
+        const details = this.messageDetailsByMessageId[message.messageId.toString()];
+        if (details) {
+          this._endSocketConnection(details.socket);
+          return messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+        }
+      }, this.clientOptions.timeout) : null,
     };
 
     // Send the message to the socket
@@ -748,15 +764,8 @@ export class Client {
         delete this.messageDetailsByMessageId[message.messageId.toString()];
         messageResolve();
       } else if (message instanceof UnbindRequest) {
-        logDebug(`Unbind success. Ending socket`);
-        this.connected = false;
-        if (this.socket) {
-          // Ignore any error since the connection is being closed
-          this.socket.removeAllListeners('error');
-          // tslint:disable-next-line:no-empty
-          this.socket.on('error', () => {});
-          this.socket.end();
-        }
+        logDebug('Unbind success');
+        this._endSocketConnection(this.socket);
       } else {
         // NOTE: messageResolve will be called as 'data' events come from the socket
         logDebug('Message sent successfully.');

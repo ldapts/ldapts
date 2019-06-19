@@ -1,6 +1,6 @@
 {
   "name": "ldapts-binarysilk-fork",
-  "version": "1.8.1",
+  "version": "1.8.3",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
