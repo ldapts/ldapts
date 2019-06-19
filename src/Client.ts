@@ -68,6 +68,7 @@ export interface ClientOptions {
 
 interface MessageDetails {
   message: Message;
+  socket: net.Socket;
   searchEntries?: SearchEntry[];
   searchReferences?: SearchReference[];
   resolve: (message?: MessageResponse) => void;
@@ -665,32 +666,37 @@ export class Client {
         this.messageParser.read(data);
       }
     };
-    const socketClose = () => {
-      this.connected = false;
-      if (this.socket) {
-        this.socket.removeListener('error', socketError);
-        this.socket.removeListener('close', socketClose);
-        this.socket.removeListener('data', socketData);
-        this.socket.removeListener('end', socketEnd);
-        this.socket.removeListener('timeout', socketTimeout);
-      }
+    const socketClose = ((socketToClose) => {
+      return () => {
+        socketToClose.removeListener('error', socketError);
+        socketToClose.removeListener('close', socketClose);
+        socketToClose.removeListener('data', socketData);
+        socketToClose.removeListener('end', socketEnd);
+        socketToClose.removeListener('timeout', socketTimeout);
 
-      delete this.socket;
-
-      // Clean up any pending messages
-      for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
-        if (messageDetails.message instanceof UnbindRequest) {
-          // Consider unbind as success since the connection is closed.
-          messageDetails.resolve();
+        if (this.socket === socketToClose) {
+          this.connected = false;
+          delete this.socket;
         } else {
-          messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
+          logDebug('Detected socketToClose differs this.socket');
         }
 
-        delete this.messageDetailsByMessageId[key];
-      }
+        // Clean up any pending messages
+        for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
+          if (messageDetails.socket === socketToClose) {
+            if (messageDetails.message instanceof UnbindRequest) {
+              // Consider unbind as success since the connection is closed.
+              messageDetails.resolve();
+            } else {
+              messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
+            }
 
-      // Cleanup handlers
-    };
+            delete this.messageDetailsByMessageId[key];
+          }
+        }
+      };
+    })(this.socket);
+
     // endregion
 
     // Hook up event listeners
@@ -726,6 +732,7 @@ export class Client {
 
     this.messageDetailsByMessageId[message.messageId.toString()] = {
       message,
+      socket: this.socket,
       resolve: messageResolve,
       reject: messageReject,
       timeoutTimer: this.clientOptions.timeout ? setTimeout(() => {

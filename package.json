@@ -1,6 +1,6 @@
 {
-  "name": "ldapts",
-  "version": "1.8.0",
+  "name": "ldapts-binarysilk-fork",
+  "version": "1.8.1",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
@@ -17,7 +17,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ldapts/ldapts.git"
+    "url": "git+https://github.com/december1981/ldapts.git#socket-test"
   },
   "engines": {
     "node": ">=8.11"
