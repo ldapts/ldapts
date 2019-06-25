@@ -50,6 +50,13 @@ describe('FilterParser', () => {
         FilterParser.parseString('((cn=foo))');
       }).should.throw(Error, 'Invalid attribute name: (cn=foo');
     });
+
+    it('should throw for just parenthesis', () => {
+      (() => {
+        FilterParser.parseString('()');
+      }).should.throw(Error, 'Invalid attribute name:');
+    });
+
     it('should allow xml in filter string', () => {
       const result = FilterParser.parseString('(&(CentralUIEnrollments=<mydoc>*)(objectClass=User))');
       result.should.deep.equal(new AndFilter({
