@@ -495,7 +495,7 @@ export class Client {
       controls.push(pagedResultsControl);
     }
 
-    const filter = FilterParser.parseString(options.filter);
+    const filter = FilterParser.parseString(options.filter as string);
 
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
