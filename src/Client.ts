@@ -6,6 +6,7 @@ import Timer = NodeJS.Timer;
 import { Attribute } from './Attribute';
 import { Change } from './Change';
 import { MessageParser } from './MessageParser';
+import { FilterParser } from './FilterParser';
 import { MessageResponseStatus } from './MessageResponseStatus';
 import { StatusCodeParser } from './StatusCodeParser';
 import { MessageParserError } from './errors';
@@ -494,15 +495,17 @@ export class Client {
       controls.push(pagedResultsControl);
     }
 
+    const filter = FilterParser.parseString(options.filter);
+
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
       baseDN: typeof baseDN === 'string' ? baseDN : baseDN.toString(),
       scope: options.scope,
-      filter: options.filter,
       attributes: options.attributes,
       returnAttributeValues: options.returnAttributeValues,
       sizeLimit: options.sizeLimit,
       timeLimit: options.timeLimit,
+      filter,
       controls,
     });
 
