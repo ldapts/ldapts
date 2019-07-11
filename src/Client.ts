@@ -39,6 +39,8 @@ import {
   ModifyRequest,
   ModifyResponse,
 } from './messages';
+import { FilterParser } from './FilterParser';
+import { PresenceFilter } from './filters';
 
 const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
 const logDebug = debug('ldapts');
@@ -494,11 +496,22 @@ export class Client {
       controls.push(pagedResultsControl);
     }
 
+    let filter: Filter;
+    if (options.filter) {
+      if (typeof options.filter === 'string') {
+        filter = FilterParser.parseString(options.filter as string);
+      } else {
+        filter = options.filter;
+      }
+    } else {
+      filter = new PresenceFilter({ attribute: 'objectclass' });
+    }
+
     const searchRequest = new SearchRequest({
       messageId: -1, // NOTE: This will be set from _sendRequest()
       baseDN: typeof baseDN === 'string' ? baseDN : baseDN.toString(),
       scope: options.scope,
-      filter: options.filter,
+      filter,
       attributes: options.attributes,
       returnAttributeValues: options.returnAttributeValues,
       sizeLimit: options.sizeLimit,

@@ -1,13 +1,13 @@
 import { BerReader, BerWriter } from 'asn1';
 import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
-import { PresenceFilter } from '../filters/PresenceFilter';
 import { FilterParser } from '../FilterParser';
 import { Filter } from '../filters/Filter';
 import { SearchOptions } from '../Client';
 
 export interface SearchRequestMessageOptions extends MessageOptions, SearchOptions {
   baseDN?: string;
+  filter: Filter;
 }
 
 export class SearchRequest extends Message {
@@ -18,7 +18,7 @@ export class SearchRequest extends Message {
   public sizeLimit: number;
   public timeLimit: number;
   public returnAttributeValues: boolean;
-  public filter: string | Filter;
+  public filter: Filter;
   public attributes: string[];
 
   constructor(options: SearchRequestMessageOptions) {
@@ -31,7 +31,7 @@ export class SearchRequest extends Message {
     this.sizeLimit = options.sizeLimit || 0;
     this.timeLimit = options.timeLimit || 10;
     this.returnAttributeValues = options.returnAttributeValues !== false;
-    this.filter = options.filter || '';
+    this.filter = options.filter;
     this.attributes = options.attributes || [];
   }
 
@@ -76,13 +76,7 @@ export class SearchRequest extends Message {
     writer.writeInt(this.timeLimit);
     writer.writeBoolean(!this.returnAttributeValues);
 
-    if (this.filter && typeof this.filter === 'string') {
-      this.filter = FilterParser.parseString(this.filter as string);
-    } else if (!this.filter) {
-      this.filter = new PresenceFilter({ attribute: 'objectclass' });
-    }
-
-    (this.filter as Filter).write(writer);
+    this.filter.write(writer);
 
     writer.startSequence();
 

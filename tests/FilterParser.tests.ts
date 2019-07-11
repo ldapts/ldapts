@@ -45,6 +45,11 @@ describe('FilterParser', () => {
         }),
       );
     });
+    it('should throw for only parenthesis', () => {
+      (() => {
+        FilterParser.parseString('()');
+      }).should.throw(Error, 'Invalid attribute name:');
+    });
     it('should throw for nested parenthesis', () => {
       (() => {
         FilterParser.parseString('((cn=foo))');
