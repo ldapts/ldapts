@@ -1,3 +1,7 @@
+### 1.9.0
+  * Export Change and Attribute classes. Thanks @willmcenaney!
+  * Parse search filter before sending partial request. Thanks @markhatchell!
+
 ### 1.8.0
   * Remove "dist" folder from published npm
   * Include type definitions as "dependencies" instead of "devDependencies"
