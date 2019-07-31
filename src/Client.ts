@@ -139,7 +139,7 @@ export class Client {
   private readonly host: string;
   private readonly port: number;
   private readonly secure: boolean;
-  private connected: boolean = false;
+  public connected: boolean = false;
   private socket!: tls.TLSSocket | net.Socket;
   private connectTimer!: Timer;
   private readonly messageParser = new MessageParser();
