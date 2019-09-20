@@ -75,6 +75,7 @@ interface MessageDetails {
   resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
   timeoutTimer: Timer | null;
+  socket: tls.TLSSocket | net.Socket;
 }
 
 export interface SearchPageOptions {
@@ -666,48 +667,58 @@ export class Client {
 
       this.socket.destroy();
     };
-    const socketEnd = () => {
-      if (this.socket) {
+
+    function socketEnd(this: tls.TLSSocket | net.Socket) {
+      if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
-        this.socket.end();
+        this.end();
       }
-    };
-    const socketTimeout = () => {
-      if (this.socket) {
-        this.socket.end();
+    }
+
+    function socketTimeout(this: tls.TLSSocket | net.Socket) {
+      if (this) {
+        // Acknowledge to other end of the connection that the connection is ended.
+        this.end();
       }
-    };
+    }
+
     const socketData = (data: Buffer) => {
       if (this.messageParser) {
         this.messageParser.read(data);
       }
     };
-    const socketClose = () => {
-      this.connected = false;
-      if (this.socket) {
-        this.socket.removeListener('error', socketError);
-        this.socket.removeListener('close', socketClose);
-        this.socket.removeListener('data', socketData);
-        this.socket.removeListener('end', socketEnd);
-        this.socket.removeListener('timeout', socketTimeout);
+
+    // tslint:disable-next-line:no-this-assignment
+    const clientInstance = this;
+
+    function socketClose(this: tls.TLSSocket | net.Socket) {
+      if (this) {
+        this.removeListener('error', socketError);
+        this.removeListener('close', socketClose);
+        this.removeListener('data', socketData);
+        this.removeListener('end', socketEnd);
+        this.removeListener('timeout', socketTimeout);
       }
 
-      delete this.socket;
+      if (this === clientInstance.socket) {
+        clientInstance.connected = false;
+        delete clientInstance.socket;
+      }
 
       // Clean up any pending messages
-      for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
-        if (messageDetails.message instanceof UnbindRequest) {
-          // Consider unbind as success since the connection is closed.
-          messageDetails.resolve();
-        } else {
-          messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
+      for (const [key, messageDetails] of Object.entries(clientInstance.messageDetailsByMessageId)) {
+        if (messageDetails.socket === this) {
+          if (messageDetails.message instanceof UnbindRequest) {
+            // Consider unbind as success since the connection is closed.
+            messageDetails.resolve();
+          } else {
+            messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
+          }
+
+          delete clientInstance.messageDetailsByMessageId[key];
         }
-
-        delete this.messageDetailsByMessageId[key];
       }
-
-      // Cleanup handlers
-    };
+    }
     // endregion
 
     // Hook up event listeners
@@ -718,6 +729,18 @@ export class Client {
     this.socket.on('timeout', socketTimeout);
 
     return next();
+  }
+
+  private _endSocket(socket: tls.TLSSocket | net.Socket) {
+    if (socket === this.socket) {
+      this.connected = false;
+    }
+
+    // Ignore any error since the connection is being closed
+    socket.removeAllListeners('error');
+    // tslint:disable-next-line:no-empty
+    socket.on('error', () => {});
+    socket.end();
   }
 
   /**
@@ -746,8 +769,13 @@ export class Client {
       resolve: messageResolve,
       reject: messageReject,
       timeoutTimer: this.clientOptions.timeout ? setTimeout(() => {
-        return messageReject(new Error(`${message.constructor.name}: Operation timed out`));
-      },                                                    this.clientOptions.timeout) : null,
+        const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
+        if (messageDetails) {
+          this._endSocket(messageDetails.socket);
+          return messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+        }
+      }, this.clientOptions.timeout) : null,
+      socket: this.socket,
     };
 
     // Send the message to the socket
@@ -759,14 +787,7 @@ export class Client {
         messageResolve();
       } else if (message instanceof UnbindRequest) {
         logDebug(`Unbind success. Ending socket`);
-        this.connected = false;
-        if (this.socket) {
-          // Ignore any error since the connection is being closed
-          this.socket.removeAllListeners('error');
-          // tslint:disable-next-line:no-empty
-          this.socket.on('error', () => {});
-          this.socket.end();
-        }
+        this._endSocket(this.socket);
       } else {
         // NOTE: messageResolve will be called as 'data' events come from the socket
         logDebug('Message sent successfully.');
