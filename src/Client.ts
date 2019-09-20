@@ -212,7 +212,7 @@ export class Client {
 
     const result = await this._send<BindResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
   }
 
@@ -261,7 +261,7 @@ export class Client {
 
     const result = await this._send<AddResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
   }
 
@@ -297,7 +297,7 @@ export class Client {
       case CompareResult.compareFalse:
         return false;
       default:
-        throw StatusCodeParser.parse(response.status);
+        throw StatusCodeParser.parse(response.status, response.errorMessage);
     }
   }
 
@@ -324,7 +324,7 @@ export class Client {
 
     const result = await this._send<DeleteResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
   }
 
@@ -353,7 +353,7 @@ export class Client {
 
     const result = await this._send<ExtendedResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
 
     return {
@@ -392,7 +392,7 @@ export class Client {
 
     const result = await this._send<ModifyResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
   }
 
@@ -423,7 +423,7 @@ export class Client {
 
     const result = await this._send<ModifyDNResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
   }
 
@@ -551,7 +551,7 @@ export class Client {
     const result = await this._send<SearchResponse>(searchRequest);
 
     if (result.status !== MessageResponseStatus.Success && !(result.status === MessageResponseStatus.SizeLimitExceeded && searchRequest.sizeLimit)) {
-      throw StatusCodeParser.parse(result.status);
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
     }
 
     for (const searchEntry of result.searchEntries) {
