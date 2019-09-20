@@ -187,6 +187,10 @@ export class Client {
     this.messageParser.on('message', this._handleSendResponse.bind(this));
   }
 
+  public get isConnected(): boolean {
+    return this.connected;
+  }
+
   /**
    * Performs a simple authentication against the server.
    * @param {string|DN} dn

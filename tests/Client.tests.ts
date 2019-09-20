@@ -58,6 +58,43 @@ describe('Client', () => {
       }).should.not.throw(Error);
     });
   });
+  describe('#isConnected', () => {
+    it('should not be connected if a method has not been called', async () => {
+      const client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      client.isConnected.should.equal(false);
+    });
+    it('should not be connected after unbind has been called', async () => {
+      const client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      await client.bind(bindDN, bindPassword);
+
+      client.isConnected.should.equal(true);
+
+      await client.unbind();
+
+      client.isConnected.should.equal(false);
+    });
+    it('should be connected if a method has been called', async () => {
+      const client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      await client.bind(bindDN, bindPassword);
+
+      client.isConnected.should.equal(true);
+
+      try {
+        await client.unbind();
+      } catch {
+        // This can fail since it's not the part being tested
+      }
+    });
+  });
   describe('#bind()', () => {
     it('should succeed on basic bind', async () => {
       const client = new Client({
