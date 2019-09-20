@@ -555,7 +555,7 @@ export class Client {
     }
 
     for (const searchEntry of result.searchEntries) {
-      searchResult.searchEntries.push(searchEntry.toObject());
+      searchResult.searchEntries.push(searchEntry.toObject(searchRequest.attributes));
     }
 
     for (const searchReference of result.searchReferences) {

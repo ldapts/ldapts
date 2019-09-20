@@ -36,7 +36,7 @@ export class SearchEntry extends MessageResponse {
     }
   }
 
-  public toObject(): Entry {
+  public toObject(requestAttributes: string[]): Entry {
     const result: Entry = {
       dn: this.name,
     };
@@ -50,6 +50,13 @@ export class SearchEntry extends MessageResponse {
         }
       } else {
         result[attribute.type] = [];
+      }
+    }
+
+    // Fill in any missing attributes that were requested
+    for (const attribute of requestAttributes) {
+      if (typeof result[attribute] === 'undefined') {
+        result[attribute] = [];
       }
     }
 
