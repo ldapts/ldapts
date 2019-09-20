@@ -1,3 +1,10 @@
+### 1.10.0
+  * Include original error message with exceptions. Fix #36
+  * Include all requested attributes with search results. Fix #22
+  * Add isConnected to Client. Fix #25
+  * Try to fix socket ending and reference handling issues. Thanks @december1981! Fix #24
+  * Update npms
+
 ### 1.9.0
   * Export Change and Attribute classes. Thanks @willmcenaney!
   * Parse search filter before sending partial request. Thanks @markhatchell!
