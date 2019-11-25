@@ -36,7 +36,7 @@
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
     "@types/asn1": "~0.2.0",
-    "@types/node": "~8.10.54",
+    "@types/node": "~12.12.12",
     "asn1": "~0.2.4",
     "debug": "~4.1.1",
     "strict-event-emitter-types": "~2.0.0"
