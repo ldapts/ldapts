@@ -1,3 +1,10 @@
+### 2.0.0
+  * Drop support for nodejs v8
+  * Update to Typescript 3.7
+  * Fix exop response overwriting status and error message. Fixes #52
+  * Update npms
+  * Improve documentation. Lots of :heart: for ldapjs docs, [ldapwiki](https://ldapwiki.com/), and [ldap.com](https://ldap.com/ldapv3-wire-protocol-reference/) docs. Fix #31
+
 ### 1.10.0
   * Include original error message with exceptions. Fix #36
   * Include all requested attributes with search results. Fix #22
@@ -23,9 +30,9 @@
 
 ### 1.5.1
   * Do not throw "Size limit exceeded" error if `sizeLimit` is defined and the server responds with `4` (Size limit exceeded).
-     - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded). 
-       
-       I'm not really sure what to do in that case. At this time, I decided against throwing an error and instead 
+     - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded).
+
+       I'm not really sure what to do in that case. At this time, I decided against throwing an error and instead
        just returning the results returned thus far. That approach works with JumpCloud and forumsys' ldap servers
 
 ### 1.5.0
@@ -84,11 +91,11 @@
 
   * Add original string to error message when parsing filters
   * Adjust parsing & and | in filters
-  * Add more filter parsing tests 
+  * Add more filter parsing tests
 
 ### 1.1.0
 
-  * Add client.add() and client.modify() 
+  * Add client.add() and client.modify()
 
 ### 1.0.6
 
