@@ -27,7 +27,7 @@ describe('Client', () => {
     o: '5be4c382c583e54de6a3ff52',
     dc: ['jumpcloud', 'com'],
   }).toString();
-  const bindPassword: string = 'MyRedSuitKeepsMeWarm';
+  const bindPassword = 'MyRedSuitKeepsMeWarm';
 
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
@@ -239,7 +239,23 @@ describe('Client', () => {
         }),
       }));
     });
-  });*/
+  }); */
+  describe('#exop()', () => {
+    it('should throw if fast bind is not supported', async () => {
+      const client: Client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      try {
+        await client.exop('1.2.840.113556.1.4.1781');
+        false.should.equal(true);
+      } catch (ex) {
+        ex.message.should.equal('unsupported extended operation Code: 0x2');
+      }
+      await client.bind(bindDN, bindPassword);
+      await client.unbind();
+    });
+  });
   describe('#search()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',

@@ -14,10 +14,12 @@ export enum ExtendedResponseProtocolOperations {
 
 export class ExtendedResponse extends MessageResponse {
   public protocolOperation: ProtocolOperation;
+
   public oid?: string;
+
   public value?: string;
 
-  constructor(options: ExtendedResponseOptions) {
+  public constructor(options: ExtendedResponseOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_EXTENSION;
     this.oid = options.oid;
@@ -34,9 +36,5 @@ export class ExtendedResponse extends MessageResponse {
     if (reader.peek() === ExtendedResponseProtocolOperations.value) {
       this.value = reader.readString(ExtendedResponseProtocolOperations.value);
     }
-
-    this.status = reader.readEnumeration();
-    this.matchedDN = reader.readString();
-    this.errorMessage = reader.readString();
   }
 }

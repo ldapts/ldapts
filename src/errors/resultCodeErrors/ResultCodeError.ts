@@ -1,10 +1,14 @@
 export abstract class ResultCodeError extends Error {
   public code: number;
 
-  constructor(code: number, message: string) {
+  public constructor(code: number, message: string) {
     super();
 
     this.code = code;
-    this.message = `${message} Code: 0x${code.toString(16)}`;
+    if (typeof code === 'undefined' || code === null) {
+      this.message = message;
+    } else {
+      this.message = `${message} Code: 0x${code.toString(16)}`;
+    }
   }
 }
