@@ -1,19 +1,27 @@
 {
   "name": "ldapts",
-  "version": "1.10.0",
+  "version": "2.0.0",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
     "test": "mocha -r ts-node/register tests/*.tests.ts tests/**/*.tests.ts",
-    "lint": "tslint --fix -p tsconfig.lint.json -c tslint.json -t stylish",
+    "lint": "eslint --fix --ext .ts src tests",
     "dist": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish; fi",
     "prepublishOnly": "if [ -d \"src\" ]; then echo \"Please use: npm run dist\" && exit 125; fi"
   },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ],
+    "*.ts": [
+      "eslint --fix"
+    ]
+  },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run lint"
+      "pre-commit": "lint-staged"
     }
   },
   "repository": {
@@ -21,7 +29,7 @@
     "url": "git+https://github.com/ldapts/ldapts.git"
   },
   "engines": {
-    "node": ">=8.11"
+    "node": ">=10"
   },
   "keywords": [
     "ldap",
@@ -36,20 +44,30 @@
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
     "@types/asn1": "~0.2.0",
-    "@types/node": "~8.10.54",
+    "@types/node": "~10.17.9",
     "asn1": "~0.2.4",
     "debug": "~4.1.1",
     "strict-event-emitter-types": "~2.0.0"
   },
   "devDependencies": {
-    "@types/chai": "~4.2.3",
+    "@types/chai": "~4.2.7",
     "@types/chai-as-promised": "~7.1.2",
     "@types/debug": "~4.1.5",
     "@types/mocha": "~5.2.6",
+    "@typescript-eslint/eslint-plugin": "~2.12.0",
+    "@typescript-eslint/parser": "~2.12.0",
     "chai": "~4.2.0",
     "chai-as-promised": "~7.1.1",
+    "eslint": "~6.7.1",
+    "eslint-config-airbnb-base": "~14.0.0",
+    "eslint-plugin-import": "~2.19.1",
+    "eslint-plugin-jsdoc": "~18.4.3",
+    "eslint-plugin-mocha": "~6.2.2",
+    "eslint-plugin-promise": "~4.2.1",
+    "eslint-plugin-security": "~1.4.0",
     "husky": "~3.1.0",
-    "mocha": "~6.2.0",
+    "lint-staged": "9.5.0",
+    "mocha": "~6.2.2",
     "ts-mockito": "~2.5.0",
     "ts-node": "~8.5.4",
     "tslint": "~5.20.0",
