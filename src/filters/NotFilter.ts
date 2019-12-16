@@ -8,9 +8,10 @@ export interface NotFilterOptions {
 
 export class NotFilter extends Filter {
   public type: SearchFilter = SearchFilter.not;
+
   public filter: Filter;
 
-  constructor(options: NotFilterOptions) {
+  public constructor(options: NotFilterOptions) {
     super();
     this.filter = options.filter;
   }

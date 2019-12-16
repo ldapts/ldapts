@@ -5,14 +5,15 @@ import { PagedResultsControl } from './controls/PagedResultsControl';
 import { PersistentSearchControl } from './controls/PersistentSearchControl';
 import { ServerSideSortingRequestControl } from './controls/ServerSideSortingRequestControl';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ControlParser {
   public static parse(reader: BerReader): Control | null {
     if (reader.readSequence() === null) {
       return null;
     }
 
-    let type: string = '';
-    let critical: boolean = false;
+    let type = '';
+    let critical = false;
     let value: Buffer = Buffer.alloc(0);
     if (reader.length) {
       const end = reader.offset + reader.length;

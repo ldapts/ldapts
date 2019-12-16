@@ -10,10 +10,12 @@ export interface AddMessageOptions extends MessageOptions {
 
 export class AddRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public dn: string;
+
   public attributes: Attribute[];
 
-  constructor(options: AddMessageOptions) {
+  public constructor(options: AddMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_ADD;
 

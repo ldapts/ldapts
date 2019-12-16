@@ -10,8 +10,11 @@ export interface MessageOptions {
 
 export abstract class Message {
   public version: ProtocolOperation = ProtocolOperation.LDAP_VERSION_3;
-  public messageId: number = 0;
+
+  public messageId = 0;
+
   public abstract protocolOperation: ProtocolOperation;
+
   public controls?: Control[];
 
   protected constructor(options: MessageOptions) {
@@ -60,14 +63,16 @@ export abstract class Message {
     return JSON.stringify({
       messageId: this.messageId,
       messageType: this.constructor.name,
-    },                    null, 2);
+    }, null, 2);
   }
 
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected parseMessage(_: BerReader): void {
+    // Do nothing as the default action
   }
 
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected writeMessage(_: BerWriter): void {
+    // Do nothing as the default action
   }
 }

@@ -14,12 +14,16 @@ export interface ExtensibleFilterOptions {
 
 export class ExtensibleFilter extends Filter {
   public type: SearchFilter = SearchFilter.extensibleMatch;
+
   public value: string;
+
   public rule: string;
+
   public matchType: string;
+
   public dnAttributes: boolean;
 
-  constructor(options: ExtensibleFilterOptions = {}) {
+  public constructor(options: ExtensibleFilterOptions = {}) {
     super();
 
     this.matchType = options.matchType || '';
@@ -73,12 +77,13 @@ export class ExtensibleFilter extends Filter {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public matches(_: { [index: string]: string } = {}, __: boolean): void {
-    throw new Error(`Approximate match implementation unknown`);
+    throw new Error('Approximate match implementation unknown');
   }
 
   public toString(): string {
-    let result: string = `(${this.escape(this.matchType)}:`;
+    let result = `(${this.escape(this.matchType)}:`;
 
     if (this.dnAttributes) {
       result += 'dn:';

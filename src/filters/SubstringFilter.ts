@@ -10,17 +10,21 @@ export interface SubstringFilterOptions {
 }
 
 export class SubstringFilter extends Filter {
-
   private static _escapeRegExp(str: string): string {
-    return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
+    return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
   }
+
   public type: SearchFilter = SearchFilter.substrings;
+
   public attribute: string;
+
   public initial: string;
+
   public any: string[];
+
   public final: string;
 
-  constructor(options: SubstringFilterOptions = {}) {
+  public constructor(options: SubstringFilterOptions = {}) {
     super();
     this.attribute = options.attribute || '';
     this.initial = options.initial || '';
@@ -43,7 +47,7 @@ export class SubstringFilter extends Filter {
           }
 
           break;
-        case 0x81:
+        case 0x81: {
           let anyValue: string = reader.readString(tag);
           if (this.attribute === 'objectclass') {
             anyValue = anyValue.toLowerCase();
@@ -51,6 +55,7 @@ export class SubstringFilter extends Filter {
 
           this.any.push(anyValue);
           break;
+        }
         case 0x82:
           this.final = reader.readString(tag);
           if (this.attribute === 'objectclass') {
@@ -106,6 +111,7 @@ export class SubstringFilter extends Filter {
         regexp += `${SubstringFilter._escapeRegExp(this.final)}$`;
       }
 
+      // eslint-disable-next-line security/detect-non-literal-regexp
       const matcher = new RegExp(regexp, strictAttributeCase ? 'gmu' : 'igmu');
       return matcher.test(objectToCheckValue);
     }

@@ -2,7 +2,6 @@ import debug from 'debug';
 import { parse as parseUrl } from 'url';
 import * as net from 'net';
 import * as tls from 'tls';
-import Timer = NodeJS.Timer;
 import { Attribute } from './Attribute';
 import { Change } from './Change';
 import { MessageParser } from './MessageParser';
@@ -42,7 +41,7 @@ import {
 import { FilterParser } from './FilterParser';
 import { PresenceFilter } from './filters';
 
-const MAX_MESSAGE_ID = Math.pow(2, 31) - 1;
+const MAX_MESSAGE_ID = (2 ** 31) - 1;
 const logDebug = debug('ldapts');
 
 export interface ClientOptions {
@@ -74,7 +73,7 @@ interface MessageDetails {
   searchReferences?: SearchReference[];
   resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
-  timeoutTimer: Timer | null;
+  timeoutTimer: NodeJS.Timer | null;
   socket: tls.TLSSocket | net.Socket;
 }
 
@@ -136,17 +135,26 @@ export interface SearchResult {
 
 export class Client {
   private clientOptions: ClientOptions;
-  private messageId: number = 1;
+
+  private messageId = 1;
+
   private readonly host: string;
+
   private readonly port: number;
+
   private readonly secure: boolean;
-  private connected: boolean = false;
+
+  private connected = false;
+
   private socket!: tls.TLSSocket | net.Socket;
-  private connectTimer!: Timer;
+
+  private connectTimer!: NodeJS.Timer;
+
   private readonly messageParser = new MessageParser();
+
   private readonly messageDetailsByMessageId: { [index: string]: MessageDetails } = {};
 
-  constructor(options: ClientOptions) {
+  public constructor(options: ClientOptions) {
     this.clientOptions = options || {};
     if (!this.clientOptions.timeout) {
       this.clientOptions.timeout = 0;
@@ -178,7 +186,8 @@ export class Client {
         const messageDetails = this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
         if (messageDetails) {
           delete this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
-          return messageDetails.reject(err);
+          messageDetails.reject(err);
+          return;
         }
       }
 
@@ -204,7 +213,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -224,7 +232,7 @@ export class Client {
   /**
    * Used to create a new entry in the directory
    * @param {string|DN} dn - The DN of the entry to add
-   * @param {Attribute[]|Object} attributes - Array of attributes or object where keys are the name of each attribute
+   * @param {Attribute[]|object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
   public async add(dn: string | DN, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
@@ -233,7 +241,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -283,7 +290,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -317,7 +323,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -345,7 +350,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -379,12 +383,10 @@ export class Client {
     }
 
     if (changes && !Array.isArray(changes)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       changes = [changes];
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -413,7 +415,6 @@ export class Client {
     }
 
     if (controls && !Array.isArray(controls)) {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [controls];
     }
 
@@ -462,10 +463,8 @@ export class Client {
 
     if (controls) {
       if (Array.isArray(controls)) {
-        // tslint:disable-next-line:no-parameter-reassignment
         controls = controls.slice(0);
       } else {
-        // tslint:disable-next-line:no-parameter-reassignment
         controls = [controls];
       }
 
@@ -476,11 +475,10 @@ export class Client {
         }
       }
     } else {
-      // tslint:disable-next-line:no-parameter-reassignment
       controls = [];
     }
 
-    let pageSize: number = 100;
+    let pageSize = 100;
     if (typeof options.paged === 'object' && options.paged.pageSize) {
       pageSize = options.paged.pageSize;
     } else if (options.sizeLimit && options.sizeLimit > 1) {
@@ -637,7 +635,7 @@ export class Client {
           }
 
           return reject(new Error('Connection timeout'));
-        },                             this.clientOptions.connectTimeout);
+        }, this.clientOptions.connectTimeout);
       }
     });
   }
@@ -688,7 +686,7 @@ export class Client {
       }
     };
 
-    // tslint:disable-next-line:no-this-assignment
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const clientInstance = this;
 
     function socketClose(this: tls.TLSSocket | net.Socket) {
@@ -738,26 +736,31 @@ export class Client {
 
     // Ignore any error since the connection is being closed
     socket.removeAllListeners('error');
-    // tslint:disable-next-line:no-empty
-    socket.on('error', () => {});
+    socket.on('error', () => {
+      // Ignore NOOP
+    });
     socket.end();
   }
 
   /**
    * Sends request message to the ldap server over the connected socket.
-   * Each message request is given a unique id (messageId), used to identify the associated response when it is sent back over the socket.
+Each message request is given a unique id (messageId), used to identify the associated response when it is sent back over the socket.
+   *
    * @returns {Promise<Message>}
    * @private
+   * @param {object} message
    */
   private _send<TMessageResponse extends MessageResponse>(message: Message): Promise<TMessageResponse> {
     if (!this.connected || !this.socket) {
       throw new Error('Socket connection not established');
     }
 
-    /* tslint:disable:no-empty */
-    let messageResolve: (message?: MessageResponse) => void = () => {};
-    let messageReject: (err: Error) => void = () => {};
-    /* tslint:enable:no-empty */
+    let messageResolve: (message?: MessageResponse) => void = () => {
+      // Ignore this as a NOOP
+    };
+    let messageReject: (err: Error) => void = () => {
+      // Ignore this as a NOOP
+    };
     const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
       // @ts-ignore
       messageResolve = resolve;
@@ -772,7 +775,7 @@ export class Client {
         const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
         if (messageDetails) {
           this._endSocket(messageDetails.socket);
-          return messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+          messageReject(new Error(`${message.constructor.name}: Operation timed out`));
         }
       }, this.clientOptions.timeout) : null,
       socket: this.socket,
@@ -786,7 +789,7 @@ export class Client {
         delete this.messageDetailsByMessageId[message.messageId.toString()];
         messageResolve();
       } else if (message instanceof UnbindRequest) {
-        logDebug(`Unbind success. Ending socket`);
+        logDebug('Unbind success. Ending socket');
         this._endSocket(this.socket);
       } else {
         // NOTE: messageResolve will be called as 'data' events come from the socket

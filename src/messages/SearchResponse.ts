@@ -10,10 +10,12 @@ export interface SearchResponseOptions extends MessageResponseOptions {
 
 export class SearchResponse extends MessageResponse {
   public protocolOperation: ProtocolOperation;
+
   public searchEntries: SearchEntry[];
+
   public searchReferences: SearchReference[];
 
-  constructor(options: SearchResponseOptions) {
+  public constructor(options: SearchResponseOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH;
     this.searchEntries = options.searchEntries || [];

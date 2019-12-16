@@ -9,10 +9,12 @@ export interface ApproximateFilterOptions {
 
 export class ApproximateFilter extends Filter {
   public type: SearchFilter = SearchFilter.approxMatch;
+
   public attribute: string;
+
   public value: string;
 
-  constructor(options: ApproximateFilterOptions = {}) {
+  public constructor(options: ApproximateFilterOptions = {}) {
     super();
     this.attribute = options.attribute || '';
     this.value = options.value || '';
@@ -28,8 +30,9 @@ export class ApproximateFilter extends Filter {
     writer.writeString(this.value);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public matches(_: { [index: string]: string } = {}, __: boolean): void {
-    throw new Error(`Approximate match implementation unknown`);
+    throw new Error('Approximate match implementation unknown');
   }
 
   public toString(): string {

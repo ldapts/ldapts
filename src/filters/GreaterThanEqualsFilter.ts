@@ -9,10 +9,12 @@ export interface GreaterThanEqualsFilterOptions {
 
 export class GreaterThanEqualsFilter extends Filter {
   public type: SearchFilter = SearchFilter.greaterOrEqual;
+
   public attribute: string;
+
   public value: string;
 
-  constructor(options: GreaterThanEqualsFilterOptions = {}) {
+  public constructor(options: GreaterThanEqualsFilterOptions = {}) {
     super();
 
     this.attribute = options.attribute || '';

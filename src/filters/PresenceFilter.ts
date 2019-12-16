@@ -8,9 +8,10 @@ export interface PresenceFilterOptions {
 
 export class PresenceFilter extends Filter {
   public type: SearchFilter = SearchFilter.present;
+
   public attribute: string;
 
-  constructor(options: PresenceFilterOptions = {}) {
+  public constructor(options: PresenceFilterOptions = {}) {
     super();
     this.attribute = options.attribute || '';
   }
@@ -21,8 +22,7 @@ export class PresenceFilter extends Filter {
   }
 
   public writeFilter(writer: BerWriter): void {
-    // tslint:disable-next-line:no-increment-decrement
-    for (let i = 0; i < this.attribute.length; i++) {
+    for (let i = 0; i < this.attribute.length; i += 1) {
       writer.writeByte(this.attribute.charCodeAt(i));
     }
   }

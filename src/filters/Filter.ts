@@ -14,17 +14,19 @@ export abstract class Filter {
     return this.parseFilter(reader);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public matches(_: { [index: string]: string } = {}, __: boolean): boolean|void {
     return true;
   }
 
   /**
    * RFC 2254 Escaping of filter strings
-   *
    * Raw                     Escaped
    * (o=Parens (R Us))       (o=Parens \28R Us\29)
    * (cn=star*)              (cn=star\2A)
    * (filename=C:\MyFile)    (filename=C:\5cMyFile)
+   *
+   * @param {string|Buffer} input
    */
   public escape(input: string|Buffer): string {
     let escapedResult = '';
@@ -64,11 +66,14 @@ export abstract class Filter {
     return escapedResult;
   }
 
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected parseFilter(_: BerReader): void {
+    // Do nothing as the default action
   }
-  // tslint:disable-next-line:no-empty
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected writeFilter(_: BerWriter): void {
+    // Do nothing as the default action
   }
 
   protected getObjectValue(objectToCheck: { [index: string]: string } = {}, key: string, strictAttributeCase: boolean): string | undefined {

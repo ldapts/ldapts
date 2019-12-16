@@ -1,4 +1,3 @@
-// @ts-ignore
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { Client } from '../src';
@@ -33,7 +32,6 @@ describe('Client', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
       const url = 'https://127.0.0.1';
       (() => {
-        // tslint:disable-next-line:no-unused-expression
         new Client({
           url,
         });
@@ -42,7 +40,6 @@ describe('Client', () => {
     it('should not throw error if url protocol is ldap://', () => {
       const url = 'ldap://127.0.0.1';
       (() => {
-        // tslint:disable-next-line:no-unused-expression
         new Client({
           url,
         });
@@ -51,7 +48,6 @@ describe('Client', () => {
     it('should not throw error if url protocol is ldaps://', () => {
       const url = 'ldaps://127.0.0.1';
       (() => {
-        // tslint:disable-next-line:no-unused-expression
         new Client({
           url,
         });
@@ -194,7 +190,6 @@ describe('Client', () => {
         await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'lorem', 'ipsum');
         false.should.equal(true);
       } catch (ex) {
-        // tslint:disable-next-line:no-unused-expression
         (ex instanceof UndefinedTypeError).should.equal(true);
       }
     });
@@ -203,7 +198,6 @@ describe('Client', () => {
         await client.compare('uid=foo.bar,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'uid', 'bruce.banner');
         false.should.equal(true);
       } catch (ex) {
-        // tslint:disable-next-line:no-unused-expression
         (ex instanceof NoSuchObjectError).should.equal(true);
       }
     });
@@ -212,7 +206,6 @@ describe('Client', () => {
         await client.compare('foo=bar', 'cn', 'bar');
         false.should.equal(true);
       } catch (ex) {
-        // tslint:disable-next-line:no-unused-expression
         (ex instanceof InvalidDNSyntaxError).should.equal(true);
       }
     });

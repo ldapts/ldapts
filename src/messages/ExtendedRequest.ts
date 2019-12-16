@@ -9,10 +9,12 @@ export interface ExtendedRequestMessageOptions extends MessageOptions {
 
 export class ExtendedRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public oid: string;
+
   public value: string | Buffer;
 
-  constructor(options: ExtendedRequestMessageOptions) {
+  public constructor(options: ExtendedRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_EXTENSION;
 

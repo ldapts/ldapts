@@ -1,7 +1,6 @@
 import { RDN } from '../../src';
 
 describe('RDN', () => {
-
   describe('#toString()', () => {
     it('should format & escape correct string representation', () => {
       const rdn1 = new RDN({ cn: 'Smith, James K.' });

@@ -9,10 +9,12 @@ export interface LessThanEqualsFilterOptions {
 
 export class LessThanEqualsFilter extends Filter {
   public type: SearchFilter = SearchFilter.lessOrEqual;
+
   public attribute: string;
+
   public value: string;
 
-  constructor(options: LessThanEqualsFilterOptions = {}) {
+  public constructor(options: LessThanEqualsFilterOptions = {}) {
     super();
 
     this.attribute = options.attribute || '';

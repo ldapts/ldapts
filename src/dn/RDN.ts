@@ -9,7 +9,7 @@ export interface RDNAttributes {
 export class RDN {
   private attrs: RDNAttributes = {};
 
-  constructor(attrs?: RDNAttributes) {
+  public constructor(attrs?: RDNAttributes) {
     if (attrs) {
       Object.keys(attrs).forEach((name) => this.set(name, attrs[name]));
     }
@@ -17,31 +17,29 @@ export class RDN {
 
   /**
    * Set an RDN pair.
-   *
-   * @param name
-   * @param value
+   * @param {string} name
+   * @param {string} value
+   * @returns {object} RDN class
    */
-  public set(name: string, value: string) {
+  public set(name: string, value: string): RDN {
     this.attrs[name] = value;
     return this;
   }
 
   /**
    * Get an RDN value at the specified name.
-   *
-   * @param name
-   * @returns value
+   * @param {string} name
+   * @returns {string} value
    */
-  public get(name: string) {
+  public get(name: string): string {
     return this.attrs[name];
   }
 
   /**
    * Checks, if this instance of RDN is equal to the other RDN.
-   *
-   * @param other
+   * @param {object} other
    */
-  public equals(other: RDN) {
+  public equals(other: RDN): boolean {
     const ourKeys = Object.keys(this.attrs);
     const otherKeys = Object.keys(other.attrs);
 
@@ -66,10 +64,9 @@ export class RDN {
 
   /**
    * Parse the RDN, escape values & return a string representation.
-   *
-   * @returns Escaped string representation of RDN.
+   * @returns {string} Escaped string representation of RDN.
    */
-  public toString() {
+  public toString(): string {
     let str = '';
 
     const keys = Object.keys(this.attrs);
@@ -90,32 +87,32 @@ export class RDN {
    *
    * RFC defines, that these characters should be escaped:
    *
-   * Comma 	                        ,
-   * Backslash character 	          \
-   * Pound sign (hash sign) 	      #
-   * Plus sign 	                    +
-   * Less than symbol 	            <
-   * Greater than symbol 	          >
-   * Semicolon 	                    ;
-   * Double quote (quotation mark) 	"
-   * Equal sign 	                  =
+   * Comma                          ,
+   * Backslash character            \
+   * Pound sign (hash sign)         #
+   * Plus sign                      +
+   * Less than symbol               <
+   * Greater than symbol            >
+   * Semicolon                      ;
+   * Double quote (quotation mark)  "
+   * Equal sign                     =
    * Leading or trailing spaces
    *
-   * @param value RDN value to be escaped
-   * @returns Escaped string representation of RDN
+   * @param {string} value - RDN value to be escaped
+   * @returns {string} Escaped string representation of RDN
    */
-  private _escape(value: string) {
+  private _escape(value: string): string {
     let str = '';
     let current = 0;
     let quoted = false;
     const len = value.length;
 
-    const escaped = /[\\\"]/;
+    const escaped = /[\\"]/;
     const special = /[,=+<>#;]/;
 
     if (len > 0) {
       // Wrap strings with trailing or leading spaces in quotes
-      quoted = value[0] === ' ' || value[len - 1] === ' ';
+      quoted = value.startsWith(' ') || value[len - 1] === ' ';
     }
 
     while (current < len) {

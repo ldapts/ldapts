@@ -1,7 +1,8 @@
-// @ts-ignore
-import chai, { should } from 'chai';
+import chai from 'chai';
 import { BerWriter } from 'asn1';
-import { anyString, mock, capture, verify, anything, when, instance, reset } from 'ts-mockito';
+import {
+ anyString, mock, capture, verify, anything, when, instance, reset,
+} from 'ts-mockito';
 import { ExtensibleFilter } from '../../src/filters';
 
 describe('ExtensibleFilter', () => {

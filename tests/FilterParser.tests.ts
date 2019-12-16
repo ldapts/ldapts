@@ -1,5 +1,4 @@
-// @ts-ignore
-import chai, { should } from 'chai';
+import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { FilterParser } from '../src/FilterParser';
 import {
@@ -98,13 +97,6 @@ describe('FilterParser', () => {
           result.should.deep.equal(new EqualityFilter({
             attribute: 'foo',
             value: 'bar()',
-          }));
-        });
-        it('should allow )( in filter string', () => {
-          const result = FilterParser.parseString('foo=bar\\29\\28');
-          result.should.deep.equal(new EqualityFilter({
-            attribute: 'foo',
-            value: 'bar)(',
           }));
         });
         it('should allow )( in filter string', () => {

@@ -9,7 +9,9 @@ export interface MessageResponseOptions extends MessageOptions {
 
 export abstract class MessageResponse extends Message {
   public status: number;
+
   public matchedDN: string;
+
   public errorMessage: string;
 
   protected constructor(options: MessageResponseOptions) {

@@ -15,10 +15,12 @@ export interface Entry {
 
 export class SearchEntry extends MessageResponse {
   public protocolOperation: ProtocolOperation;
+
   public name: string;
+
   public attributes: Attribute[];
 
-  constructor(options: SearchEntryOptions) {
+  public constructor(options: SearchEntryOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH_ENTRY;
     this.name = options.name || '';
@@ -44,6 +46,7 @@ export class SearchEntry extends MessageResponse {
     for (const attribute of this.attributes) {
       if (attribute.values && attribute.values.length) {
         if (attribute.values.length === 1) {
+          // eslint-disable-next-line prefer-destructuring
           result[attribute.type] = attribute.values[0];
         } else {
           result[attribute.type] = attribute.values;

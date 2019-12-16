@@ -12,11 +12,13 @@ export interface ServerSideSortingRequestControlOptions extends ControlOptions {
 }
 
 export class ServerSideSortingRequestControl extends Control {
-  public static type: string = '2.16.840.1.113730.3.4.3';
+  public static type = '2.16.840.1.113730.3.4.3';
+
   public type: string = ServerSideSortingRequestControl.type;
+
   public values: ServerSideSortingRequestValue[];
 
-  constructor(options: ServerSideSortingRequestControlOptions = {}) {
+  public constructor(options: ServerSideSortingRequestControlOptions = {}) {
     super(options);
 
     if (Array.isArray(options.value)) {
@@ -32,8 +34,8 @@ export class ServerSideSortingRequestControl extends Control {
     if (reader.readSequence(0x30)) {
       while (reader.readSequence(0x30)) {
         const attributeType: string = reader.readString();
-        let orderingRule: string = '';
-        let reverseOrder: boolean = false;
+        let orderingRule = '';
+        let reverseOrder = false;
         if (reader.peek() === 0x80) {
           orderingRule = reader.readString(0x80);
         }

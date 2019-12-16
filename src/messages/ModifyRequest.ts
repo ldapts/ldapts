@@ -10,10 +10,12 @@ export interface ModifyRequestMessageOptions extends MessageOptions {
 
 export class ModifyRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public dn: string;
+
   public changes: Change[];
 
-  constructor(options: ModifyRequestMessageOptions) {
+  public constructor(options: ModifyRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_MODIFY;
 

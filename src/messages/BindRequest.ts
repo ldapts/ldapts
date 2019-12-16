@@ -9,10 +9,12 @@ export interface BindRequestMessageOptions extends MessageOptions {
 
 export class BindRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public dn: string;
+
   public password: string;
 
-  constructor(options: BindRequestMessageOptions) {
+  public constructor(options: BindRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
     this.dn = options.dn || '';

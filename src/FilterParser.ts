@@ -26,6 +26,7 @@ interface Substring {
   final: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class FilterParser {
   public static parseString(filterString: string): Filter {
     if (!filterString) {
@@ -33,8 +34,7 @@ export class FilterParser {
     }
 
     // Wrap input in parens if it wasn't already
-    if (filterString.charAt(0) !== '(') {
-      // tslint:disable-next-line:no-parameter-reassignment
+    if (!filterString.startsWith('(')) {
       filterString = `(${filterString})`;
     }
 
@@ -85,12 +85,13 @@ export class FilterParser {
 
     let filter: Filter;
     switch (type) {
-      case SearchFilter.and:
+      case SearchFilter.and: {
         const andFilters = FilterParser._parseSet(reader);
         filter = new AndFilter({
           filters: andFilters,
         });
         break;
+      }
       case SearchFilter.approxMatch:
         filter = new ApproximateFilter();
         filter.parse(reader);
@@ -111,18 +112,20 @@ export class FilterParser {
         filter = new LessThanEqualsFilter();
         filter.parse(reader);
         break;
-      case SearchFilter.not:
+      case SearchFilter.not: {
         const innerFilter = FilterParser.parse(reader);
         filter = new NotFilter({
           filter: innerFilter,
         });
         break;
-      case SearchFilter.or:
+      }
+      case SearchFilter.or: {
         const orFilters = FilterParser._parseSet(reader);
         filter = new OrFilter({
           filters: orFilters,
         });
         break;
+      }
       case SearchFilter.present:
         filter = new PresenceFilter();
         filter.parse(reader);
@@ -140,7 +143,7 @@ export class FilterParser {
 
   private static _parseString(filterString: string, start: number, fullString: string): ParseStringResult {
     let cursor = start;
-    const length = filterString.length;
+    const { length } = filterString;
     let filter: Filter;
 
     if (filterString[cursor] !== '(') {
@@ -209,14 +212,14 @@ export class FilterParser {
     let attribute: string;
     let remainingExpression: string;
 
-    if (filterString[0] === ':') {
+    if (filterString.startsWith(':')) {
       // An extensible filter can have no attribute name (Only valid when using dn and * matching-rule evaluation)
       attribute = '';
       remainingExpression = filterString;
     } else {
       const matches = filterString.match(/^[-\w]+/);
       if (matches && matches.length) {
-        attribute = matches[0];
+        [attribute] = matches;
         remainingExpression = filterString.substr(attribute.length);
       } else {
         throw new Error(`Invalid attribute name: ${filterString}`);
@@ -229,9 +232,9 @@ export class FilterParser {
       });
     }
 
-    if (remainingExpression[0] === '=') {
+    if (remainingExpression.startsWith('=')) {
       remainingExpression = remainingExpression.substr(1);
-      if (remainingExpression.indexOf('*') !== -1) {
+      if (remainingExpression.includes('*')) {
         const escapedExpression = FilterParser._unescapeSubstring(remainingExpression);
         return new SubstringFilter({
           attribute,
@@ -247,28 +250,28 @@ export class FilterParser {
       });
     }
 
-    if (remainingExpression[0] === '>' && remainingExpression[1] === '=') {
+    if (remainingExpression.startsWith('>') && remainingExpression[1] === '=') {
       return new GreaterThanEqualsFilter({
         attribute,
         value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
-    if (remainingExpression[0] === '<' && remainingExpression[1] === '=') {
+    if (remainingExpression.startsWith('<') && remainingExpression[1] === '=') {
       return new LessThanEqualsFilter({
         attribute,
         value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
-    if (remainingExpression[0] === '~' && remainingExpression[1] === '=') {
+    if (remainingExpression.startsWith('~') && remainingExpression[1] === '=') {
       return new ApproximateFilter({
         attribute,
         value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
       });
     }
 
-    if (remainingExpression[0] === ':') {
+    if (remainingExpression.startsWith(':')) {
       return FilterParser._parseExtensibleFilterFromString(attribute, remainingExpression);
     }
 
@@ -276,7 +279,7 @@ export class FilterParser {
   }
 
   private static _parseExtensibleFilterFromString(attribute: string, filterString: string): ExtensibleFilter {
-    let dnAttributes: boolean = false;
+    let dnAttributes = false;
     let rule: string | undefined;
 
     const fields = filterString.split(':');
@@ -292,11 +295,11 @@ export class FilterParser {
       fields.shift();
     }
 
-    if (fields.length && fields[0][0] !== '=') {
+    if (fields.length && !fields[0].startsWith('=')) {
       rule = fields.shift();
     }
 
-    if (fields.length && fields[0][0] !== '=') {
+    if (fields.length && !fields[0].startsWith('=')) {
       throw new Error(`Missing := in extensible filter: ${filterString}`);
     }
 
@@ -321,9 +324,9 @@ export class FilterParser {
   }
 
   private static _unescapeHexValues(input: string): string {
-    let index: number = 0;
+    let index = 0;
     const end = input.length;
-    let result: string = '';
+    let result = '';
 
     while (index < end) {
       const char = input[index];

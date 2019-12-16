@@ -4,7 +4,7 @@ import { ProtocolOperation } from '../ProtocolOperation';
 export class ModifyDNResponse extends MessageResponse {
   public protocolOperation: ProtocolOperation;
 
-  constructor(options: MessageResponseOptions) {
+  public constructor(options: MessageResponseOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_MODRDN;
   }

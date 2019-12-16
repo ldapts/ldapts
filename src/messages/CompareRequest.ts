@@ -10,11 +10,14 @@ export interface CompareRequestMessageOptions extends MessageOptions {
 
 export class CompareRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public dn: string;
+
   public attribute: string;
+
   public value: string;
 
-  constructor(options: CompareRequestMessageOptions) {
+  public constructor(options: CompareRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_COMPARE;
     this.attribute = options.attribute || '';

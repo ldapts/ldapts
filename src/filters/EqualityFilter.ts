@@ -9,10 +9,12 @@ export interface EqualityFilterOptions {
 
 export class EqualityFilter extends Filter {
   public type: SearchFilter = SearchFilter.equalityMatch;
+
   public attribute: string;
+
   public value: string;
 
-  constructor(options: EqualityFilterOptions = {}) {
+  public constructor(options: EqualityFilterOptions = {}) {
     super();
 
     this.attribute = options.attribute || '';

@@ -12,16 +12,24 @@ export interface SearchRequestMessageOptions extends MessageOptions, SearchOptio
 
 export class SearchRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public baseDN: string;
+
   public scope: 'base' | 'one' | 'sub' | 'children';
+
   public derefAliases: 'never' | 'always' | 'search' | 'find';
+
   public sizeLimit: number;
+
   public timeLimit: number;
+
   public returnAttributeValues: boolean;
+
   public filter: Filter;
+
   public attributes: string[];
 
-  constructor(options: SearchRequestMessageOptions) {
+  public constructor(options: SearchRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_SEARCH;
 

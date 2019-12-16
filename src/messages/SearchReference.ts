@@ -8,9 +8,10 @@ export interface SearchReferenceOptions extends MessageResponseOptions {
 
 export class SearchReference extends MessageResponse {
   public protocolOperation: ProtocolOperation;
+
   public uris: string[];
 
-  constructor(options: SearchReferenceOptions) {
+  public constructor(options: SearchReferenceOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH_REF;
     this.uris = options.uris || [];

@@ -8,9 +8,10 @@ export interface ChangeOptions {
 
 export class Change {
   public operation: 'add' | 'delete' | 'replace';
+
   public modification: Attribute;
 
-  constructor(options: ChangeOptions = {
+  public constructor(options: ChangeOptions = {
     modification: new Attribute(),
   }) {
     this.operation = options.operation || 'add';

@@ -39,6 +39,7 @@ import {
   TLSNotSupportedError,
 } from './errors/resultCodeErrors';
 
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StatusCodeParser {
   public static parse(code: number, message?: string): ResultCodeError {
     switch (code) {

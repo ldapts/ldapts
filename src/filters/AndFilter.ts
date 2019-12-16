@@ -8,9 +8,10 @@ export interface AndFilterOptions {
 
 export class AndFilter extends Filter {
   public type: SearchFilter = SearchFilter.and;
+
   public filters: Filter[];
 
-  constructor(options: AndFilterOptions) {
+  public constructor(options: AndFilterOptions) {
     super();
     this.filters = options.filters;
   }
@@ -37,7 +38,7 @@ export class AndFilter extends Filter {
   }
 
   public toString(): string {
-    let result: string = '(&';
+    let result = '(&';
     for (const filter of this.filters) {
       result += filter.toString();
     }

@@ -11,12 +11,16 @@ export interface ModifyDNRequestMessageOptions extends MessageOptions {
 
 export class ModifyDNRequest extends Message {
   public protocolOperation: ProtocolOperation;
+
   public deleteOldRdn: boolean;
+
   public dn: string;
+
   public newRdn: string;
+
   public newSuperior: string;
 
-  constructor(options: ModifyDNRequestMessageOptions) {
+  public constructor(options: ModifyDNRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_MODRDN;
 

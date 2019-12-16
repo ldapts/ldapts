@@ -6,6 +6,7 @@ export interface ControlOptions {
 
 export abstract class Control {
   public abstract type: string;
+
   public critical: boolean;
 
   protected constructor(options: ControlOptions = {}) {
@@ -24,11 +25,13 @@ export abstract class Control {
     this.parseControl(reader);
   }
 
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected writeControl(_: BerWriter): void {
+    // Do nothing as the default action
   }
 
-  // tslint:disable-next-line:no-empty
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected parseControl(_: BerReader): void {
+    // Do nothing as the default action
   }
 }

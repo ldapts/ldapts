@@ -8,16 +8,17 @@ export interface AttributeOptions {
 
 export class Attribute {
   public type: string;
+
   public values: string[] | Buffer[];
 
-  constructor(options: AttributeOptions = {}) {
+  public constructor(options: AttributeOptions = {}) {
     this.type = options.type || '';
     this.values = options.values || [];
   }
 
   public write(writer: BerWriter): void {
     writer.startSequence();
-    let type = this.type;
+    let { type } = this;
     const isBinaryType = this._isBinaryType();
     // If the value is a buffer and the type does not end in ;binary, append it
     if (!isBinaryType && this.values.length && Buffer.isBuffer(this.values[0])) {
@@ -64,6 +65,6 @@ export class Attribute {
   }
 
   private _isBinaryType() {
-    return /;binary$/.test(this.type);
+    return this.type.endsWith(';binary');
   }
 }

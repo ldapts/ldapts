@@ -12,11 +12,13 @@ export interface EntryChangeNotificationControlOptions extends ControlOptions {
 }
 
 export class EntryChangeNotificationControl extends Control {
-  public static type: string = '2.16.840.1.113730.3.4.7';
+  public static type = '2.16.840.1.113730.3.4.7';
+
   public type: string = EntryChangeNotificationControl.type;
+
   public value?: EntryChangeNotificationControlValue;
 
-  constructor(options: EntryChangeNotificationControlOptions = {}) {
+  public constructor(options: EntryChangeNotificationControlOptions = {}) {
     super(options);
 
     this.value = options.value;

@@ -8,9 +8,10 @@ export interface OrFilterOptions {
 
 export class OrFilter extends Filter {
   public type: SearchFilter = SearchFilter.or;
+
   public filters: Filter[];
 
-  constructor(options: OrFilterOptions) {
+  public constructor(options: OrFilterOptions) {
     super();
     this.filters = options.filters;
   }
@@ -37,7 +38,7 @@ export class OrFilter extends Filter {
   }
 
   public toString(): string {
-    let result: string = '(|';
+    let result = '(|';
     for (const filter of this.filters) {
       result += filter.toString();
     }

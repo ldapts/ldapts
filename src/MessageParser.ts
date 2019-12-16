@@ -146,7 +146,7 @@ export class MessageParser extends (EventEmitter as new() => MessageParserEmitte
           messageId,
         });
         break;
-      default:
+      default: {
         const error = new MessageParserError(`Protocol Operation not supported: 0x${protocolOperation.toString(16)}`);
         error.messageDetails = {
           messageId,
@@ -154,6 +154,7 @@ export class MessageParser extends (EventEmitter as new() => MessageParserEmitte
         };
 
         throw error;
+      }
     }
 
     message.parse(reader);

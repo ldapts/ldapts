@@ -17,7 +17,7 @@ export interface RDNMap {
 export class DN {
   private rdns: RDN[] = [];
 
-  constructor(rdns?: RDN[] | RDNMap) {
+  public constructor(rdns?: RDN[] | RDNMap) {
     if (rdns) {
       if (Array.isArray(rdns)) {
         this.rdns = rdns;
@@ -29,10 +29,9 @@ export class DN {
 
   /**
    * Add an RDN component to the DN, consisting of key & value pair.
-   *
-   * @param key
-   * @param value
-   * @returns DN
+   * @param {string} key
+   * @param {string} value
+   * @returns {object} DN
    */
   public addPairRDN(key: string, value: string) {
     this.rdns.push(new RDN({ [key]: value }));
@@ -44,8 +43,8 @@ export class DN {
    * Add a single RDN component to the DN.
    *
    * Note, that this RDN can be compound (single RDN can have multiple key & value pairs).
-   * @param rdn
-   * @returns DN
+   * @param {object} rdn
+   * @returns {object} DN
    */
   public addRDN(rdn: RDN | RDNAttributes) {
     if (rdn instanceof RDN) {
@@ -65,25 +64,30 @@ export class DN {
    * - join other DN into this DN
    * - join list of RDNs or RDNAttributes into this DN
    * - create RDNs from object map, where every key & value will create a new RDN
-   *
-   * @param rdns
-   * @returns DN
+   * @param {object|object[]} rdns
+   * @returns {object} DN
    */
   public addRDNs(rdns: RDN[] | RDNAttributes[] | RDNMap | DN) {
     if (rdns instanceof DN) {
-      this.rdns = [...this.rdns, ...rdns.rdns];
+      this.rdns.push(...rdns.rdns);
     } else if (Array.isArray(rdns)) {
-      rdns.forEach((rdn: RDN | RDNAttributes) => this.addRDN(rdn));
+      for (const rdn of rdns) {
+        this.addRDN(rdn);
+      }
     } else {
-      Object.keys(rdns).map((name) => {
-        const value = rdns[name];
-
+      for (const [name, value] of Object.entries(rdns)) {
         if (Array.isArray(value)) {
-          value.forEach((v) => this.rdns.push(new RDN({ [name]: v })));
+          for (const rdnValue of value) {
+            this.rdns.push(new RDN({
+              [name]: rdnValue,
+            }));
+          }
         } else {
-          this.rdns.push(new RDN({ [name]: value }));
+          this.rdns.push(new RDN({
+            [name]: value,
+          }));
         }
-      });
+      }
     }
 
     return this;
@@ -108,13 +112,12 @@ export class DN {
   }
 
   public isEmpty() {
-    return this.rdns.length === 0;
+    return !this.rdns.length;
   }
 
   /**
    * Checks, if this instance of DN is equal to the other DN.
-   *
-   * @param other
+   * @param {object} other
    */
   public equals(other: DN) {
     if (this.rdns.length !== other.rdns.length) {

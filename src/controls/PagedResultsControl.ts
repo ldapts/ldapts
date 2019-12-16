@@ -11,11 +11,13 @@ export interface PagedResultsControlOptions extends ControlOptions {
 }
 
 export class PagedResultsControl extends Control {
-  public static type: string = '1.2.840.113556.1.4.319';
+  public static type = '1.2.840.113556.1.4.319';
+
   public type: string = PagedResultsControl.type;
+
   public value?: PagedResultsValue;
 
-  constructor(options: PagedResultsControlOptions = {}) {
+  public constructor(options: PagedResultsControlOptions = {}) {
     super(options);
 
     this.value = options.value;

@@ -1,7 +1,6 @@
 import { DN } from '../../src';
 
 describe('DN', () => {
-
   describe('#toString()', () => {
     it('should chain build & escape correctly', () => {
       const dn = new DN()
