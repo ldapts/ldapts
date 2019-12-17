@@ -1,3 +1,6 @@
+### 2.0.1
+  * Documentation updates
+
 ### 2.0.0
   * Drop support for nodejs v8
   * Update to Typescript 3.7

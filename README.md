@@ -69,9 +69,11 @@ of `Control` objects. You probably don't need them though...
 
 Arguments:
 
-  `dn (string)`: The name (DN) of the directory object that the client wishes to bind as
-  `password (string)`: Password for the target bind DN
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+|`dn` (string)|The name (DN) of the directory object that the client wishes to bind as
+|`password` (string)|Password for the target bind DN
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 Example:
 
@@ -87,9 +89,11 @@ controls are optional.
 
 Arguments:
 
-  `dn (string)`: The DN of the entry to add
-  `entry (object|Attribute[])`: The set of attributes to include in that entry
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+|`dn` (string)|The DN of the entry to add
+|`entry` (object&#124;Attribute[])|The set of attributes to include in that entry
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 Example:
 
@@ -109,10 +113,12 @@ the entry referenced by dn.
 
 Arguments:
 
-  `dn (string)`: The DN of the entry in which the comparison is to be made
-  `attribute (string)`: The Name of the attribute in which the comparison is to be made
-  `value (string)`: The Attribute Value Assertion to try to find in the specified attribute
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+|`dn` (string)|The DN of the entry in which the comparison is to be made
+|`attribute` (string)|The Name of the attribute in which the comparison is to be made
+|`value` (string)|The Attribute Value Assertion to try to find in the specified attribute
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 Returns:
   `(boolean)`: Returns `true` if the target entry exists and does contain the specified attribute value; otherwise `false`
@@ -128,8 +134,10 @@ Deletes an entry from the LDAP server.
 
 Arguments:
 
-  `dn (string)`: The DN of the entry to delete
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+`dn` (string)|The DN of the entry to delete
+ `[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 Example:
 
@@ -142,9 +150,11 @@ Performs an LDAP extended operation against an LDAP server.
 
 Arguments:
 
-  `oid (string)`: Object identifier representing the type of request
-  `[value] (string)`: Optional value - based on the type of operation
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+|`oid` (string)|Object identifier representing the type of request
+|`[value]` (string)|Optional value - based on the type of operation
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 
 Example (performs an LDAP 'whois' extended op):
@@ -160,9 +170,11 @@ pass in a single `Change` or an array of `Change` objects.
 
 Arguments:
 
-  `dn (string)`: The DN of the entry to modify
-  `changes (Change|Change[])`: The set of changes to make to the entry
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+`dn` (string)|The DN of the entry to modify
+`changes` (Change&#124;Change[])|The set of changes to make to the entry
+`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 
 Example (update multiple attributes):
@@ -195,24 +207,22 @@ Example (update binary attribute):
 `Change({ operation, modification })`
 
 A `Change` object maps to the LDAP protocol of a modify change, and requires you
-to set the `operation` and `modification`.  The `operation` is a string, and
-must be one of:
-
-||replace||Replaces the attribute referenced in `modification`.  If the modification has no values, it is equivalent to a delete.||
-||add||Adds the attribute value(s) referenced in `modification`.  The attribute may or may not already exist.||
-||delete||Deletes the attribute (and all values) referenced in `modification`.||
+to set the `operation` and `modification`.
 
 Arguments:
 
-  `operation (replace|add|delete)`:
+|Argument |Description
+|---------|--------------
+|`operation` (replace&#124;add&#124;delete)|*See table below*
+|`modification` (Attribute)|Attribute details to add, remove, or update
+
+Operations:
 
 | Value     | Description
 | --------- | ------------
 | `replace` |Replaces the attribute referenced in `modification`.  If the modification has no values, it is equivalent to a delete.|
 | `add`     |Adds the attribute value(s) referenced in `modification`.  The attribute may or may not already exist.|
 | `delete`  |Deletes the attribute (and all values) referenced in `modification`.|
-
-   `modification (Attribute)`: Attribute details to add, remove, or update
 
 ## modifyDN
 `modifyDN(dn, newDN, [controls])`
@@ -228,9 +238,11 @@ as opposed to just renaming the leaf).
 
 Arguments:
 
-  `dn (string)`: The DN of the entry to rename
-  `newDN (string)`: The new RDN to use assign to the entry. It may be the same as the current RDN if you only intend to move the entry beneath a new parent. If the new RDN includes any attribute values that aren’t already in the entry, the entry will be updated to include them.
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
+|Argument |Description
+|---------|--------------
+|`dn` (string)|The DN of the entry to rename
+|`newDN` (string)|The new RDN to use assign to the entry. It may be the same as the current RDN if you only intend to move the entry beneath a new parent. If the new RDN includes any attribute values that aren’t already in the entry, the entry will be updated to include them.
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 
 Example:
@@ -247,8 +259,13 @@ takes an `options` object for all the parameters.
 
 Arguments:
 
-  `baseDN (string)`: The base of the subtree in which the search is to be constrained
-  `options (object)`:
+|Argument |Description
+|---------|--------------
+|`baseDN` (string)|The base of the subtree in which the search is to be constrained
+|`options` (object)|*See table below*
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
+
+Options:
 
 |Attribute                                      |Description
 |-----------------------------------------------|---------------------------------------------------|
@@ -259,9 +276,8 @@ Arguments:
 |[sizeLimit=0] (number)                         |The maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
 |[timeLimit=10] (number)                        |The maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
 |[paged=false] (boolean&#124;SearchPageOptions) |Used to allow paging and specify the page size
-|[attributes=] (string[])                     |A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
+|[attributes=] (string[])                       |A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
 
-  `[controls] (Control|Control[])`: Optional `Control` object or array of `Control` objects
 
 
 Example:
