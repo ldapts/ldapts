@@ -65,6 +65,6 @@ export class Attribute {
   }
 
   private _isBinaryType() {
-    return this.type.endsWith(';binary');
+    return /;binary$/i.test(this.type || '');
   }
 }

@@ -1,3 +1,6 @@
+### 2.0.2
+  * Ignore case when determining if attribute is binary. Fix #11
+
 ### 2.0.1
   * Documentation updates
 
