@@ -39,7 +39,7 @@ export class Change {
     writer.endSequence();
   }
 
-  public parse(reader: BerReader) {
+  public parse(reader: BerReader): void {
     reader.readSequence();
 
     const operation = reader.readEnumeration();

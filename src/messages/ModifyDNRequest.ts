@@ -45,7 +45,7 @@ export class ModifyDNRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     this.dn = reader.readString();
     this.newRdn = reader.readString();
     this.deleteOldRdn = reader.readBoolean();

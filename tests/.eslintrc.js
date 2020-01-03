@@ -14,5 +14,6 @@ module.exports = {
   },
   rules: {
     'max-classes-per-file': 'off',
+    '@typescript-eslint/unbound-method': 'off',
   },
 };

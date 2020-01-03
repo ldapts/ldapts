@@ -44,7 +44,7 @@ export class Attribute {
     writer.endSequence();
   }
 
-  public parse(reader: BerReader) {
+  public parse(reader: BerReader): void {
     reader.readSequence();
 
     this.type = reader.readString();
@@ -64,7 +64,7 @@ export class Attribute {
     }
   }
 
-  private _isBinaryType() {
+  private _isBinaryType(): boolean {
     return /;binary$/i.test(this.type || '');
   }
 }

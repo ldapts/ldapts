@@ -22,17 +22,17 @@ describe('FilterParser', () => {
 
   describe('#parseString()', () => {
     it('should throw for empty filters', () => {
-      (() => {
+      ((): void => {
         FilterParser.parseString('');
       }).should.throw(Error, 'Filter cannot be empty');
     });
     it('should throw if parenthesis are unbalanced', () => {
-      (() => {
+      ((): void => {
         FilterParser.parseString('(cn=foo');
       }).should.throw(Error, 'Unbalanced parens');
     });
     it('should throw for invalid filter', () => {
-      (() => {
+      ((): void => {
         FilterParser.parseString('foo>bar');
       }).should.throw(Error, 'Invalid expression: foo>bar');
     });
@@ -45,12 +45,12 @@ describe('FilterParser', () => {
       );
     });
     it('should throw for only parenthesis', () => {
-      (() => {
+      ((): void => {
         FilterParser.parseString('()');
       }).should.throw(Error, 'Invalid attribute name:');
     });
     it('should throw for nested parenthesis', () => {
-      (() => {
+      ((): void => {
         FilterParser.parseString('((cn=foo))');
       }).should.throw(Error, 'Invalid attribute name: (cn=foo');
     });

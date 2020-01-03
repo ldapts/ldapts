@@ -27,7 +27,7 @@ export class BindRequest extends Message {
     writer.writeString(this.password, Ber.Context);
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     this.version = reader.readInt();
     this.dn = reader.readString();
 

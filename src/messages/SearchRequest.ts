@@ -97,7 +97,7 @@ export class SearchRequest extends Message {
     writer.endSequence();
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     this.baseDN = reader.readString();
     const scope = reader.readEnumeration();
     switch (scope) {

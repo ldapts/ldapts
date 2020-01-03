@@ -31,7 +31,7 @@ describe('Client', () => {
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
       const url = 'https://127.0.0.1';
-      (() => {
+      ((): void => {
         new Client({
           url,
         });
@@ -39,7 +39,7 @@ describe('Client', () => {
     });
     it('should not throw error if url protocol is ldap://', () => {
       const url = 'ldap://127.0.0.1';
-      (() => {
+      ((): void => {
         new Client({
           url,
         });
@@ -47,7 +47,7 @@ describe('Client', () => {
     });
     it('should not throw error if url protocol is ldaps://', () => {
       const url = 'ldaps://127.0.0.1';
-      (() => {
+      ((): void => {
         new Client({
           url,
         });
@@ -55,7 +55,7 @@ describe('Client', () => {
     });
   });
   describe('#isConnected', () => {
-    it('should not be connected if a method has not been called', async () => {
+    it('should not be connected if a method has not been called', () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
       });
@@ -546,13 +546,23 @@ describe('Client', () => {
         description: 'tagGroup',
       }]);
     });
-    it('should throw if a PagedResultsControl is specified', () => {
+    it('should throw if a PagedResultsControl is specified', async () => {
       const pagedResultsControl = new PagedResultsControl({});
-      client.search('cn=test', {}, pagedResultsControl).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
+      try {
+        await client.search('cn=test', {}, pagedResultsControl);
+        true.should.equal(false);
+      } catch (ex) {
+        ex.message.should.equal('Should not specify PagedResultsControl');
+      }
     });
-    it('should throw if a PagedResultsControl is specified in the controls array', () => {
+    it('should throw if a PagedResultsControl is specified in the controls array', async () => {
       const pagedResultsControl = new PagedResultsControl({});
-      client.search('cn=test', {}, [pagedResultsControl]).should.be.rejectedWith(Error, 'Should not specify PagedResultsControl');
+      try {
+        await client.search('cn=test', {}, [pagedResultsControl]);
+        true.should.equal(false);
+      } catch (ex) {
+        ex.message.should.equal('Should not specify PagedResultsControl');
+      }
     });
   });
 });

@@ -344,7 +344,7 @@ export class Client {
    * @param {string} [value]
    * @param {Control|Control[]} [controls]
    */
-  public async exop(oid: string, value?: string, controls?: Control|Control[]) {
+  public async exop(oid: string, value?: string, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.connected) {
       await this._connect();
     }
@@ -377,7 +377,7 @@ export class Client {
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control|Control[]) {
+  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -409,7 +409,7 @@ export class Client {
    * @param {string|DN} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control|Control[]) {
+  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control|Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -502,7 +502,7 @@ export class Client {
     let filter: Filter;
     if (options.filter) {
       if (typeof options.filter === 'string') {
-        filter = FilterParser.parseString(options.filter as string);
+        filter = FilterParser.parseString(options.filter);
       } else {
         filter = options.filter;
       }
@@ -548,7 +548,7 @@ export class Client {
     await this._send(req);
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl) {
+  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl): Promise<void> {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
@@ -586,7 +586,7 @@ export class Client {
     }
   }
 
-  private _nextMessageId() {
+  private _nextMessageId(): number {
     this.messageId += 1;
     if (this.messageId >= MAX_MESSAGE_ID) {
       this.messageId = 1;
@@ -600,9 +600,9 @@ export class Client {
    * @returns {Promise<void>}
    * @private
    */
-  private _connect() {
+  private _connect(): Promise<void> {
     if (this.connected) {
-      return true;
+      return Promise.resolve();
     }
 
     return new Promise((resolve, reject) => {
@@ -640,7 +640,7 @@ export class Client {
     });
   }
 
-  private _onConnect(next: () => void) {
+  private _onConnect(next: () => void): void {
     clearTimeout(this.connectTimer);
     // Clear out event listeners from _connect()
     this.socket.removeAllListeners('error');
@@ -650,7 +650,7 @@ export class Client {
     this.connected = true;
 
     // region Socket events handlers
-    const socketError = (err: Error) => {
+    const socketError = (err: Error): void => {
       // Clean up any pending messages
       for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
         if (messageDetails.message instanceof UnbindRequest) {
@@ -666,21 +666,21 @@ export class Client {
       this.socket.destroy();
     };
 
-    function socketEnd(this: tls.TLSSocket | net.Socket) {
+    function socketEnd(this: tls.TLSSocket | net.Socket): void {
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
       }
     }
 
-    function socketTimeout(this: tls.TLSSocket | net.Socket) {
+    function socketTimeout(this: tls.TLSSocket | net.Socket): void {
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
       }
     }
 
-    const socketData = (data: Buffer) => {
+    const socketData = (data: Buffer): void => {
       if (this.messageParser) {
         this.messageParser.read(data);
       }
@@ -689,7 +689,7 @@ export class Client {
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const clientInstance = this;
 
-    function socketClose(this: tls.TLSSocket | net.Socket) {
+    function socketClose(this: tls.TLSSocket | net.Socket): void {
       if (this) {
         this.removeListener('error', socketError);
         this.removeListener('close', socketClose);
@@ -729,7 +729,7 @@ export class Client {
     return next();
   }
 
-  private _endSocket(socket: tls.TLSSocket | net.Socket) {
+  private _endSocket(socket: tls.TLSSocket | net.Socket): void {
     if (socket === this.socket) {
       this.connected = false;
     }
@@ -762,6 +762,7 @@ Each message request is given a unique id (messageId), used to identify the asso
       // Ignore this as a NOOP
     };
     const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
       // @ts-ignore
       messageResolve = resolve;
       messageReject = reject;
@@ -800,7 +801,7 @@ Each message request is given a unique id (messageId), used to identify the asso
     return sendPromise;
   }
 
-  private _handleSendResponse(message: Message) {
+  private _handleSendResponse(message: Message): void {
     const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
     if (messageDetails) {
       // When performing a search, an arbitrary number of SearchEntry and SearchReference messages come through with the

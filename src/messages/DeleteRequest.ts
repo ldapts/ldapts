@@ -24,7 +24,7 @@ export class DeleteRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     const { length } = reader;
     this.dn = reader.buffer.slice(0, length).toString('utf8');
     reader._offset += reader.length;

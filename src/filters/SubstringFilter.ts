@@ -10,10 +10,6 @@ export interface SubstringFilterOptions {
 }
 
 export class SubstringFilter extends Filter {
-  private static _escapeRegExp(str: string): string {
-    return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
-  }
-
   public type: SearchFilter = SearchFilter.substrings;
 
   public attribute: string;
@@ -129,5 +125,9 @@ export class SubstringFilter extends Filter {
     result += `${this.escape(this.final)})`;
 
     return result;
+  }
+
+  private static _escapeRegExp(str: string): string {
+    return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
   }
 }

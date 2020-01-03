@@ -39,7 +39,7 @@ export class AbandonRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     const { length } = reader;
     if (length) {
       // Abandon request messages are encoded using different ASN.1 integer logic, forcing custom decoding logic

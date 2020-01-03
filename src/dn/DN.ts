@@ -33,7 +33,7 @@ export class DN {
    * @param {string} value
    * @returns {object} DN
    */
-  public addPairRDN(key: string, value: string) {
+  public addPairRDN(key: string, value: string): DN {
     this.rdns.push(new RDN({ [key]: value }));
 
     return this;
@@ -46,7 +46,7 @@ export class DN {
    * @param {object} rdn
    * @returns {object} DN
    */
-  public addRDN(rdn: RDN | RDNAttributes) {
+  public addRDN(rdn: RDN | RDNAttributes): DN {
     if (rdn instanceof RDN) {
       this.rdns.push(rdn);
     } else {
@@ -67,7 +67,7 @@ export class DN {
    * @param {object|object[]} rdns
    * @returns {object} DN
    */
-  public addRDNs(rdns: RDN[] | RDNAttributes[] | RDNMap | DN) {
+  public addRDNs(rdns: RDN[] | RDNAttributes[] | RDNMap | DN): DN {
     if (rdns instanceof DN) {
       this.rdns.push(...rdns.rdns);
     } else if (Array.isArray(rdns)) {
@@ -93,15 +93,15 @@ export class DN {
     return this;
   }
 
-  public getRDNs() {
+  public getRDNs(): RDN[] {
     return this.rdns;
   }
 
-  public get(index: number) {
+  public get(index: number): RDN {
     return this.rdns[index];
   }
 
-  public set(rdn: RDN | RDNAttributes, index: number) {
+  public set(rdn: RDN | RDNAttributes, index: number): DN {
     if (rdn instanceof RDN) {
       this.rdns[index] = rdn;
     } else {
@@ -111,7 +111,7 @@ export class DN {
     return this;
   }
 
-  public isEmpty() {
+  public isEmpty(): boolean {
     return !this.rdns.length;
   }
 
@@ -119,7 +119,7 @@ export class DN {
    * Checks, if this instance of DN is equal to the other DN.
    * @param {object} other
    */
-  public equals(other: DN) {
+  public equals(other: DN): boolean {
     if (this.rdns.length !== other.rdns.length) {
       return false;
     }
@@ -133,7 +133,7 @@ export class DN {
     return true;
   }
 
-  public parent() {
+  public parent(): DN | null {
     if (this.rdns.length !== 0) {
       const save = this.rdns.shift() as RDN;
       const dn = new DN(this.rdns);
@@ -144,7 +144,7 @@ export class DN {
     return null;
   }
 
-  public parentOf(dn: DN) {
+  public parentOf(dn: DN): boolean {
     if (this.rdns.length >= dn.rdns.length) {
       return false;
     }
@@ -162,28 +162,28 @@ export class DN {
     return true;
   }
 
-  public clone() {
+  public clone(): DN {
     return new DN(this.rdns);
   }
 
-  public reverse() {
+  public reverse(): DN {
     this.rdns.reverse();
 
     return this;
   }
 
-  public pop() {
+  public pop(): RDN | undefined {
     return this.rdns.pop();
   }
 
-  public shift() {
+  public shift(): RDN | undefined {
     return this.rdns.shift();
   }
 
   /**
    * Parse the DN, escape values & return a string representation.
    */
-  public toString() {
+  public toString(): string {
     let str = '';
 
     for (const rdn of this.rdns) {

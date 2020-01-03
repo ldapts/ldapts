@@ -31,7 +31,7 @@ export class ExtendedRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     this.oid = reader.readString(0x80);
     if (reader.peek() === 0x81) {
       try {

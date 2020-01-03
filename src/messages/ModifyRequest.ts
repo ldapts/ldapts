@@ -33,7 +33,7 @@ export class ModifyRequest extends Message {
     writer.endSequence();
   }
 
-  public parseMessage(reader: BerReader) {
+  public parseMessage(reader: BerReader): void {
     this.dn = reader.readString();
 
     reader.readSequence();

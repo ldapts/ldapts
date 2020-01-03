@@ -1,3 +1,7 @@
+### 2.0.3
+  * Update npms
+  * Make typescript lint rules more strict
+
 ### 2.0.2
   * Ignore case when determining if attribute is binary. Fix #11
 

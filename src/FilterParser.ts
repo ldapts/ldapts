@@ -363,7 +363,7 @@ export class FilterParser {
     return {
       initial: FilterParser._unescapeHexValues(fields.shift() || ''),
       final: FilterParser._unescapeHexValues(fields.pop() || ''),
-      any: fields.map(FilterParser._unescapeHexValues),
+      any: fields.map((field) => FilterParser._unescapeHexValues(field)),
     };
   }
 

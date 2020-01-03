@@ -28,7 +28,7 @@ interface MessageParserEvents {
 export class MessageParser extends (EventEmitter as new() => MessageParserEmitter) {
   private buffer?: Buffer;
 
-  public read(data: Buffer) {
+  public read(data: Buffer): void {
     let nextMessage;
 
     if (this.buffer) {
@@ -64,7 +64,7 @@ export class MessageParser extends (EventEmitter as new() => MessageParserEmitte
     let messageId: number | undefined;
     let protocolOperation: ProtocolOperation | undefined;
     try {
-      messageId = reader.readInt() as number;
+      messageId = reader.readInt();
       protocolOperation = reader.readSequence() as ProtocolOperation;
 
       const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader);
