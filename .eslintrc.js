@@ -7,11 +7,16 @@ module.exports = {
     'mocha',
     'promise',
     'security',
-    '@typescript-eslint'
+    'import',
+    '@typescript-eslint',
   ],
   extends: [
     'eslint:recommended',
     'airbnb-base',
+    'plugin:import/typescript',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
   'env': {
     'node': true,
@@ -72,7 +77,7 @@ module.exports = {
     'valid-jsdoc': 'off',
     'yoda': 'error',
 
-    'import/extensions': 'off',
+    'import/extensions': ['error', 'never'],
     'import/no-unresolved': 'off',
 
     'jsdoc/check-alignment': 'error',
@@ -209,7 +214,7 @@ module.exports = {
       '@typescript-eslint/consistent-type-definitions': 'error',
       '@typescript-eslint/no-extraneous-class': 'error',
       '@typescript-eslint/explicit-function-return-type': 'error',
-      '@typescript-eslint/explicit-member-accessibility': ["error"],
+      '@typescript-eslint/explicit-member-accessibility': ['error'],
       '@typescript-eslint/generic-type-naming': 'error',
       '@typescript-eslint/interface-name-prefix': ['error', 'never'],
       '@typescript-eslint/member-ordering': ['error', {
