@@ -1,3 +1,6 @@
+### 2.1.0
+  * Use secure connection if `tlsOptions` is specified or if url starts with `ldaps:` when constructing a client. Fix #71
+
 ### 2.0.3
   * Update npms
   * Make typescript lint rules more strict

@@ -171,11 +171,12 @@ export class Client {
       throw new Error(`${options.url} is an invalid LDAP URL (protocol)`);
     }
 
-    this.secure = parsedUrl.protocol === 'ldaps:';
+    const isSecureProtocol = parsedUrl.protocol === 'ldaps:';
+    this.secure = isSecureProtocol || !!this.clientOptions.tlsOptions;
     this.host = parsedUrl.hostname || 'localhost';
     if (parsedUrl.port) {
       this.port = Number(parsedUrl.port);
-    } else if (this.secure) {
+    } else if (isSecureProtocol) {
       this.port = 636;
     } else {
       this.port = 389;
