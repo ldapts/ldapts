@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
@@ -45,9 +45,11 @@
   "dependencies": {
     "@types/asn1": "~0.2.0",
     "@types/node": "~10.17.13",
+    "@types/uuid": "~3.4.6",
     "asn1": "~0.2.4",
     "debug": "~4.1.1",
-    "strict-event-emitter-types": "~2.0.0"
+    "strict-event-emitter-types": "~2.0.0",
+    "uuid": "~3.3.3"
   },
   "devDependencies": {
     "@types/chai": "~4.2.7",

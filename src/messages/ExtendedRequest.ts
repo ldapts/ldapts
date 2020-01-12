@@ -26,7 +26,7 @@ export class ExtendedRequest extends Message {
     writer.writeString(this.oid, 0x80);
     if (Buffer.isBuffer(this.value)) {
       writer.writeBuffer(this.value, 0x81);
-    } else {
+    } else if (this.value) {
       writer.writeString(this.value, 0x81);
     }
   }

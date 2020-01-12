@@ -1,3 +1,9 @@
+### 2.2.0
+  * Support `startTLS` for upgrading an existing connection to be encrypted. Fix #71
+  * Fix type of `tlsOptions` to `tls.ConnectionOptions` in `Client` constructor options
+  * Fix sending exop with empty/undefined value
+  * Add `.id` to internal socket to allow cleanup when unbinding after startTLS
+
 ### 2.1.0
   * Use secure connection if `tlsOptions` is specified or if url starts with `ldaps:` when constructing a client. Fix #71
 

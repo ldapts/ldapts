@@ -2,6 +2,7 @@ import debug from 'debug';
 import { parse as parseUrl } from 'url';
 import * as net from 'net';
 import * as tls from 'tls';
+import { v4 } from 'uuid';
 import { Attribute } from './Attribute';
 import { Change } from './Change';
 import { MessageParser } from './MessageParser';
@@ -44,6 +45,8 @@ import { PresenceFilter } from './filters';
 const MAX_MESSAGE_ID = (2 ** 31) - 1;
 const logDebug = debug('ldapts');
 
+type SocketWithId = (tls.TLSSocket | net.Socket) & { id?: string };
+
 export interface ClientOptions {
   /**
    * A valid LDAP URL (proto/host/port only)
@@ -60,7 +63,7 @@ export interface ClientOptions {
   /**
    * Additional options passed to TLS connection layer when connecting via ldaps://
    */
-  tlsOptions?: tls.TlsOptions;
+  tlsOptions?: tls.ConnectionOptions;
   /**
    * Force strict DN parsing for client methods (Default: true)
    */
@@ -74,7 +77,7 @@ interface MessageDetails {
   resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
   timeoutTimer: NodeJS.Timer | null;
-  socket: tls.TLSSocket | net.Socket;
+  socket: SocketWithId;
 }
 
 export interface SearchPageOptions {
@@ -146,7 +149,7 @@ export class Client {
 
   private connected = false;
 
-  private socket!: tls.TLSSocket | net.Socket;
+  private socket!: SocketWithId;
 
   private connectTimer!: NodeJS.Timer;
 
@@ -200,6 +203,41 @@ export class Client {
 
   public get isConnected(): boolean {
     return this.connected;
+  }
+
+  public async startTLS(options: tls.ConnectionOptions = {}, controls?: Control|Control[]): Promise<void> {
+    if (!this.connected) {
+      await this._connect();
+    }
+
+    await this.exop('1.3.6.1.4.1.1466.20037', undefined, controls);
+
+    const originalSocket = this.socket;
+    originalSocket.removeListener('data', this.socketDataHandler);
+
+    // Reuse existing socket
+    options.socket = originalSocket;
+
+    this.socket = await new Promise((resolve, reject) => {
+      const secureSocket = tls.connect(options);
+      secureSocket.once('secureConnect', () => {
+        secureSocket.removeAllListeners('error');
+
+        secureSocket.on('data', this.socketDataHandler);
+        secureSocket.on('error', () => {
+          originalSocket.destroy();
+        });
+
+        resolve(secureSocket);
+      });
+      secureSocket.once('error', (err) => {
+        secureSocket.removeAllListeners();
+        reject(err);
+      });
+    });
+
+    // Allows pending messages and unbind responses to be handled and cleaned up
+    this.socket.id = originalSocket.id;
   }
 
   /**
@@ -587,6 +625,12 @@ export class Client {
     }
   }
 
+  private readonly socketDataHandler = (data: Buffer): void => {
+    if (this.messageParser) {
+      this.messageParser.read(data);
+    }
+  };
+
   private _nextMessageId(): number {
     this.messageId += 1;
     if (this.messageId >= MAX_MESSAGE_ID) {
@@ -609,11 +653,13 @@ export class Client {
     return new Promise((resolve, reject) => {
       if (this.secure) {
         this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
+        this.socket.id = v4();
         this.socket.once('secureConnect', () => {
           this._onConnect(resolve);
         });
       } else {
         this.socket = net.connect(this.port, this.host);
+        this.socket.id = v4();
         this.socket.once('connect', () => {
           this._onConnect(resolve);
         });
@@ -667,34 +713,28 @@ export class Client {
       this.socket.destroy();
     };
 
-    function socketEnd(this: tls.TLSSocket | net.Socket): void {
+    function socketEnd(this: SocketWithId): void {
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
       }
     }
 
-    function socketTimeout(this: tls.TLSSocket | net.Socket): void {
+    function socketTimeout(this: SocketWithId): void {
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
       }
     }
-
-    const socketData = (data: Buffer): void => {
-      if (this.messageParser) {
-        this.messageParser.read(data);
-      }
-    };
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
     const clientInstance = this;
 
-    function socketClose(this: tls.TLSSocket | net.Socket): void {
+    function socketClose(this: SocketWithId): void {
       if (this) {
         this.removeListener('error', socketError);
         this.removeListener('close', socketClose);
-        this.removeListener('data', socketData);
+        this.removeListener('data', clientInstance.socketDataHandler);
         this.removeListener('end', socketEnd);
         this.removeListener('timeout', socketTimeout);
       }
@@ -706,7 +746,7 @@ export class Client {
 
       // Clean up any pending messages
       for (const [key, messageDetails] of Object.entries(clientInstance.messageDetailsByMessageId)) {
-        if (messageDetails.socket === this) {
+        if (messageDetails.socket.id === this.id) {
           if (messageDetails.message instanceof UnbindRequest) {
             // Consider unbind as success since the connection is closed.
             messageDetails.resolve();
@@ -723,14 +763,14 @@ export class Client {
     // Hook up event listeners
     this.socket.on('error', socketError);
     this.socket.on('close', socketClose);
-    this.socket.on('data', socketData);
+    this.socket.on('data', this.socketDataHandler);
     this.socket.on('end', socketEnd);
     this.socket.on('timeout', socketTimeout);
 
     return next();
   }
 
-  private _endSocket(socket: tls.TLSSocket | net.Socket): void {
+  private _endSocket(socket: SocketWithId): void {
     if (socket === this.socket) {
       this.connected = false;
     }
@@ -744,8 +784,8 @@ export class Client {
   }
 
   /**
-   * Sends request message to the ldap server over the connected socket.
-Each message request is given a unique id (messageId), used to identify the associated response when it is sent back over the socket.
+   * Sends request message to the ldap server over the connected socket. Each message request is given a
+   * unique id (messageId), used to identify the associated response when it is sent back over the socket.
    *
    * @returns {Promise<Message>}
    * @private

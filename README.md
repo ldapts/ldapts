@@ -11,6 +11,7 @@ LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
 * [API Details](#api-details)
   * [Create a client](#create-a-client)
   * [bind](#bind)
+  * [startTLS](#startTLS)
   * [add](#add)
   * [compare](#compare)
   * [del](#del)
@@ -78,6 +79,25 @@ Arguments:
 Example:
 
     await client.bind('cn=root', 'secret');
+
+## startTLS
+`startTLS(options, [controls])`
+
+Performs a StartTLS extended operation against the LDAP server to initiate a TLS-secured communication channel over an
+otherwise clear-text connection.
+
+Arguments:
+
+|Argument |Description
+|---------|--------------
+|`options` (object)|TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)
+|`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
+
+Example:
+
+    await client.startTLS({
+      ca: [fs.readFileSync('mycacert.pem')],
+    });
 
 ## add
 `add(dn, entry, [controls])`

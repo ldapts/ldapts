@@ -134,6 +134,24 @@ describe('Client', () => {
       }
     });
   });
+  describe('#startTLS()', () => {
+    it('should upgrade an existing clear-text connection to be secure', async () => {
+      const client = new Client({
+        url: 'ldap://ldap.jumpcloud.com',
+      });
+
+      await client.startTLS();
+    });
+    it('should use secure connection for subsequent operations', async () => {
+      const client = new Client({
+        url: 'ldap://ldap.jumpcloud.com',
+      });
+
+      await client.startTLS();
+      await client.bind(bindDN, bindPassword);
+      await client.unbind();
+    });
+  });
   describe('#unbind()', () => {
     it('should succeed on basic unbind after successful bind', async () => {
       const client = new Client({
