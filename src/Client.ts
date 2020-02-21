@@ -383,7 +383,7 @@ export class Client {
    * @param {string} [value]
    * @param {Control|Control[]} [controls]
    */
-  public async exop(oid: string, value?: string, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
+  public async exop(oid: string, value?: string | Buffer, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.connected) {
       await this._connect();
     }
