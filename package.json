@@ -5,11 +5,9 @@
   "main": "index.js",
   "types": "index.d.ts",
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc",
-    "test": "mocha -r ts-node/register tests/*.tests.ts tests/**/*.tests.ts",
-    "lint": "eslint --fix --ext .ts src tests",
-    "dist": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish; fi",
-    "prepublishOnly": "if [ -d \"src\" ]; then echo \"Please use: npm run dist\" && exit 125; fi"
+    "test": "mocha -r ts-node/register tests/*.tests.ts tests/**/*.tests.ts"
   },
   "lint-staged": {
     "*.js": [
