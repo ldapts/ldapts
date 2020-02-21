@@ -7,7 +7,7 @@
 
     "esModuleInterop": true,
 
-    "outDir": "dist",
+    "outDir": ".",
     "baseUrl": ".",
 
     "declaration": true,
@@ -19,7 +19,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-
+    "types": [],
     "paths": {
       "*": [
         "node_modules/*"
