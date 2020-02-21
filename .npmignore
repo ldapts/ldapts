@@ -9,7 +9,6 @@
 tests
 src
 
-tsconfig.json
 tsconfig.lint.json
 tslint.json
 
