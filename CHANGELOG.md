@@ -1,3 +1,6 @@
+### 2.2.1
+  * Update npms
+
 ### 2.2.0
   * Support `startTLS` for upgrading an existing connection to be encrypted. Fix #71
   * Fix type of `tlsOptions` to `tls.ConnectionOptions` in `Client` constructor options
