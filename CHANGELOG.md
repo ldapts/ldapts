@@ -1,3 +1,6 @@
+### 2.5.1
+  * Update npms
+
 ### 2.5.0
   * Update @types/node npm to latest version. Fix #73
   * Add mocharc file
