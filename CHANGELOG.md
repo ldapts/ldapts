@@ -1,3 +1,6 @@
+### 2.4.0
+  * Add Buffer as value type for client.exop(). Fixes #74
+
 ### 2.3.0
   * Update npms
   * Update Typescript to v3.9

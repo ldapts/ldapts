@@ -380,10 +380,10 @@ export class Client {
   /**
    * Performs an extended operation on the LDAP server.
    * @param {string} oid - The object identifier (OID) of the extended operation to perform
-   * @param {string} [value]
+   * @param {string|Buffer} [value]
    * @param {Control|Control[]} [controls]
    */
-  public async exop(oid: string, value?: string, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
+  public async exop(oid: string, value?: string | Buffer, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.connected) {
       await this._connect();
     }
