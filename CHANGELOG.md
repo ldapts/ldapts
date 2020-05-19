@@ -1,3 +1,7 @@
+### 2.5.0
+  * Update @types/node npm to latest version. Fix #73
+  * Add mocharc file
+
 ### 2.4.0
   * Add Buffer as value type for client.exop(). Fixes #74
 
