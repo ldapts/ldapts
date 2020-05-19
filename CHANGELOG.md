@@ -1,3 +1,7 @@
+### 2.3.0
+  * Update npms
+  * Update Typescript to v3.9
+
 ### 2.2.1
   * Update npms
 
