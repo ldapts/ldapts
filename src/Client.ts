@@ -129,6 +129,10 @@ export interface SearchOptions {
    * A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    */
   attributes?: string[];
+  /**
+   * List of attributes to explicitly return as buffers
+   */
+  explicitBufferAttributes?: string[];
 }
 
 export interface SearchResult {
@@ -493,6 +497,7 @@ export class Client {
    * @param {number} [options.timeLimit=10] - This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
    * @param {boolean|SearchPageOptions} [options.paged=false] - Used to allow paging and specify the page size
    * @param {string[]} [options.attributes] - A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
+   * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
   public async search(baseDN: string | DN, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
@@ -555,6 +560,7 @@ export class Client {
       scope: options.scope,
       filter,
       attributes: options.attributes,
+      explicitBufferAttributes: options.explicitBufferAttributes,
       returnAttributeValues: options.returnAttributeValues,
       sizeLimit: options.sizeLimit,
       timeLimit: options.timeLimit,
@@ -597,7 +603,7 @@ export class Client {
     }
 
     for (const searchEntry of result.searchEntries) {
-      searchResult.searchEntries.push(searchEntry.toObject(searchRequest.attributes));
+      searchResult.searchEntries.push(searchEntry.toObject(searchRequest.attributes, searchRequest.explicitBufferAttributes));
     }
 
     for (const searchReference of result.searchReferences) {

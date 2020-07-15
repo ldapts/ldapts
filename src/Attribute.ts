@@ -7,6 +7,8 @@ export interface AttributeOptions {
 }
 
 export class Attribute {
+  private buffers: Buffer[] = [];
+
   public type: string;
 
   public values: string[] | Buffer[];
@@ -14,6 +16,10 @@ export class Attribute {
   public constructor(options: AttributeOptions = {}) {
     this.type = options.type || '';
     this.values = options.values || [];
+  }
+
+  public get parsedBuffers(): Buffer[] {
+    return this.buffers;
   }
 
   public write(writer: BerWriter): void {
@@ -54,10 +60,12 @@ export class Attribute {
       if (reader.readSequence(ProtocolOperation.LBER_SET)) {
         const end = reader.offset + reader.length;
         while (reader.offset < end) {
+          const buffer = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);
+          this.buffers.push(buffer);
           if (isBinaryType) {
-            (this.values as Buffer[]).push(reader.readString(Ber.OctetString, true) || Buffer.alloc(0));
+            (this.values as Buffer[]).push(buffer);
           } else {
-            (this.values as string[]).push(reader.readString());
+            (this.values as string[]).push(buffer.toString('utf8'));
           }
         }
       }

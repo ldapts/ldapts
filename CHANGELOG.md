@@ -1,3 +1,7 @@
+### 2.6.0
+  * Update npms
+  * Expose parsedBuffers on Attribute and added `explicitBufferAttributes` to search options. Fix #72 and Fix #82
+
 ### 2.5.1
   * Update npms
 

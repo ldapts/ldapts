@@ -38,18 +38,24 @@ export class SearchEntry extends MessageResponse {
     }
   }
 
-  public toObject(requestAttributes: string[]): Entry {
+  public toObject(requestAttributes: string[], explicitBufferAttributes: string[]): Entry {
     const result: Entry = {
       dn: this.name,
     };
 
+    const hasExplicitBufferAttributes = explicitBufferAttributes && explicitBufferAttributes.length;
     for (const attribute of this.attributes) {
-      if (attribute.values && attribute.values.length) {
-        if (attribute.values.length === 1) {
+      let { values } = attribute;
+      if (hasExplicitBufferAttributes && explicitBufferAttributes.includes(attribute.type)) {
+        values = attribute.parsedBuffers;
+      }
+
+      if (values && values.length) {
+        if (values.length === 1) {
           // eslint-disable-next-line prefer-destructuring
-          result[attribute.type] = attribute.values[0];
+          result[attribute.type] = values[0];
         } else {
-          result[attribute.type] = attribute.values;
+          result[attribute.type] = values;
         }
       } else {
         result[attribute.type] = [];

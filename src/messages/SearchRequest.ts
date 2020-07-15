@@ -29,6 +29,8 @@ export class SearchRequest extends Message {
 
   public attributes: string[];
 
+  public explicitBufferAttributes: string[];
+
   public constructor(options: SearchRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_SEARCH;
@@ -41,6 +43,7 @@ export class SearchRequest extends Message {
     this.returnAttributeValues = options.returnAttributeValues !== false;
     this.filter = options.filter;
     this.attributes = options.attributes || [];
+    this.explicitBufferAttributes = options.explicitBufferAttributes || [];
   }
 
   public writeMessage(writer: BerWriter): void {
