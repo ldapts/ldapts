@@ -1,8 +1,6 @@
-'use strict';
-
 module.exports = {
-  'root': true,
-  'plugins': [
+  root: true,
+  plugins: [
     'jsdoc',
     'mocha',
     'promise',
@@ -13,28 +11,24 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'airbnb-base',
-    'plugin:import/typescript',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:@typescript-eslint/recommended-requiring-type-checking',
   ],
-  'env': {
-    'node': true,
-    'es6': true
+  env: {
+    node: true,
+    es6: true,
   },
-  'settings': {
+  settings: {
     'import/resolver': {
-      'node': {
-        'extensions': ['.js', '.ts']
-      }
-    }
+      node: {
+        extensions: ['.js', '.ts'],
+      },
+    },
   },
   rules: {
-    'curly': ['error', 'all'],
+    curly: ['error', 'all'],
     'callback-return': ['error', ['callback', 'cb', 'next', 'done']],
     'class-methods-use-this': 'off',
     'consistent-return': 'off',
-    'handle-callback-err': ['error', '^.*err' ],
+    'handle-callback-err': ['error', '^.*err'],
     'new-cap': 'off',
     'no-console': 'error',
     'no-else-return': 'error',
@@ -51,7 +45,9 @@ module.exports = {
     'no-use-before-define': ['error', 'nofunc'],
     'no-useless-rename': 'error',
     'padding-line-between-statements': ['error',
-      { 'blankLine': 'always', 'prev': [
+      {
+        blankLine: 'always',
+        prev: [
           'directive',
           'block',
           'block-like',
@@ -61,21 +57,23 @@ module.exports = {
           'class',
           'export',
           'import',
-          'if'
-        ], 'next': '*' },
-      { 'blankLine': 'never', 'prev': 'directive', 'next': 'directive' },
-      { 'blankLine': 'any', 'prev': '*', 'next': ['if', 'for', 'cjs-import', 'import'] },
-      { 'blankLine': 'any', 'prev': ['export', 'import'], 'next': ['export', 'import'] },
-      { 'blankLine': 'always', 'prev': '*', 'next': ['try', 'function', 'switch'] },
-      { 'blankLine': 'always', 'prev': 'if', 'next': 'if' },
-      { 'blankLine': 'never', 'prev': ['return', 'throw'], 'next': '*' }
+          'if',
+        ],
+        next: '*',
+      },
+      { blankLine: 'never', prev: 'directive', next: 'directive' },
+      { blankLine: 'any', prev: '*', next: ['if', 'for', 'cjs-import', 'import'] },
+      { blankLine: 'any', prev: ['export', 'import'], next: ['export', 'import'] },
+      { blankLine: 'always', prev: '*', next: ['try', 'function', 'switch'] },
+      { blankLine: 'always', prev: 'if', next: 'if' },
+      { blankLine: 'never', prev: ['return', 'throw'], next: '*' },
     ],
-    'strict': ['error', 'safe'],
+    strict: ['error', 'safe'],
     'no-new': 'off',
     'no-empty': 'error',
     'no-empty-function': 'error',
     'valid-jsdoc': 'off',
-    'yoda': 'error',
+    yoda: 'error',
 
     'import/extensions': ['error', 'never'],
     'import/no-unresolved': 'off',
@@ -101,7 +99,7 @@ module.exports = {
 
     'promise/always-return': 'error',
     'promise/always-catch': 'off',
-    'promise/catch-or-return': ['error', {'allowThen': true }],
+    'promise/catch-or-return': ['error', { allowThen: true }],
     'promise/no-native': 'off',
     'promise/param-names': 'error',
 
@@ -120,11 +118,11 @@ module.exports = {
     'security/detect-unsafe-regex': 'error',
 
     // Override airbnb
-    'eqeqeq': ['error', 'smart'],
+    eqeqeq: ['error', 'smart'],
     'func-names': 'error',
-    'id-length': ['error', {'exceptions': ['_', '$', 'e', 'i', 'j', 'k', 'q', 'x', 'y']}],
+    'id-length': ['error', { exceptions: ['_', '$', 'e', 'i', 'j', 'k', 'q', 'x', 'y'] }],
     'no-param-reassign': 'off', // Work toward enforcing this rule
-    'radix': 'off',
+    radix: 'off',
     'spaced-comment': 'off',
     'max-len': 'off',
     'no-continue': 'off',
@@ -134,28 +132,28 @@ module.exports = {
       'error',
       'DebuggerStatement',
       'LabeledStatement',
-      'WithStatement'
+      'WithStatement',
     ],
     'no-restricted-properties': ['error', {
-      'object': 'arguments',
-      'property': 'callee',
-      'message': 'arguments.callee is deprecated'
+      object: 'arguments',
+      property: 'callee',
+      message: 'arguments.callee is deprecated',
     }, {
-      'property': '__defineGetter__',
-      'message': 'Please use Object.defineProperty instead.'
+      property: '__defineGetter__',
+      message: 'Please use Object.defineProperty instead.',
     }, {
-      'property': '__defineSetter__',
-      'message': 'Please use Object.defineProperty instead.'
+      property: '__defineSetter__',
+      message: 'Please use Object.defineProperty instead.',
     }],
     'no-useless-escape': 'off',
     'object-shorthand': ['error', 'always', {
-      'ignoreConstructors': false,
-      'avoidQuotes': true,
-      'avoidExplicitReturnArrows': true
+      ignoreConstructors: false,
+      avoidQuotes: true,
+      avoidExplicitReturnArrows: true,
     }],
     // 'prefer-arrow-callback': ['error', { 'allowNamedFunctions': true }],
     'prefer-spread': 'error',
-    'prefer-destructuring': 'off'
+    'prefer-destructuring': 'off',
   },
   overrides: [{
     files: [
@@ -168,7 +166,7 @@ module.exports = {
       'mocha/no-identical-title': 'error',
       'mocha/no-nested-tests': 'error',
       'mocha/no-pending-tests': 'error',
-    }
+    },
   }, {
     files: [
       '*.ts',
@@ -180,12 +178,14 @@ module.exports = {
     extends: [
       'eslint:recommended',
       'airbnb-base',
-      'plugin:@typescript-eslint/recommended',
       'plugin:import/typescript',
+      'plugin:@typescript-eslint/eslint-recommended',
+      'plugin:@typescript-eslint/recommended',
+      'plugin:@typescript-eslint/recommended-requiring-type-checking',
     ],
     rules: {
       'class-methods-use-this': 'off',
-      'indent': 'off',
+      indent: 'off',
       'max-len': 'off',
       'no-dupe-class-members': 'off',
       'no-extra-semi': 'off',
@@ -198,7 +198,7 @@ module.exports = {
         'error',
         'DebuggerStatement',
         'LabeledStatement',
-        'WithStatement'
+        'WithStatement',
       ],
 
       'import/prefer-default-export': 'off',
@@ -209,14 +209,15 @@ module.exports = {
       '@typescript-eslint/array-type': ['error', { default: 'array' }],
       '@typescript-eslint/await-thenable': 'error',
       '@typescript-eslint/adjacent-overload-signatures': 'error',
-      '@typescript-eslint/class-name-casing': 'error',
       '@typescript-eslint/consistent-type-assertions': 'error',
       '@typescript-eslint/consistent-type-definitions': 'error',
       '@typescript-eslint/no-extraneous-class': 'error',
       '@typescript-eslint/explicit-function-return-type': 'error',
       '@typescript-eslint/explicit-member-accessibility': ['error'],
-      '@typescript-eslint/generic-type-naming': 'error',
-      '@typescript-eslint/interface-name-prefix': ['error', 'never'],
+      '@typescript-eslint/naming-convention': ['error', {
+        selector: 'enumMember',
+        format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+      }],
       '@typescript-eslint/member-ordering': ['error', {
         default: [
           // Index signature
@@ -261,5 +262,5 @@ module.exports = {
       '@typescript-eslint/unbound-method': 'error',
       '@typescript-eslint/unified-signatures': 'error',
     },
-  }]
+  }],
 };

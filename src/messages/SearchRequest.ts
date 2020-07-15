@@ -60,6 +60,7 @@ export class SearchRequest extends Message {
         writer.writeEnumeration(3);
         break;
       default:
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`Invalid search scope: ${this.scope}`);
     }
 
@@ -77,6 +78,7 @@ export class SearchRequest extends Message {
         writer.writeEnumeration(3);
         break;
       default:
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`Invalid deref alias: ${this.derefAliases}`);
     }
 

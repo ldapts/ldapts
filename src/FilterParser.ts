@@ -135,7 +135,7 @@ export class FilterParser {
         filter.parse(reader);
         break;
       default:
-        throw new Error(`Invalid search filter type: 0x${type}`);
+        throw new Error(`Invalid search filter type: 0x${type || '<null>'}`);
     }
 
     return filter;

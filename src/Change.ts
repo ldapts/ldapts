@@ -31,6 +31,7 @@ export class Change {
         writer.writeEnumeration(0x02);
         break;
       default:
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
         throw new Error(`Unknown change operation: ${this.operation}`);
     }
 

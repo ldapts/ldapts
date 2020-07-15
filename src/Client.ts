@@ -803,7 +803,7 @@ export class Client {
       // Ignore this as a NOOP
     };
     const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       messageResolve = resolve;
       messageReject = reject;
@@ -824,7 +824,7 @@ export class Client {
     };
 
     // Send the message to the socket
-    logDebug(`Sending message: ${message}`);
+    logDebug(`Sending message: ${JSON.stringify(message)}`);
     this.socket.write(message.write(), () => {
       if (message instanceof AbandonRequest) {
         logDebug(`Abandoned message: ${message.messageId}`);
@@ -870,7 +870,7 @@ export class Client {
         messageDetails.resolve(message as MessageResponse);
       }
     } else {
-      logDebug(`Unable to find details related to message response: ${message}`);
+      logDebug(`Unable to find details related to message response: ${JSON.stringify(message)}`);
     }
   }
 }
