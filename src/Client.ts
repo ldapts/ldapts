@@ -462,11 +462,19 @@ export class Client {
     }
 
     // TODO: parse newDN to determine if newSuperior should be specified
+    let newSuperior;
+    if (typeof newDN === 'string' && newDN.includes(',')) {
+        const parseIndex = newDN.indexOf(',');
+        newSuperior = newDN.slice(parseIndex + 1);
+        newDN = newDN.slice(0, parseIndex);
+    }
+
     const req = new ModifyDNRequest({
       messageId: this._nextMessageId(),
       dn: typeof dn === 'string' ? dn : dn.toString(),
       deleteOldRdn: true,
       newRdn: typeof newDN === 'string' ? newDN : newDN.toString(),
+      newSuperior: newSuperior,
       controls,
     });
 
