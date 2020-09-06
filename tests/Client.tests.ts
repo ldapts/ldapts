@@ -348,6 +348,43 @@ describe('Client', () => {
         objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
       }]);
     });
+    it('should return parallel search entries if filter="(mail=peter.parker@marvel.com)". Issue #83', async () => {
+      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+      const [
+        result1,
+        result2,
+        result3,
+      ] = await Promise.all([
+        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+          filter: '(mail=peter.parker@marvel.com)',
+        }),
+        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+          filter: '(mail=peter.parker@marvel.com)',
+        }),
+        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+          filter: '(mail=peter.parker@marvel.com)',
+        }),
+      ]);
+      const expectedResult = [{
+        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        gidNumber: '5004',
+        mail: 'peter.parker@marvel.com',
+        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        cn: 'Peter Parker',
+        jcLdapAdmin: 'TRUE',
+        uid: 'peter.parker',
+        uidNumber: '5004',
+        loginShell: '/bin/bash',
+        homeDirectory: '/home/peter.parker',
+        givenName: 'Peter',
+        sn: 'Parker',
+        objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+      }];
+
+      result1.searchEntries.should.deep.equal(expectedResult);
+      result2.searchEntries.should.deep.equal(expectedResult);
+      result3.searchEntries.should.deep.equal(expectedResult);
+    });
     it('should return search results for non-secure ldap server', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
       const testClient = new Client({
