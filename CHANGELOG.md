@@ -1,3 +1,7 @@
+### 2.7.0
+  * Support NewSuperior with modifyDN. PR #84 Thanks @IsraelFrid!
+  * Update npms
+
 ### 2.6.1
   * Added documentation for `explicitBufferAttributes` attribute
 

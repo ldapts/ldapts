@@ -153,9 +153,9 @@ export class Client {
 
   private connected = false;
 
-  private socket!: SocketWithId;
+  private socket?: SocketWithId;
 
-  private connectTimer!: NodeJS.Timer;
+  private connectTimer?: NodeJS.Timer;
 
   private readonly messageParser = new MessageParser();
 
@@ -217,19 +217,23 @@ export class Client {
     await this.exop('1.3.6.1.4.1.1466.20037', undefined, controls);
 
     const originalSocket = this.socket;
-    originalSocket.removeListener('data', this.socketDataHandler);
+    if (originalSocket) {
+      originalSocket.removeListener('data', this.socketDataHandler);
 
-    // Reuse existing socket
-    options.socket = originalSocket;
+      // Reuse existing socket
+      options.socket = originalSocket;
+    }
 
-    this.socket = await new Promise((resolve, reject) => {
+    this.socket = await new Promise((resolve: (value: SocketWithId) => void, reject: (reason: Error) => void) => {
       const secureSocket = tls.connect(options);
       secureSocket.once('secureConnect', () => {
         secureSocket.removeAllListeners('error');
 
         secureSocket.on('data', this.socketDataHandler);
         secureSocket.on('error', () => {
-          originalSocket.destroy();
+          if (originalSocket) {
+            originalSocket.destroy();
+          }
         });
 
         resolve(secureSocket);
@@ -240,8 +244,10 @@ export class Client {
       });
     });
 
-    // Allows pending messages and unbind responses to be handled and cleaned up
-    this.socket.id = originalSocket.id;
+    if (originalSocket) {
+      // Allows pending messages and unbind responses to be handled and cleaned up
+      this.socket.id = originalSocket.id;
+    }
   }
 
   /**
@@ -461,8 +467,7 @@ export class Client {
       controls = [controls];
     }
 
-    // TODO: parse newDN to determine if newSuperior should be specified
-    let newSuperior;
+    let newSuperior: string | undefined;
     if (typeof newDN === 'string' && newDN.includes(',')) {
         const parseIndex = newDN.indexOf(',');
         newSuperior = newDN.slice(parseIndex + 1);
@@ -474,7 +479,7 @@ export class Client {
       dn: typeof dn === 'string' ? dn : dn.toString(),
       deleteOldRdn: true,
       newRdn: typeof newDN === 'string' ? newDN : newDN.toString(),
-      newSuperior: newSuperior,
+      newSuperior,
       controls,
     });
 
@@ -702,11 +707,15 @@ export class Client {
   }
 
   private _onConnect(next: () => void): void {
-    clearTimeout(this.connectTimer);
+    if (this.connectTimer) {
+      clearTimeout(this.connectTimer);
+    }
     // Clear out event listeners from _connect()
-    this.socket.removeAllListeners('error');
-    this.socket.removeAllListeners('connect');
-    this.socket.removeAllListeners('secureConnect');
+    if (this.socket) {
+      this.socket.removeAllListeners('error');
+      this.socket.removeAllListeners('connect');
+      this.socket.removeAllListeners('secureConnect');
+    }
 
     this.connected = true;
 
@@ -724,7 +733,9 @@ export class Client {
         delete this.messageDetailsByMessageId[key];
       }
 
-      this.socket.destroy();
+      if (this.socket) {
+        this.socket.destroy();
+      }
     };
 
     function socketEnd(this: SocketWithId): void {
@@ -775,11 +786,13 @@ export class Client {
     // endregion
 
     // Hook up event listeners
-    this.socket.on('error', socketError);
-    this.socket.on('close', socketClose);
-    this.socket.on('data', this.socketDataHandler);
-    this.socket.on('end', socketEnd);
-    this.socket.on('timeout', socketTimeout);
+    if (this.socket) {
+      this.socket.on('error', socketError);
+      this.socket.on('close', socketClose);
+      this.socket.on('data', this.socketDataHandler);
+      this.socket.on('end', socketEnd);
+      this.socket.on('timeout', socketTimeout);
+    }
 
     return next();
   }
@@ -810,7 +823,7 @@ export class Client {
       throw new Error('Socket connection not established');
     }
 
-    let messageResolve: (message?: MessageResponse) => void = () => {
+    let messageResolve: (messageResponse?: MessageResponse) => void = () => {
       // Ignore this as a NOOP
     };
     let messageReject: (err: Error) => void = () => {
@@ -846,7 +859,9 @@ export class Client {
         messageResolve();
       } else if (message instanceof UnbindRequest) {
         logDebug('Unbind success. Ending socket');
-        this._endSocket(this.socket);
+        if (this.socket) {
+          this._endSocket(this.socket);
+        }
       } else {
         // NOTE: messageResolve will be called as 'data' events come from the socket
         logDebug('Message sent successfully.');

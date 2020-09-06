@@ -18,12 +18,12 @@ import {
 import { MessageResponse } from './messages/MessageResponse';
 import { MessageParserError } from './errors';
 
-type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
-
 interface MessageParserEvents {
   message: (message: MessageResponse) => void;
   error: (error: Error) => void;
 }
+
+type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
 export class MessageParser extends (EventEmitter as new() => MessageParserEmitter) {
   private buffer?: Buffer;
