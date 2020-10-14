@@ -1,6 +1,8 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Filter } from './Filter';
+import type { BerReader, BerWriter } from 'asn1';
+
 import { SearchFilter } from '../SearchFilter';
+
+import { Filter } from './Filter';
 
 export interface ExtensibleFilterOptions {
   rule?: string;

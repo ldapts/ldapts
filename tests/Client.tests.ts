@@ -1,18 +1,11 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+
 import { Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
-import {
-  InvalidCredentialsError,
-  UndefinedTypeError,
-  NoSuchObjectError,
-  InvalidDNSyntaxError,
-} from '../src/errors/resultCodeErrors';
-import {
-  AndFilter,
-  EqualityFilter,
-} from '../src/filters';
 import { DN } from '../src/dn';
+import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
+import { AndFilter, EqualityFilter } from '../src/filters';
 
 describe('Client', () => {
   before(() => {
@@ -175,10 +168,7 @@ describe('Client', () => {
 
       await client.bind(bindDN, bindPassword);
 
-      await Promise.all([
-        client.unbind(),
-        client.unbind(),
-      ]);
+      await Promise.all([client.unbind(), client.unbind()]);
 
       await client.unbind();
     });
@@ -310,21 +300,23 @@ describe('Client', () => {
         filter: '(mail=peter.parker@marvel.com)',
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        gidNumber: '5004',
-        mail: 'peter.parker@marvel.com',
-        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        cn: 'Peter Parker',
-        jcLdapAdmin: 'TRUE',
-        uid: 'peter.parker',
-        uidNumber: '5004',
-        loginShell: '/bin/bash',
-        homeDirectory: '/home/peter.parker',
-        givenName: 'Peter',
-        sn: 'Parker',
-        objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          gidNumber: '5004',
+          mail: 'peter.parker@marvel.com',
+          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          cn: 'Peter Parker',
+          jcLdapAdmin: 'TRUE',
+          uid: 'peter.parker',
+          uidNumber: '5004',
+          loginShell: '/bin/bash',
+          homeDirectory: '/home/peter.parker',
+          givenName: 'Peter',
+          sn: 'Parker',
+          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+        },
+      ]);
     });
     it('should return full search entries if filter="(mail=peter.park*)"', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
@@ -332,29 +324,27 @@ describe('Client', () => {
         filter: '(mail=peter.park*)',
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        gidNumber: '5004',
-        mail: 'peter.parker@marvel.com',
-        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        cn: 'Peter Parker',
-        jcLdapAdmin: 'TRUE',
-        uid: 'peter.parker',
-        uidNumber: '5004',
-        loginShell: '/bin/bash',
-        homeDirectory: '/home/peter.parker',
-        givenName: 'Peter',
-        sn: 'Parker',
-        objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          gidNumber: '5004',
+          mail: 'peter.parker@marvel.com',
+          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          cn: 'Peter Parker',
+          jcLdapAdmin: 'TRUE',
+          uid: 'peter.parker',
+          uidNumber: '5004',
+          loginShell: '/bin/bash',
+          homeDirectory: '/home/peter.parker',
+          givenName: 'Peter',
+          sn: 'Parker',
+          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+        },
+      ]);
     });
     it('should return parallel search entries if filter="(mail=peter.parker@marvel.com)". Issue #83', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
-      const [
-        result1,
-        result2,
-        result3,
-      ] = await Promise.all([
+      const [result1, result2, result3] = await Promise.all([
         client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
           filter: '(mail=peter.parker@marvel.com)',
         }),
@@ -365,21 +355,23 @@ describe('Client', () => {
           filter: '(mail=peter.parker@marvel.com)',
         }),
       ]);
-      const expectedResult = [{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        gidNumber: '5004',
-        mail: 'peter.parker@marvel.com',
-        memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        cn: 'Peter Parker',
-        jcLdapAdmin: 'TRUE',
-        uid: 'peter.parker',
-        uidNumber: '5004',
-        loginShell: '/bin/bash',
-        homeDirectory: '/home/peter.parker',
-        givenName: 'Peter',
-        sn: 'Parker',
-        objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
-      }];
+      const expectedResult = [
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          gidNumber: '5004',
+          mail: 'peter.parker@marvel.com',
+          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          cn: 'Peter Parker',
+          jcLdapAdmin: 'TRUE',
+          uid: 'peter.parker',
+          uidNumber: '5004',
+          loginShell: '/bin/bash',
+          homeDirectory: '/home/peter.parker',
+          givenName: 'Peter',
+          sn: 'Parker',
+          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+        },
+      ];
 
       result1.searchEntries.should.deep.equal(expectedResult);
       result2.searchEntries.should.deep.equal(expectedResult);
@@ -397,20 +389,17 @@ describe('Client', () => {
           filter: '(uid=einstein)',
         });
 
-        searchResult.searchEntries.should.deep.equal([{
-          cn: 'Albert Einstein',
-          dn: 'uid=einstein,dc=example,dc=com',
-          mail: 'einstein@ldap.forumsys.com',
-          objectClass: [
-            'inetOrgPerson',
-            'organizationalPerson',
-            'person',
-            'top',
-          ],
-          sn: 'Einstein',
-          telephoneNumber: '314-159-2653',
-          uid: 'einstein',
-        }]);
+        searchResult.searchEntries.should.deep.equal([
+          {
+            cn: 'Albert Einstein',
+            dn: 'uid=einstein,dc=example,dc=com',
+            mail: 'einstein@ldap.forumsys.com',
+            objectClass: ['inetOrgPerson', 'organizationalPerson', 'person', 'top'],
+            sn: 'Einstein',
+            telephoneNumber: '314-159-2653',
+            uid: 'einstein',
+          },
+        ]);
       } catch (ex) {
         // Shouldn't get here
         ex.should.equal(false);
@@ -426,10 +415,12 @@ describe('Client', () => {
         attributes: ['cn'],
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        cn: 'Peter Parker',
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          cn: 'Peter Parker',
+        },
+      ]);
     });
     it('should include attributes without values if attributes are specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
@@ -439,11 +430,13 @@ describe('Client', () => {
         attributes: ['cn', 'telephoneNumber'],
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        cn: 'Peter Parker',
-        telephoneNumber: [],
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          cn: 'Peter Parker',
+          telephoneNumber: [],
+        },
+      ]);
     });
     it('should not return attribute values if returnAttributeValues=false', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
@@ -453,21 +446,23 @@ describe('Client', () => {
         returnAttributeValues: false,
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        gidNumber: [],
-        mail: [],
-        memberOf: [],
-        cn: [],
-        jcLdapAdmin: [],
-        uid: [],
-        uidNumber: [],
-        loginShell: [],
-        homeDirectory: [],
-        givenName: [],
-        sn: [],
-        objectClass: [],
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          gidNumber: [],
+          mail: [],
+          memberOf: [],
+          cn: [],
+          jcLdapAdmin: [],
+          uid: [],
+          uidNumber: [],
+          loginShell: [],
+          homeDirectory: [],
+          givenName: [],
+          sn: [],
+          objectClass: [],
+        },
+      ]);
     });
     it('should page search entries if paging is specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
@@ -563,21 +558,20 @@ describe('Client', () => {
         }),
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        cn: 'Something (Special)',
-        ou: 'Something (Special)',
-        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        member: [
-          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        ],
-        objectClass: [
-          'top',
-          'groupOfNames',
-        ],
-        description: 'tagGroup',
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          cn: 'Something (Special)',
+          ou: 'Something (Special)',
+          dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          member: [
+            'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+            'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+            'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          ],
+          objectClass: ['top', 'groupOfNames'],
+          description: 'tagGroup',
+        },
+      ]);
     });
     it('should return group contents with parenthesis in name - string filter', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
@@ -585,21 +579,20 @@ describe('Client', () => {
         filter: '(&(objectClass=groupOfNames)(cn=Something \\28Special\\29))',
       });
 
-      searchResult.searchEntries.should.deep.equal([{
-        cn: 'Something (Special)',
-        ou: 'Something (Special)',
-        dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        member: [
-          'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-        ],
-        objectClass: [
-          'top',
-          'groupOfNames',
-        ],
-        description: 'tagGroup',
-      }]);
+      searchResult.searchEntries.should.deep.equal([
+        {
+          cn: 'Something (Special)',
+          ou: 'Something (Special)',
+          dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          member: [
+            'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+            'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+            'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+          ],
+          objectClass: ['top', 'groupOfNames'],
+          description: 'tagGroup',
+        },
+      ]);
     });
     it('should throw if a PagedResultsControl is specified', async () => {
       const pagedResultsControl = new PagedResultsControl({});

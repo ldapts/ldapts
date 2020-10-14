@@ -1,6 +1,9 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Message, MessageOptions } from './Message';
+import type { BerReader, BerWriter } from 'asn1';
+
 import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageOptions } from './Message';
+import { Message } from './Message';
 
 export interface DeleteRequestMessageOptions extends MessageOptions {
   dn?: string;

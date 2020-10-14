@@ -1,4 +1,4 @@
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { ProtocolOperation } from '../ProtocolOperation';
 
 export interface MessageParserErrorDetails {
   messageId: number;

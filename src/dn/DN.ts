@@ -1,4 +1,5 @@
-import { RDN, RDNAttributes } from './RDN';
+import type { RDNAttributes } from './RDN';
+import { RDN } from './RDN';
 
 /**
  * RDNMap is an interface, that maps every key & value to a specified RDN.
@@ -78,14 +79,18 @@ export class DN {
       for (const [name, value] of Object.entries(rdns)) {
         if (Array.isArray(value)) {
           for (const rdnValue of value) {
-            this.rdns.push(new RDN({
-              [name]: rdnValue,
-            }));
+            this.rdns.push(
+              new RDN({
+                [name]: rdnValue,
+              }),
+            );
           }
         } else {
-          this.rdns.push(new RDN({
-            [name]: value,
-          }));
+          this.rdns.push(
+            new RDN({
+              [name]: value,
+            }),
+          );
         }
       }
     }

@@ -1,8 +1,7 @@
-import chai from 'chai';
 import { BerWriter } from 'asn1';
-import {
- anyString, mock, capture, verify, when, instance, reset,
-} from 'ts-mockito';
+import chai from 'chai';
+import { anyString, mock, capture, verify, when, instance, reset } from 'ts-mockito';
+
 import { EqualityFilter } from '../../src/filters';
 
 describe('EqualityFilter', () => {

@@ -1,9 +1,12 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Message, MessageOptions } from './Message';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { BerReader, BerWriter } from 'asn1';
+
+import type { SearchOptions } from '../Client';
 import { FilterParser } from '../FilterParser';
-import { Filter } from '../filters/Filter';
-import { SearchOptions } from '../Client';
+import type { Filter } from '../filters/Filter';
+import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageOptions } from './Message';
+import { Message } from './Message';
 
 export interface SearchRequestMessageOptions extends MessageOptions, SearchOptions {
   baseDN?: string;

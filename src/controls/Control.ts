@@ -1,4 +1,4 @@
-import { BerReader, BerWriter } from 'asn1';
+import type { BerReader, BerWriter } from 'asn1';
 
 export interface ControlOptions {
   critical?: boolean;

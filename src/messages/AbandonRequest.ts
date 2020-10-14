@@ -1,7 +1,11 @@
-import { BerReader, BerWriter } from 'asn1';
 import * as assert from 'assert';
-import { Message, MessageOptions } from './Message';
+
+import type { BerReader, BerWriter } from 'asn1';
+
 import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageOptions } from './Message';
+import { Message } from './Message';
 
 export interface AbandonRequestMessageOptions extends MessageOptions {
   abandonId?: number;
@@ -25,7 +29,7 @@ export class AbandonRequest extends Message {
     let intSize = 4;
     const mask = 0xff800000;
 
-    while ((((i & mask) === 0) || ((i & mask) === mask)) && (intSize > 1)) {
+    while (((i & mask) === 0 || (i & mask) === mask) && intSize > 1) {
       intSize -= 1;
       i <<= 8;
     }
@@ -47,11 +51,11 @@ export class AbandonRequest extends Message {
       let value: number;
 
       const fb = reader.buffer[offset];
-      value = fb & 0x7F;
+      value = fb & 0x7f;
       for (let i = 1; i < length; i += 1) {
         value <<= 8;
         offset += 1;
-        value |= (reader.buffer[offset] & 0xff);
+        value |= reader.buffer[offset] & 0xff;
       }
       if ((fb & 0x80) === 0x80) {
         value = -value;

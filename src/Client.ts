@@ -1,20 +1,21 @@
-import debug from 'debug';
-import { parse as parseUrl } from 'url';
 import * as net from 'net';
 import * as tls from 'tls';
+import { parse as parseUrl } from 'url';
+
+import debug from 'debug';
 import { v4 } from 'uuid';
+
 import { Attribute } from './Attribute';
-import { Change } from './Change';
+import type { Change } from './Change';
+import type { Control } from './controls/Control';
+import { PagedResultsControl } from './controls/PagedResultsControl';
+import type { DN } from './dn';
+import type { MessageParserError } from './errors';
+import { FilterParser } from './FilterParser';
+import { PresenceFilter } from './filters';
+import type { Filter } from './filters/Filter';
 import { MessageParser } from './MessageParser';
 import { MessageResponseStatus } from './MessageResponseStatus';
-import { StatusCodeParser } from './StatusCodeParser';
-import { MessageParserError } from './errors';
-import { Control } from './controls/Control';
-import { PagedResultsControl } from './controls/PagedResultsControl';
-import { Filter } from './filters/Filter';
-import { Message } from './messages/Message';
-import { MessageResponse } from './messages/MessageResponse';
-import { DN } from './dn';
 import {
   BindRequest,
   UnbindRequest,
@@ -24,25 +25,19 @@ import {
   ExtendedRequest,
   ModifyDNRequest,
   SearchRequest,
-  BindResponse,
-  CompareResponse,
   CompareResult,
   SearchResponse,
   SearchReference,
-  Entry,
   SearchEntry,
-  DeleteResponse,
-  ExtendedResponse,
-  ModifyDNResponse,
   AddRequest,
-  AddResponse,
   ModifyRequest,
-  ModifyResponse,
 } from './messages';
-import { FilterParser } from './FilterParser';
-import { PresenceFilter } from './filters';
+import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse } from './messages';
+import type { Message } from './messages/Message';
+import type { MessageResponse } from './messages/MessageResponse';
+import { StatusCodeParser } from './StatusCodeParser';
 
-const MAX_MESSAGE_ID = (2 ** 31) - 1;
+const MAX_MESSAGE_ID = 2 ** 31 - 1;
 const logDebug = debug('ldapts');
 
 type SocketWithId = (tls.TLSSocket | net.Socket) & { id?: string };
@@ -209,7 +204,7 @@ export class Client {
     return this.connected;
   }
 
-  public async startTLS(options: tls.ConnectionOptions = {}, controls?: Control|Control[]): Promise<void> {
+  public async startTLS(options: tls.ConnectionOptions = {}, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -256,7 +251,7 @@ export class Client {
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string | DN, password?: string, controls?: Control|Control[]): Promise<void> {
+  public async bind(dn: string | DN, password?: string, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -284,7 +279,7 @@ export class Client {
    * @param {Attribute[]|object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: string | DN, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control|Control[]): Promise<void> {
+  public async add(dn: string | DN, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -306,10 +301,12 @@ export class Client {
           values = [value];
         }
 
-        attributesToAdd.push(new Attribute({
-          type: key,
-          values,
-        }));
+        attributesToAdd.push(
+          new Attribute({
+            type: key,
+            values,
+          }),
+        );
       }
     }
 
@@ -333,7 +330,7 @@ export class Client {
    * @param {string} value
    * @param {Control|Control[]} [controls]
    */
-  public async compare(dn: string | DN, attribute: string, value: string, controls?: Control|Control[]): Promise<boolean> {
+  public async compare(dn: string | DN, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -366,7 +363,7 @@ export class Client {
    * @param {string|DN} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
    */
-  public async del(dn: string | DN, controls?: Control|Control[]): Promise<void> {
+  public async del(dn: string | DN, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -393,7 +390,7 @@ export class Client {
    * @param {string|Buffer} [value]
    * @param {Control|Control[]} [controls]
    */
-  public async exop(oid: string, value?: string | Buffer, controls?: Control|Control[]): Promise<{ oid?: string; value?: string }> {
+  public async exop(oid: string, value?: string | Buffer, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.connected) {
       await this._connect();
     }
@@ -426,7 +423,7 @@ export class Client {
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control|Control[]): Promise<void> {
+  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -458,7 +455,7 @@ export class Client {
    * @param {string|DN} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control|Control[]): Promise<void> {
+  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -513,7 +510,7 @@ export class Client {
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string | DN, options: SearchOptions = {}, controls?: Control|Control[]): Promise<SearchResult> {
+  public async search(baseDN: string | DN, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }
@@ -626,7 +623,7 @@ export class Client {
     // Recursively search if paging is specified
     if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
       let pagedResultsFromResponse: PagedResultsControl | undefined;
-      for (const control of (result.controls || [])) {
+      for (const control of result.controls || []) {
         if (control instanceof PagedResultsControl) {
           pagedResultsFromResponse = control;
           break;
@@ -727,7 +724,9 @@ export class Client {
           // Consider unbind as success since the connection is closed.
           messageDetails.resolve();
         } else {
-          messageDetails.reject(new Error(`Socket error. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})\n${err.message || err.stack || 'Unknown'}`));
+          messageDetails.reject(
+            new Error(`Socket error. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})\n${err.message || err.stack || 'Unknown'}`),
+          );
         }
 
         delete this.messageDetailsByMessageId[key];
@@ -776,7 +775,11 @@ export class Client {
             // Consider unbind as success since the connection is closed.
             messageDetails.resolve();
           } else {
-            messageDetails.reject(new Error(`Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`));
+            messageDetails.reject(
+              new Error(
+                `Connection closed before message response was received. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})`,
+              ),
+            );
           }
 
           delete clientInstance.messageDetailsByMessageId[key];
@@ -840,13 +843,15 @@ export class Client {
       message,
       resolve: messageResolve,
       reject: messageReject,
-      timeoutTimer: this.clientOptions.timeout ? setTimeout(() => {
-        const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
-        if (messageDetails) {
-          this._endSocket(messageDetails.socket);
-          messageReject(new Error(`${message.constructor.name}: Operation timed out`));
-        }
-      }, this.clientOptions.timeout) : null,
+      timeoutTimer: this.clientOptions.timeout
+        ? setTimeout(() => {
+            const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
+            if (messageDetails) {
+              this._endSocket(messageDetails.socket);
+              messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+            }
+          }, this.clientOptions.timeout)
+        : null,
       socket: this.socket,
     };
 

@@ -22,8 +22,7 @@ describe('DN', () => {
         cn: 'Smith, James K.',
         oa: 'eu',
         dc: 'domain',
-      })
-      .addRDNs({
+      }).addRDNs({
         dc: 'gb',
         group: 'all',
       });

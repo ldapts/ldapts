@@ -1,17 +1,14 @@
 module.exports = {
   root: true,
   plugins: [
-    'jsdoc',
+    'jsdoc', //
     'mocha',
     'promise',
     'security',
     'import',
     '@typescript-eslint',
   ],
-  extends: [
-    'eslint:recommended',
-    'airbnb-base',
-  ],
+  extends: ['eslint:recommended', 'airbnb-base'],
   env: {
     node: true,
     es6: true,
@@ -22,8 +19,24 @@ module.exports = {
         extensions: ['.js', '.ts'],
       },
     },
+    jsdoc: {
+      preferredTypes: {
+        Array: 'Array<object>',
+        'Array.': 'Array<object>',
+        'Array<>': '[]',
+        'Array.<>': '[]',
+        'Promise.<>': 'Promise<>',
+      },
+    },
   },
   rules: {
+    'prettier/prettier': [
+      'error',
+      {},
+      {
+        usePrettierrc: true,
+      },
+    ],
     curly: ['error', 'all'],
     'callback-return': ['error', ['callback', 'cb', 'next', 'done']],
     'class-methods-use-this': 'off',
@@ -44,11 +57,12 @@ module.exports = {
     'no-unsafe-negation': 'error',
     'no-use-before-define': ['error', 'nofunc'],
     'no-useless-rename': 'error',
-    'padding-line-between-statements': ['error',
+    'padding-line-between-statements': [
+      'error',
       {
         blankLine: 'always',
         prev: [
-          'directive',
+          'directive', //
           'block',
           'block-like',
           'multiline-block-like',
@@ -77,6 +91,13 @@ module.exports = {
 
     'import/extensions': ['error', 'never'],
     'import/no-unresolved': 'off',
+    'import/order': [
+      'error',
+      {
+        'newlines-between': 'always',
+        alphabetize: { order: 'asc', caseInsensitive: true },
+      },
+    ],
 
     'jsdoc/check-alignment': 'error',
     'jsdoc/check-indentation': 'off',
@@ -128,141 +149,161 @@ module.exports = {
     'no-continue': 'off',
     'no-plusplus': 'off',
     'no-prototype-builtins': 'off',
-    'no-restricted-syntax': [
+    'no-restricted-syntax': ['error', 'DebuggerStatement', 'LabeledStatement', 'WithStatement'],
+    'no-restricted-properties': [
       'error',
-      'DebuggerStatement',
-      'LabeledStatement',
-      'WithStatement',
+      {
+        object: 'arguments',
+        property: 'callee',
+        message: 'arguments.callee is deprecated',
+      },
+      {
+        property: '__defineGetter__',
+        message: 'Please use Object.defineProperty instead.',
+      },
+      {
+        property: '__defineSetter__',
+        message: 'Please use Object.defineProperty instead.',
+      },
     ],
-    'no-restricted-properties': ['error', {
-      object: 'arguments',
-      property: 'callee',
-      message: 'arguments.callee is deprecated',
-    }, {
-      property: '__defineGetter__',
-      message: 'Please use Object.defineProperty instead.',
-    }, {
-      property: '__defineSetter__',
-      message: 'Please use Object.defineProperty instead.',
-    }],
     'no-useless-escape': 'off',
-    'object-shorthand': ['error', 'always', {
-      ignoreConstructors: false,
-      avoidQuotes: true,
-      avoidExplicitReturnArrows: true,
-    }],
+    'object-shorthand': [
+      'error',
+      'always',
+      {
+        ignoreConstructors: false,
+        avoidQuotes: true,
+        avoidExplicitReturnArrows: true,
+      },
+    ],
     // 'prefer-arrow-callback': ['error', { 'allowNamedFunctions': true }],
     'prefer-spread': 'error',
     'prefer-destructuring': 'off',
   },
-  overrides: [{
-    files: [
-      '**/*.tests.ts',
-    ],
-    rules: {
-      'mocha/no-async-describe': 'error',
-      'mocha/no-exclusive-tests': 'error',
-      'mocha/no-global-tests': 'error',
-      'mocha/no-identical-title': 'error',
-      'mocha/no-nested-tests': 'error',
-      'mocha/no-pending-tests': 'error',
-    },
-  }, {
-    files: [
-      '*.ts',
-    ],
-    parser: '@typescript-eslint/parser',
-    parserOptions: {
-      project: './tsconfig.lint.json',
-    },
-    extends: [
-      'eslint:recommended',
-      'airbnb-base',
-      'plugin:import/typescript',
-      'plugin:@typescript-eslint/eslint-recommended',
-      'plugin:@typescript-eslint/recommended',
-      'plugin:@typescript-eslint/recommended-requiring-type-checking',
-    ],
-    rules: {
-      'class-methods-use-this': 'off',
-      indent: 'off',
-      'max-len': 'off',
-      'no-dupe-class-members': 'off',
-      'no-extra-semi': 'off',
-      'no-new': 'off',
-      'no-param-reassign': 'off',
-      'no-underscore-dangle': 'off',
-      'no-useless-constructor': 'off',
-      'no-unused-expressions': 'error',
-      'no-restricted-syntax': [
-        'error',
-        'DebuggerStatement',
-        'LabeledStatement',
-        'WithStatement',
+  overrides: [
+    {
+      files: ['*.ts'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        project: './tsconfig.lint.json',
+      },
+      extends: [
+        'eslint:recommended',
+        'airbnb-typescript/base',
+        'plugin:import/typescript',
+        'plugin:@typescript-eslint/eslint-recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'prettier',
+        'prettier/@typescript-eslint',
+        'plugin:prettier/recommended',
       ],
-      'no-shadow': 'off',
+      rules: {
+        'class-methods-use-this': 'off',
+        indent: 'off',
+        'max-len': 'off',
+        'no-dupe-class-members': 'off',
+        'no-extra-semi': 'off',
+        'no-new': 'off',
+        'no-param-reassign': 'off',
+        'no-underscore-dangle': 'off',
+        'no-useless-constructor': 'off',
+        'no-unused-expressions': 'error',
+        'no-restricted-syntax': ['error', 'DebuggerStatement', 'LabeledStatement', 'WithStatement'],
+        'no-use-before-define': 'off',
+        'no-shadow': 'off',
 
-      'import/prefer-default-export': 'off',
-      'import/no-cycle': 'off',
-      'import/no-extraneous-dependencies': 'off',
-      'import/extensions': ['error', 'never'],
-
-      '@typescript-eslint/array-type': ['error', { default: 'array' }],
-      '@typescript-eslint/await-thenable': 'error',
-      '@typescript-eslint/adjacent-overload-signatures': 'error',
-      '@typescript-eslint/consistent-type-assertions': 'error',
-      '@typescript-eslint/consistent-type-definitions': 'error',
-      '@typescript-eslint/no-extraneous-class': 'error',
-      '@typescript-eslint/explicit-function-return-type': 'error',
-      '@typescript-eslint/explicit-member-accessibility': ['error'],
-      '@typescript-eslint/naming-convention': ['error', {
-        selector: 'enumMember',
-        format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
-      }],
-      '@typescript-eslint/member-ordering': ['error', {
-        default: [
-          // Index signature
-          'signature',
-          // Fields
-          'private-field',
-          'public-field',
-          'protected-field',
-          // Constructors
-          'public-constructor',
-          'protected-constructor',
-          'private-constructor',
-          // Methods
-          'public-method',
-          'protected-method',
-          'private-method',
+        'import/prefer-default-export': 'off',
+        'import/no-cycle': 'off',
+        'import/no-extraneous-dependencies': 'off',
+        'import/extensions': ['error', 'never'],
+        'import/order': [
+          'error',
+          {
+            'newlines-between': 'always',
+            alphabetize: { order: 'asc', caseInsensitive: true },
+          },
         ],
-      }],
-      '@typescript-eslint/no-array-constructor': 'error',
-      '@typescript-eslint/no-empty-interface': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/no-extra-semi': 'error',
-      '@typescript-eslint/no-floating-promises': 'error',
-      '@typescript-eslint/no-for-in-array': 'error',
-      '@typescript-eslint/no-misused-promises': 'error',
-      '@typescript-eslint/no-non-null-assertion': 'error',
-      '@typescript-eslint/no-parameter-properties': ['error', { allows: ['readonly'] }],
-      '@typescript-eslint/no-require-imports': 'error',
-      '@typescript-eslint/no-this-alias': 'error',
-      '@typescript-eslint/no-throw-literal': 'error',
-      '@typescript-eslint/no-unnecessary-type-assertion': 'error',
-      '@typescript-eslint/no-unused-expressions': 'error',
-      '@typescript-eslint/no-useless-constructor': 'error',
-      '@typescript-eslint/no-unused-vars': 'error',
-      '@typescript-eslint/no-shadow': 'error',
-      '@typescript-eslint/prefer-for-of': 'error',
-      '@typescript-eslint/prefer-includes': 'error',
-      '@typescript-eslint/prefer-regexp-exec': 'warn',
-      '@typescript-eslint/prefer-string-starts-ends-with': 'error',
-      '@typescript-eslint/promise-function-async': 'off',
-      '@typescript-eslint/require-await': 'error',
-      '@typescript-eslint/restrict-plus-operands': 'error',
-      '@typescript-eslint/unbound-method': 'error',
-      '@typescript-eslint/unified-signatures': 'error',
+
+        '@typescript-eslint/array-type': ['error', { default: 'array' }],
+        '@typescript-eslint/await-thenable': 'error',
+        '@typescript-eslint/adjacent-overload-signatures': 'error',
+        '@typescript-eslint/consistent-type-assertions': 'error',
+        '@typescript-eslint/consistent-type-definitions': 'error',
+        '@typescript-eslint/consistent-type-imports': 'error',
+        '@typescript-eslint/no-extraneous-class': 'error',
+        '@typescript-eslint/explicit-function-return-type': 'error',
+        '@typescript-eslint/explicit-member-accessibility': ['error'],
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'enumMember',
+            format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+          },
+        ],
+        '@typescript-eslint/member-ordering': [
+          'error',
+          {
+            default: [
+              // Index signature
+              'signature',
+              // Fields
+              'private-field',
+              'public-field',
+              'protected-field',
+              // Constructors
+              'public-constructor',
+              'protected-constructor',
+              'private-constructor',
+              // Methods
+              'public-method',
+              'protected-method',
+              'private-method',
+            ],
+          },
+        ],
+        '@typescript-eslint/no-array-constructor': 'error',
+        '@typescript-eslint/no-empty-interface': 'error',
+        '@typescript-eslint/no-explicit-any': 'error',
+        '@typescript-eslint/no-extra-semi': 'error',
+        '@typescript-eslint/no-floating-promises': 'error',
+        '@typescript-eslint/no-for-in-array': 'error',
+        '@typescript-eslint/no-misused-promises': 'error',
+        '@typescript-eslint/no-non-null-assertion': 'error',
+        '@typescript-eslint/no-parameter-properties': ['error', { allows: ['readonly'] }],
+        '@typescript-eslint/no-require-imports': 'error',
+        '@typescript-eslint/no-this-alias': 'error',
+        '@typescript-eslint/no-throw-literal': 'error',
+        '@typescript-eslint/no-unnecessary-type-assertion': 'error',
+        '@typescript-eslint/no-unused-expressions': 'error',
+        '@typescript-eslint/no-useless-constructor': 'error',
+        '@typescript-eslint/no-unused-vars': 'error',
+        '@typescript-eslint/no-shadow': 'error',
+        '@typescript-eslint/prefer-for-of': 'error',
+        '@typescript-eslint/prefer-includes': 'error',
+        '@typescript-eslint/prefer-regexp-exec': 'warn',
+        '@typescript-eslint/prefer-string-starts-ends-with': 'error',
+        '@typescript-eslint/promise-function-async': 'off',
+        '@typescript-eslint/require-await': 'error',
+        '@typescript-eslint/restrict-plus-operands': 'error',
+        '@typescript-eslint/unbound-method': 'error',
+        '@typescript-eslint/unified-signatures': 'error',
+      },
     },
-  }],
+    {
+      files: ['**/*.tests.ts'],
+      rules: {
+        '@typescript-eslint/no-unsafe-member-access': 'off',
+        '@typescript-eslint/no-unsafe-call': 'off',
+        '@typescript-eslint/restrict-template-expressions': 'off',
+
+        'mocha/no-async-describe': 'error',
+        'mocha/no-exclusive-tests': 'error',
+        'mocha/no-global-tests': 'error',
+        'mocha/no-identical-title': 'error',
+        'mocha/no-nested-tests': 'error',
+        'mocha/no-pending-tests': 'error',
+      },
+    },
+  ],
 };

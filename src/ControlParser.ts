@@ -1,5 +1,6 @@
 import { Ber, BerReader } from 'asn1';
-import { Control } from './controls/Control';
+
+import type { Control } from './controls/Control';
 import { EntryChangeNotificationControl } from './controls/EntryChangeNotificationControl';
 import { PagedResultsControl } from './controls/PagedResultsControl';
 import { PersistentSearchControl } from './controls/PersistentSearchControl';

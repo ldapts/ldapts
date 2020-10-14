@@ -1,6 +1,8 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Filter } from './Filter';
+import type { BerReader, BerWriter } from 'asn1';
+
 import { SearchFilter } from '../SearchFilter';
+
+import { Filter } from './Filter';
 
 export interface ApproximateFilterOptions {
   attribute?: string;
@@ -36,6 +38,6 @@ export class ApproximateFilter extends Filter {
   }
 
   public toString(): string {
-    return (`(${this.escape(this.attribute)}~=${this.escape(this.value)})`);
+    return `(${this.escape(this.attribute)}~=${this.escape(this.value)})`;
   }
 }

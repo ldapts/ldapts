@@ -1,6 +1,9 @@
-import { BerReader } from 'asn1';
-import { MessageResponse, MessageResponseOptions } from './MessageResponse';
+import type { BerReader } from 'asn1';
+
 import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageResponseOptions } from './MessageResponse';
+import { MessageResponse } from './MessageResponse';
 
 export interface SearchReferenceOptions extends MessageResponseOptions {
   uris?: string[];

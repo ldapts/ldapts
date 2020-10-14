@@ -1,22 +1,13 @@
-import { BerReader } from 'asn1';
 import * as assert from 'assert';
-import { StrictEventEmitter } from 'strict-event-emitter-types';
 import { EventEmitter } from 'events';
-import { ProtocolOperation } from './ProtocolOperation';
-import {
-  AddResponse,
-  BindResponse,
-  CompareResponse,
-  DeleteResponse,
-  ExtendedResponse,
-  ModifyDNResponse,
-  ModifyResponse,
-  SearchResponse,
-  SearchEntry,
-  SearchReference,
-} from './messages';
-import { MessageResponse } from './messages/MessageResponse';
+
+import { BerReader } from 'asn1';
+import type { StrictEventEmitter } from 'strict-event-emitter-types';
+
 import { MessageParserError } from './errors';
+import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages';
+import type { MessageResponse } from './messages/MessageResponse';
+import { ProtocolOperation } from './ProtocolOperation';
 
 interface MessageParserEvents {
   message: (message: MessageResponse) => void;
@@ -25,7 +16,7 @@ interface MessageParserEvents {
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
-export class MessageParser extends (EventEmitter as new() => MessageParserEmitter) {
+export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
 
   public read(data: Buffer): void {

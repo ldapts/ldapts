@@ -1,5 +1,8 @@
-import { Ber, BerReader, BerWriter } from 'asn1';
-import { Control, ControlOptions } from './Control';
+import type { BerReader } from 'asn1';
+import { Ber, BerWriter } from 'asn1';
+
+import type { ControlOptions } from './Control';
+import { Control } from './Control';
 
 export interface PagedResultsValue {
   size: number;

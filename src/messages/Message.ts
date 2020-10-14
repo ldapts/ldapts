@@ -1,7 +1,9 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Control } from '../controls/Control';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { BerReader } from 'asn1';
+import { BerWriter } from 'asn1';
+
 import { ControlParser } from '../ControlParser';
+import type { Control } from '../controls/Control';
+import { ProtocolOperation } from '../ProtocolOperation';
 
 export interface MessageOptions {
   messageId: number;
@@ -60,10 +62,14 @@ export abstract class Message {
   }
 
   public toString(): string {
-    return JSON.stringify({
-      messageId: this.messageId,
-      messageType: this.constructor.name,
-    }, null, 2);
+    return JSON.stringify(
+      {
+        messageId: this.messageId,
+        messageType: this.constructor.name,
+      },
+      null,
+      2,
+    );
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

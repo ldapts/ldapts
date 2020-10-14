@@ -1,18 +1,8 @@
-import { BerReader } from 'asn1';
-import { Filter } from './filters/Filter';
-import {
-  PresenceFilter,
-  AndFilter,
-  GreaterThanEqualsFilter,
-  ExtensibleFilter,
-  ExtensibleFilterOptions,
-  NotFilter,
-  SubstringFilter,
-  EqualityFilter,
-  ApproximateFilter,
-  OrFilter,
-  LessThanEqualsFilter,
-} from './filters';
+import type { BerReader } from 'asn1';
+
+import type { ExtensibleFilterOptions } from './filters';
+import { PresenceFilter, AndFilter, GreaterThanEqualsFilter, ExtensibleFilter, NotFilter, SubstringFilter, EqualityFilter, ApproximateFilter, OrFilter, LessThanEqualsFilter } from './filters';
+import type { Filter } from './filters/Filter';
 import { SearchFilter } from './SearchFilter';
 
 interface ParseStringResult {

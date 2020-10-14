@@ -1,4 +1,6 @@
-import { Ber, BerReader, BerWriter } from 'asn1';
+import type { BerReader, BerWriter } from 'asn1';
+import { Ber } from 'asn1';
+
 import { ProtocolOperation } from './ProtocolOperation';
 
 export interface AttributeOptions {

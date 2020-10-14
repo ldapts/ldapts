@@ -1,5 +1,7 @@
-import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageResponseOptions } from './MessageResponse';
+import { MessageResponse } from './MessageResponse';
 
 export class DeleteResponse extends MessageResponse {
   public protocolOperation: ProtocolOperation;

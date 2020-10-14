@@ -1,7 +1,9 @@
-import { MessageResponse, MessageResponseOptions } from './MessageResponse';
 import { ProtocolOperation } from '../ProtocolOperation';
-import { SearchEntry } from './SearchEntry';
-import { SearchReference } from './SearchReference';
+
+import type { MessageResponseOptions } from './MessageResponse';
+import { MessageResponse } from './MessageResponse';
+import type { SearchEntry } from './SearchEntry';
+import type { SearchReference } from './SearchReference';
 
 export interface SearchResponseOptions extends MessageResponseOptions {
   searchEntries?: SearchEntry[];

@@ -1,4 +1,5 @@
-import { BerReader, BerWriter } from 'asn1';
+import type { BerReader, BerWriter } from 'asn1';
+
 import { Attribute } from './Attribute';
 
 export interface ChangeOptions {
@@ -11,9 +12,11 @@ export class Change {
 
   public modification: Attribute;
 
-  public constructor(options: ChangeOptions = {
-    modification: new Attribute(),
-  }) {
+  public constructor(
+    options: ChangeOptions = {
+      modification: new Attribute(),
+    },
+  ) {
     this.operation = options.operation || 'add';
     this.modification = options.modification;
   }

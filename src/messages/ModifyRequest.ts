@@ -1,7 +1,10 @@
-import { BerReader, BerWriter } from 'asn1';
-import { Message, MessageOptions } from './Message';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { BerReader, BerWriter } from 'asn1';
+
 import { Change } from '../Change';
+import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageOptions } from './Message';
+import { Message } from './Message';
 
 export interface ModifyRequestMessageOptions extends MessageOptions {
   dn?: string;

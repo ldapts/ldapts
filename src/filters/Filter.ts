@@ -1,5 +1,6 @@
-import { BerReader, BerWriter } from 'asn1';
-import { SearchFilter } from '../SearchFilter';
+import type { BerReader, BerWriter } from 'asn1';
+
+import type { SearchFilter } from '../SearchFilter';
 
 export abstract class Filter {
   public abstract type: SearchFilter;
@@ -15,7 +16,7 @@ export abstract class Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public matches(_: { [index: string]: string } = {}, __: boolean): boolean|void {
+  public matches(_: { [index: string]: string } = {}, __: boolean): boolean | void {
     return true;
   }
 
@@ -28,7 +29,7 @@ export abstract class Filter {
    *
    * @param {string|Buffer} input
    */
-  public escape(input: string|Buffer): string {
+  public escape(input: string | Buffer): string {
     let escapedResult = '';
     if (Buffer.isBuffer(input)) {
       for (const inputChar of input) {

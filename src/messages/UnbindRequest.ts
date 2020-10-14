@@ -1,5 +1,7 @@
-import { Message, MessageOptions } from './Message';
 import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageOptions } from './Message';
+import { Message } from './Message';
 
 export class UnbindRequest extends Message {
   public protocolOperation: ProtocolOperation;

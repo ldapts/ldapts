@@ -1,7 +1,10 @@
-import { BerReader } from 'asn1';
-import { MessageResponse, MessageResponseOptions } from './MessageResponse';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { BerReader } from 'asn1';
+
 import { Attribute } from '../Attribute';
+import { ProtocolOperation } from '../ProtocolOperation';
+
+import type { MessageResponseOptions } from './MessageResponse';
+import { MessageResponse } from './MessageResponse';
 
 export interface SearchEntryOptions extends MessageResponseOptions {
   name?: string;

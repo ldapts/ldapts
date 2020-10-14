@@ -1,6 +1,8 @@
-import { BerWriter } from 'asn1';
-import { Filter } from './Filter';
+import type { BerWriter } from 'asn1';
+
 import { SearchFilter } from '../SearchFilter';
+
+import { Filter } from './Filter';
 
 export interface NotFilterOptions {
   filter: Filter;

@@ -1,5 +1,5 @@
+import type { ResultCodeError } from './errors/resultCodeErrors';
 import {
-  ResultCodeError,
   OperationsError,
   UnknownStatusCodeError,
   ProtocolError,
