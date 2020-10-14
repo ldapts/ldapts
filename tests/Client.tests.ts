@@ -2,13 +2,13 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
-import { Client } from '../src';
+import { Attribute, Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
 import { DN } from '../src/dn';
 import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
 import { AndFilter, EqualityFilter } from '../src/filters';
-import type { ModifyDNRequest } from '../src/messages';
-import { ModifyDNResponse } from '../src/messages';
+import type { ModifyDNRequest, AddRequest } from '../src/messages';
+import { AddResponse, ModifyDNResponse } from '../src/messages';
 
 describe('Client', () => {
   let should: Chai.Should;
@@ -245,6 +245,42 @@ describe('Client', () => {
       }));
     });
   }); */
+  describe('#add()', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should allow adding entry with null or undefined attribute value. Issue #88', async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const stub = sinon.stub(client, '_send').returns(
+        new AddResponse({
+          messageId: 123,
+        }),
+      );
+
+      await client.add('uid=reed.richards,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        userPassword: null,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        foo: undefined,
+      });
+
+      stub.restore();
+      stub.calledOnce.should.equal(true);
+      const args = stub.getCall(0).args[0] as AddRequest;
+      args.attributes.should.deep.equal([new Attribute({ type: 'userPassword', values: [] }), new Attribute({ type: 'foo', values: [] })]);
+    });
+  });
   describe('#modifyDN()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',

@@ -1,3 +1,6 @@
+### 2.8.1
+  * Fix null/undefined values for attributes when calling add(). Fix #88
+
 ### 2.8.0
   * Fix modifyDN to ignore escaped commas when determining NewSuperior. PR #87 Thanks @hasegawa-jun!
   * Add tests for modifyDN

@@ -297,6 +297,8 @@ export class Client {
         let values;
         if (Array.isArray(value)) {
           values = value;
+        } else if (value == null) {
+          values = [] as string[];
         } else {
           values = [value];
         }
