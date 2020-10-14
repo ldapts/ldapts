@@ -468,8 +468,8 @@ export class Client {
     }
 
     let newSuperior: string | undefined;
-    if (typeof newDN === 'string' && newDN.includes(',')) {
-        const parseIndex = newDN.indexOf(',');
+    if (typeof newDN === 'string' && /(?<!\\),/.test(newDN)) {
+        const parseIndex = newDN.search(/(?<!\\),/);
         newSuperior = newDN.slice(parseIndex + 1);
         newDN = newDN.slice(0, parseIndex);
     }
