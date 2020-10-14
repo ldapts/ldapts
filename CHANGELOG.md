@@ -1,3 +1,9 @@
+### 2.8.0
+  * Fix modifyDN to ignore escaped commas when determining NewSuperior. PR #87 Thanks @hasegawa-jun!
+  * Add tests for modifyDN
+  * Update npms
+  * Format code with prettier
+
 ### 2.7.0
   * Support NewSuperior with modifyDN. PR #84 Thanks @IsraelFrid!
   * Update npms
