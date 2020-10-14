@@ -1,15 +1,19 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
+import * as sinon from 'sinon';
 
 import { Client } from '../src';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
 import { DN } from '../src/dn';
 import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
 import { AndFilter, EqualityFilter } from '../src/filters';
+import type { ModifyDNRequest } from '../src/messages';
+import { ModifyDNResponse } from '../src/messages';
 
 describe('Client', () => {
+  let should: Chai.Should;
   before(() => {
-    chai.should();
+    should = chai.should();
     chai.use(chaiAsPromised);
   });
 
@@ -218,7 +222,7 @@ describe('Client', () => {
       }
     });
   });
-/*  describe('#modify()', () => {
+  /*  describe('#modify()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',
     });
@@ -241,6 +245,67 @@ describe('Client', () => {
       }));
     });
   }); */
+  describe('#modifyDN()', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should set newSuperior when newDN is a string and contains a comma', async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const stub = sinon.stub(client, '_send').returns(
+        new ModifyDNResponse({
+          messageId: 123,
+        }),
+      );
+
+      const dn = 'uid=groot,ou=Users,dc=foo,dc=com';
+      const newRdn = 'uid=new-groot';
+      const newSuperior = 'ou=Users,dc=foo,dc=com';
+      const newDN = `${newRdn},${newSuperior}`;
+      await client.modifyDN(dn, newDN);
+
+      stub.restore();
+      stub.calledOnce.should.equal(true);
+      const args = stub.getCall(0).args[0] as ModifyDNRequest;
+      args.dn.should.equal(dn);
+      args.deleteOldRdn.should.equal(true);
+      args.newRdn.should.equal(newRdn);
+      args.newSuperior.should.equal(newSuperior);
+      should.equal(args.controls, undefined);
+    });
+    it('should handle escaped comma in newDN. Issue #87', async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const stub = sinon.stub(client, '_send').returns(
+        new ModifyDNResponse({
+          messageId: 123,
+        }),
+      );
+
+      const dn = 'uid=groot,ou=Users,dc=foo,dc=com';
+      const newRdn = 'uid=new\\,groot';
+      const newSuperior = 'ou=Users,dc=foo,dc=com';
+      const newDN = `${newRdn},${newSuperior}`;
+      await client.modifyDN(dn, newDN);
+
+      stub.restore();
+      stub.calledOnce.should.equal(true);
+      const args = stub.getCall(0).args[0] as ModifyDNRequest;
+      args.dn.should.equal(dn);
+      args.deleteOldRdn.should.equal(true);
+      args.newRdn.should.equal(newRdn);
+      args.newSuperior.should.equal(newSuperior);
+      should.equal(args.controls, undefined);
+    });
+  });
   describe('#exop()', () => {
     it('should throw if fast bind is not supported', async () => {
       const client: Client = new Client({

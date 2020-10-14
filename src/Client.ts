@@ -465,10 +465,10 @@ export class Client {
     }
 
     let newSuperior: string | undefined;
-    if (typeof newDN === 'string' && /(?<!\\),/.test(newDN)) {
-        const parseIndex = newDN.search(/(?<!\\),/);
-        newSuperior = newDN.slice(parseIndex + 1);
-        newDN = newDN.slice(0, parseIndex);
+    if (typeof newDN === 'string' && /[^\\],/.test(newDN)) {
+      const parseIndex = newDN.search(/[^\\],/);
+      newSuperior = newDN.slice(parseIndex + 2);
+      newDN = newDN.slice(0, parseIndex + 1);
     }
 
     const req = new ModifyDNRequest({
