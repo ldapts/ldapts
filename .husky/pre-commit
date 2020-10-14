@@ -1,0 +1,5 @@
+#!/bin/sh
+. "$(dirname $0)/_/husky.sh"
+
+echo 'NOTE: If node is not found, you may need to run brew link for your specific node version'
+/usr/local/bin/node node_modules/.bin/lint-staged
