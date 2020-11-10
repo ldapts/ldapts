@@ -10,6 +10,7 @@ LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
 ### Table of Contents
 * [API Details](#api-details)
   * [Create a client](#create-a-client)
+  * [Specifying Controls](#specifying-controls)
   * [bind](#bind)
   * [startTLS](#startTLS)
   * [add](#add)
@@ -58,6 +59,22 @@ client is:
 |connectTimeout |Milliseconds client should wait before timing out on TCP connections (Default: OS default)|
 |tlsOptions     |TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)|
 |strictDN       |Force strict DN parsing for client methods (Default is true)|
+
+## Specifying Controls
+
+Single or an array of `Control` objects can be added to various operations like the following:
+
+```ts
+const {
+  searchEntries,
+  searchReferences,
+} = await client.search(searchDN, {
+  filter: '(mail=peter.parker@marvel.com)',
+}, new Control('1.2.840.113556.1.4.417'));
+```
+
+You can also subclass `Control` for finer control over how data is parsed and written.
+Look at [PagedResultsControl](src/controls/PagedResultsControl.ts) for an example.
 
 ## bind
 `bind(dn, password, [controls])`
