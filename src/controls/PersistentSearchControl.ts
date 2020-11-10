@@ -17,12 +17,10 @@ export interface PersistentSearchControlOptions extends ControlOptions {
 export class PersistentSearchControl extends Control {
   public static type = '2.16.840.1.113730.3.4.3';
 
-  public type: string = PersistentSearchControl.type;
-
   public value?: PersistentSearchValue;
 
   public constructor(options: PersistentSearchControlOptions = {}) {
-    super(options);
+    super(PersistentSearchControl.type, options);
 
     this.value = options.value;
   }

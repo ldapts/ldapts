@@ -17,12 +17,10 @@ export interface ServerSideSortingRequestControlOptions extends ControlOptions {
 export class ServerSideSortingRequestControl extends Control {
   public static type = '2.16.840.1.113730.3.4.3';
 
-  public type: string = ServerSideSortingRequestControl.type;
-
   public values: ServerSideSortingRequestValue[];
 
   public constructor(options: ServerSideSortingRequestControlOptions = {}) {
-    super(options);
+    super(ServerSideSortingRequestControl.type, options);
 
     if (Array.isArray(options.value)) {
       this.values = options.value;

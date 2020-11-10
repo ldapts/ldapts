@@ -4,12 +4,13 @@ export interface ControlOptions {
   critical?: boolean;
 }
 
-export abstract class Control {
-  public abstract type: string;
+export class Control {
+  public type: string;
 
   public critical: boolean;
 
-  protected constructor(options: ControlOptions = {}) {
+  public constructor(type: string, options: ControlOptions = {}) {
+    this.type = type;
     this.critical = options.critical === true;
   }
 

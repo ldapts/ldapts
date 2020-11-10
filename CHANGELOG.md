@@ -1,3 +1,7 @@
+### 2.9.0
+  * Update npms
+  * Improve Control usability and provide example test for search with a custom Control. Fix #91
+
 ### 2.8.1
   * Fix null/undefined values for attributes when calling add(). Fix #88
 

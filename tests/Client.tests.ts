@@ -3,6 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
 import { Attribute, Client } from '../src';
+import { Control } from '../src/controls/Control';
 import { PagedResultsControl } from '../src/controls/PagedResultsControl';
 import { DN } from '../src/dn';
 import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
@@ -477,6 +478,18 @@ describe('Client', () => {
       result1.searchEntries.should.deep.equal(expectedResult);
       result2.searchEntries.should.deep.equal(expectedResult);
       result3.searchEntries.should.deep.equal(expectedResult);
+    });
+    it('should allow arbitrary controls 1.2.840.113556.1.4.417 to be specified', async () => {
+      const searchResult = await client.search(
+        'ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        {
+          scope: 'sub',
+          filter: '(isDeleted=*)',
+        },
+        new Control('1.2.840.113556.1.4.417'),
+      );
+
+      searchResult.searchEntries.length.should.equal(0);
     });
     it('should return search results for non-secure ldap server', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
