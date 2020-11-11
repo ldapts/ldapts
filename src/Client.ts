@@ -7,8 +7,8 @@ import { v4 } from 'uuid';
 
 import { Attribute } from './Attribute';
 import type { Change } from './Change';
-import type { Control } from './controls/Control';
-import { PagedResultsControl } from './controls/PagedResultsControl';
+import type { Control } from './controls';
+import { PagedResultsControl } from './controls';
 import type { DN } from './dn';
 import type { MessageParserError } from './errors';
 import { FilterParser } from './FilterParser';

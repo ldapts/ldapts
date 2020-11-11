@@ -3,8 +3,7 @@ import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
 import { Attribute, Client } from '../src';
-import { Control } from '../src/controls/Control';
-import { PagedResultsControl } from '../src/controls/PagedResultsControl';
+import { Control, PagedResultsControl } from '../src/controls';
 import { DN } from '../src/dn';
 import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
 import { AndFilter, EqualityFilter } from '../src/filters';

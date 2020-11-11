@@ -2,7 +2,7 @@ import type { BerReader } from 'asn1';
 import { BerWriter } from 'asn1';
 
 import { ControlParser } from '../ControlParser';
-import type { Control } from '../controls/Control';
+import type { Control } from '../controls';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 export interface MessageOptions {

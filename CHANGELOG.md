@@ -1,3 +1,6 @@
+### 2.9.1
+  * Simplify control import directives
+
 ### 2.9.0
   * Update npms
   * Improve Control usability and provide example test for search with a custom Control. Fix #91

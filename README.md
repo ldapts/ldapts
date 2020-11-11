@@ -65,6 +65,8 @@ client is:
 Single or an array of `Control` objects can be added to various operations like the following:
 
 ```ts
+import { Control } from 'ldapts/controls';
+
 const {
   searchEntries,
   searchReferences,
