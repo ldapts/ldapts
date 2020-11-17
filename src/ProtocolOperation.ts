@@ -6,6 +6,7 @@ export enum ProtocolOperation {
 
   // Requests
   LDAP_REQ_BIND = 0x60,
+  LDAP_REQ_BIND_SASL = 0xa3,
   LDAP_REQ_UNBIND = 0x42,
   LDAP_REQ_SEARCH = 0x63,
   LDAP_REQ_MODIFY = 0x66,

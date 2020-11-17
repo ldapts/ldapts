@@ -37,6 +37,7 @@ import {
   ResultsTooLargeError,
   AffectsMultipleDSAsError,
   TLSNotSupportedError,
+  SaslBindInProgressError,
 } from './errors/resultCodeErrors';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -61,6 +62,8 @@ export class StatusCodeParser {
         return new UnavailableCriticalExtensionError(message);
       case 13:
         return new ConfidentialityRequiredError(message);
+      case 14:
+        return new SaslBindInProgressError(message);
       case 16:
         return new NoSuchAttributeError(message);
       case 17:

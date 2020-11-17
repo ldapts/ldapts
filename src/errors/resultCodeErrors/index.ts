@@ -26,6 +26,7 @@ export * from './OperationsError';
 export * from './ProtocolError';
 export * from './ResultCodeError';
 export * from './ResultsTooLargeError';
+export * from './SaslBindInProgressError';
 export * from './SizeLimitExceededError';
 export * from './StrongAuthRequiredError';
 export * from './TimeLimitExceededError';

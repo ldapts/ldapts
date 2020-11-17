@@ -6,9 +6,12 @@ import { ProtocolOperation } from '../ProtocolOperation';
 import type { MessageOptions } from './Message';
 import { Message } from './Message';
 
+export type SaslMechanism = 'PLAIN' | 'EXTERNAL';
+
 export interface BindRequestMessageOptions extends MessageOptions {
   dn?: string;
   password?: string;
+  mechanism?: SaslMechanism;
 }
 
 export class BindRequest extends Message {
@@ -18,17 +21,32 @@ export class BindRequest extends Message {
 
   public password: string;
 
+  public mechanism: SaslMechanism | undefined;
+
   public constructor(options: BindRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
     this.dn = options.dn || '';
     this.password = options.password || '';
+    this.mechanism = options.mechanism;
   }
 
   public writeMessage(writer: BerWriter): void {
     writer.writeInt(this.version);
     writer.writeString(this.dn);
-    writer.writeString(this.password, Ber.Context);
+    if (this.mechanism) {
+      // SASL authentication
+      writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
+      writer.writeString(this.mechanism);
+      if (this.password) {
+        writer.writeString(this.password);
+      }
+
+      writer.endSequence();
+    } else {
+      // Simple authentication
+      writer.writeString(this.password, Ber.Context); // 128
+    }
   }
 
   public parseMessage(reader: BerReader): void {

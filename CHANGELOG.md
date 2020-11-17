@@ -1,3 +1,6 @@
+### 2.10.0
+  * Add support for PLAIN and EXTERNAL SASL authentication to bind request
+
 ### 2.9.1
   * Simplify control import directives
 

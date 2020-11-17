@@ -32,7 +32,7 @@ import {
   AddRequest,
   ModifyRequest,
 } from './messages';
-import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse } from './messages';
+import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse, SaslMechanism } from './messages';
 import type { Message } from './messages/Message';
 import type { MessageResponse } from './messages/MessageResponse';
 import { StatusCodeParser } from './StatusCodeParser';
@@ -246,12 +246,12 @@ export class Client {
   }
 
   /**
-   * Performs a simple authentication against the server.
-   * @param {string|DN} dn
+   * Performs a simple or sasl authentication against the server.
+   * @param {string|DN|SaslMechanism} dnOrSaslMechanism
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dn: string | DN, password?: string, controls?: Control | Control[]): Promise<void> {
+  public async bind(dnOrSaslMechanism: string | DN | SaslMechanism, password?: string, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -260,12 +260,22 @@ export class Client {
       controls = [controls];
     }
 
-    const req = new BindRequest({
-      messageId: this._nextMessageId(),
-      dn: typeof dn === 'string' ? dn : dn.toString(),
-      password,
-      controls,
-    });
+    let req: BindRequest;
+    if (dnOrSaslMechanism === 'PLAIN' || dnOrSaslMechanism === 'EXTERNAL') {
+      req = new BindRequest({
+        messageId: this._nextMessageId(),
+        mechanism: dnOrSaslMechanism,
+        password,
+        controls,
+      });
+    } else {
+      req = new BindRequest({
+        messageId: this._nextMessageId(),
+        dn: typeof dnOrSaslMechanism === 'string' ? dnOrSaslMechanism : dnOrSaslMechanism.toString(),
+        password,
+        controls,
+      });
+    }
 
     const result = await this._send<BindResponse>(req);
     if (result.status !== MessageResponseStatus.Success) {

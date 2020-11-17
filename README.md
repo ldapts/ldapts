@@ -91,13 +91,22 @@ Arguments:
 
 |Argument |Description
 |---------|--------------
-|`dn` (string)|The name (DN) of the directory object that the client wishes to bind as
+|`dnOrSaslMechanism` (string)|The name (DN) of the directory object that the client wishes to bind as or the SASL mechanism (PLAIN, EXTERNAL)
 |`password` (string)|Password for the target bind DN
 |`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
-Example:
+Simple Example:
 
     await client.bind('cn=root', 'secret');
+
+SASL Example:
+
+    // No credentials
+    await client.bind("EXTERNAL");
+
+    // With credentials
+    const credentials = '...foo...';
+    await client.bind("EXTERNAL", credentials);
 
 ## startTLS
 `startTLS(options, [controls])`
