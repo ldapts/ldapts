@@ -36,7 +36,7 @@ export class BindRequest extends Message {
     writer.writeString(this.dn);
     if (this.mechanism) {
       // SASL authentication
-      writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
+      writer.startSequence();
       writer.writeString(this.mechanism);
       if (this.password) {
         writer.writeString(this.password);

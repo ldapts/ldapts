@@ -1,3 +1,8 @@
+### 2.10.1
+  * Update npms
+  * Fix documentation for SASL authentication
+  * Remove sequence identifier for SASL authentication
+
 ### 2.10.0
   * Add support for PLAIN and EXTERNAL SASL authentication to bind request
 

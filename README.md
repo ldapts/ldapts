@@ -92,7 +92,7 @@ Arguments:
 |Argument |Description
 |---------|--------------
 |`dnOrSaslMechanism` (string)|The name (DN) of the directory object that the client wishes to bind as or the SASL mechanism (PLAIN, EXTERNAL)
-|`password` (string)|Password for the target bind DN
+|`[password]` (string)|Password for the target bind DN
 |`[controls]` (Control&#124;Control[])|Optional `Control` object or array of `Control` objects
 
 Simple Example:
@@ -106,7 +106,7 @@ SASL Example:
 
     // With credentials
     const credentials = '...foo...';
-    await client.bind("EXTERNAL", credentials);
+    await client.bind("PLAIN", credentials);
 
 ## startTLS
 `startTLS(options, [controls])`
