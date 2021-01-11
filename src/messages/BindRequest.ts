@@ -6,7 +6,7 @@ import { ProtocolOperation } from '../ProtocolOperation';
 import type { MessageOptions } from './Message';
 import { Message } from './Message';
 
-export type SaslMechanism = 'PLAIN' | 'EXTERNAL';
+export type SaslMechanism = 'EXTERNAL' | 'PLAIN';
 
 export interface BindRequestMessageOptions extends MessageOptions {
   dn?: string;
@@ -36,7 +36,7 @@ export class BindRequest extends Message {
     writer.writeString(this.dn);
     if (this.mechanism) {
       // SASL authentication
-      writer.startSequence();
+      writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
       writer.writeString(this.mechanism);
       if (this.password) {
         writer.writeString(this.password);

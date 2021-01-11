@@ -7,7 +7,7 @@ import { Message } from './Message';
 
 export interface ExtendedRequestMessageOptions extends MessageOptions {
   oid?: string;
-  value?: string | Buffer;
+  value?: Buffer | string;
 }
 
 export class ExtendedRequest extends Message {
@@ -15,7 +15,7 @@ export class ExtendedRequest extends Message {
 
   public oid: string;
 
-  public value: string | Buffer;
+  public value: Buffer | string;
 
   public constructor(options: ExtendedRequestMessageOptions) {
     super(options);

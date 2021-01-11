@@ -40,7 +40,7 @@ import { StatusCodeParser } from './StatusCodeParser';
 const MAX_MESSAGE_ID = 2 ** 31 - 1;
 const logDebug = debug('ldapts');
 
-type SocketWithId = (tls.TLSSocket | net.Socket) & { id?: string };
+type SocketWithId = { id?: string } & (net.Socket | tls.TLSSocket);
 
 export interface ClientOptions {
   /**
@@ -91,7 +91,7 @@ export interface SearchOptions {
    * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
    * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
    */
-  scope?: 'base' | 'one' | 'sub' | 'children';
+  scope?: 'base' | 'children' | 'one' | 'sub';
   /**
    * Specifies how the server must treat references to other entries:
    * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
@@ -99,7 +99,7 @@ export interface SearchOptions {
    * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
    * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
    */
-  derefAliases?: 'never' | 'always' | 'search' | 'find';
+  derefAliases?: 'always' | 'find' | 'never' | 'search';
   /**
    * If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
    */
@@ -119,7 +119,7 @@ export interface SearchOptions {
   /**
    * The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
    */
-  filter?: string | Filter;
+  filter?: Filter | string;
   /**
    * A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    */
@@ -251,7 +251,7 @@ export class Client {
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
-  public async bind(dnOrSaslMechanism: string | DN | SaslMechanism, password?: string, controls?: Control | Control[]): Promise<void> {
+  public async bind(dnOrSaslMechanism: DN | SaslMechanism | string, password?: string, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -289,7 +289,7 @@ export class Client {
    * @param {Attribute[]|object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: string | DN, attributes: Attribute[] | { [index: string]: string | string[] }, controls?: Control | Control[]): Promise<void> {
+  public async add(dn: DN | string, attributes: Attribute[] | { [index: string]: string[] | string }, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -342,7 +342,7 @@ export class Client {
    * @param {string} value
    * @param {Control|Control[]} [controls]
    */
-  public async compare(dn: string | DN, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
+  public async compare(dn: DN | string, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
     if (!this.connected) {
       await this._connect();
     }
@@ -375,7 +375,7 @@ export class Client {
    * @param {string|DN} dn - The DN of the entry to delete
    * @param {Control|Control[]} [controls]
    */
-  public async del(dn: string | DN, controls?: Control | Control[]): Promise<void> {
+  public async del(dn: DN | string, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -402,7 +402,7 @@ export class Client {
    * @param {string|Buffer} [value]
    * @param {Control|Control[]} [controls]
    */
-  public async exop(oid: string, value?: string | Buffer, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
+  public async exop(oid: string, value?: Buffer | string, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.connected) {
       await this._connect();
     }
@@ -435,7 +435,7 @@ export class Client {
    * @param {Change|Change[]} changes
    * @param {Control|Control[]} [controls]
    */
-  public async modify(dn: string | DN, changes: Change | Change[], controls?: Control | Control[]): Promise<void> {
+  public async modify(dn: DN | string, changes: Change | Change[], controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -467,7 +467,7 @@ export class Client {
    * @param {string|DN} newDN - The new DN to move this entry to
    * @param {Control|Control[]} [controls]
    */
-  public async modifyDN(dn: string | DN, newDN: string | DN, controls?: Control | Control[]): Promise<void> {
+  public async modifyDN(dn: DN | string, newDN: DN | string, controls?: Control | Control[]): Promise<void> {
     if (!this.connected) {
       await this._connect();
     }
@@ -503,7 +503,7 @@ export class Client {
    *
    * @param {string|DN} baseDN - This specifies the base of the subtree in which the search is to be constrained.
    * @param {SearchOptions} [options]
-   * @param {string|Filter} [options.filter=(objectclass=*)] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515
+   * @param {string|Filter} [options.filter] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515. Defaults to (objectclass=*)
    * @param {string} [options.scope='sub'] - Specifies how broad the search context is:
    * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
    * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
@@ -522,7 +522,7 @@ export class Client {
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: string | DN, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
+  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
     if (!this.connected) {
       await this._connect();
     }

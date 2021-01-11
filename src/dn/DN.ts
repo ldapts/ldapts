@@ -8,7 +8,7 @@ import { RDN } from './RDN';
  * get applied to the same key of an RDN.
  */
 export interface RDNMap {
-  [name: string]: string | string[];
+  [name: string]: string[] | string;
 }
 
 /**
@@ -68,7 +68,7 @@ export class DN {
    * @param {object|object[]} rdns
    * @returns {object} DN
    */
-  public addRDNs(rdns: RDN[] | RDNAttributes[] | RDNMap | DN): DN {
+  public addRDNs(rdns: DN | RDN[] | RDNAttributes[] | RDNMap): DN {
     if (rdns instanceof DN) {
       this.rdns.push(...rdns.rdns);
     } else if (Array.isArray(rdns)) {

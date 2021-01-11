@@ -286,6 +286,7 @@ module.exports = {
         '@typescript-eslint/promise-function-async': 'off',
         '@typescript-eslint/require-await': 'error',
         '@typescript-eslint/restrict-plus-operands': 'error',
+        '@typescript-eslint/sort-type-union-intersection-members': 'error',
         '@typescript-eslint/unbound-method': 'error',
         '@typescript-eslint/unified-signatures': 'error',
       },

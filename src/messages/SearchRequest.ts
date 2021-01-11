@@ -18,9 +18,9 @@ export class SearchRequest extends Message {
 
   public baseDN: string;
 
-  public scope: 'base' | 'one' | 'sub' | 'children';
+  public scope: 'base' | 'children' | 'one' | 'sub';
 
-  public derefAliases: 'never' | 'always' | 'search' | 'find';
+  public derefAliases: 'always' | 'find' | 'never' | 'search';
 
   public sizeLimit: number;
 

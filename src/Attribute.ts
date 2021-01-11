@@ -5,7 +5,7 @@ import { ProtocolOperation } from './ProtocolOperation';
 
 export interface AttributeOptions {
   type?: string;
-  values?: string[] | Buffer[];
+  values?: Buffer[] | string[];
 }
 
 export class Attribute {
@@ -13,7 +13,7 @@ export class Attribute {
 
   public type: string;
 
-  public values: string[] | Buffer[];
+  public values: Buffer[] | string[];
 
   public constructor(options: AttributeOptions = {}) {
     this.type = options.type || '';

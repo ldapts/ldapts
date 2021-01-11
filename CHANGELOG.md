@@ -1,3 +1,8 @@
+### 2.11.0
+  * Update npms
+  * Sort union/intersection members
+  * Revert remove sequence identifier for SASL authentication
+
 ### 2.10.1
   * Update npms
   * Fix documentation for SASL authentication
