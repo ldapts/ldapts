@@ -1,5 +1,8 @@
 #!/bin/sh
-. "$(dirname $0)/_/husky.sh"
+# shellcheck disable=SC1090,SC1091
+. "$(dirname "$0")/_/husky.sh"
 
-echo 'NOTE: If node is not found, you may need to run brew link for your specific node version'
-/usr/local/bin/node node_modules/.bin/lint-staged
+PATH=$PATH:/usr/local/bin
+
+echo 'NOTE: If node or npm is not found, you may need to run brew link for your specific node version'
+npm run lint-staged

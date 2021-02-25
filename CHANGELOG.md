@@ -1,3 +1,6 @@
+### 2.11.1
+  * Update npms
+
 ### 2.11.0
   * Update npms
   * Sort union/intersection members
