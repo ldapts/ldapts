@@ -2,7 +2,7 @@ import { BerWriter } from 'asn1';
 import chai from 'chai';
 import { anyString, mock, capture, verify, anything, when, instance, reset } from 'ts-mockito';
 
-import { ExtensibleFilter } from '../../src/filters';
+import { ExtensibleFilter } from '../../src';
 
 describe('ExtensibleFilter', () => {
   before(() => {

@@ -2,13 +2,22 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
-import { Attribute, Client } from '../src';
-import { Control, PagedResultsControl } from '../src/controls';
-import { DN } from '../src/dn';
-import { InvalidCredentialsError, UndefinedTypeError, NoSuchObjectError, InvalidDNSyntaxError } from '../src/errors/resultCodeErrors';
-import { AndFilter, EqualityFilter } from '../src/filters';
-import type { ModifyDNRequest, AddRequest } from '../src/messages';
-import { AddResponse, ModifyDNResponse } from '../src/messages';
+import {
+  Attribute,
+  Client,
+  DN,
+  InvalidCredentialsError,
+  UndefinedTypeError,
+  NoSuchObjectError,
+  InvalidDNSyntaxError,
+  AndFilter,
+  EqualityFilter,
+  AddResponse,
+  ModifyDNResponse,
+  Control,
+  PagedResultsControl,
+} from '../src';
+import type { ModifyDNRequest, AddRequest } from '../src';
 
 describe('Client', () => {
   let should: Chai.Should;

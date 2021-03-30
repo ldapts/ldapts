@@ -1,8 +1,19 @@
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
-import { FilterParser } from '../src/FilterParser';
-import { AndFilter, EqualityFilter, ExtensibleFilter, SubstringFilter, LessThanEqualsFilter, GreaterThanEqualsFilter, NotFilter, PresenceFilter, OrFilter, ApproximateFilter } from '../src/filters';
+import {
+  FilterParser,
+  AndFilter,
+  EqualityFilter,
+  ExtensibleFilter,
+  SubstringFilter,
+  LessThanEqualsFilter,
+  GreaterThanEqualsFilter,
+  NotFilter,
+  PresenceFilter,
+  OrFilter,
+  ApproximateFilter,
+} from '../src';
 
 describe('FilterParser', () => {
   before(() => {
