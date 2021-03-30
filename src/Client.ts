@@ -867,8 +867,18 @@ export class Client {
       socket: this.socket,
     };
 
+    if ((message as BindRequest).password) {
+      logDebug(
+        `Sending message: ${JSON.stringify({
+          ...message,
+          password: '__redacted__',
+        })}`,
+      );
+    } else {
+      logDebug(`Sending message: ${JSON.stringify(message)}`);
+    }
+
     // Send the message to the socket
-    logDebug(`Sending message: ${JSON.stringify(message)}`);
     this.socket.write(message.write(), () => {
       if (message instanceof AbandonRequest) {
         logDebug(`Abandoned message: ${message.messageId}`);
