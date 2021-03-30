@@ -13,11 +13,11 @@ jobs:
         image: bitnami/openldap
         env:
           LDAP_ENABLE_TLS: yes
-          LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/server-cert.pem
-          LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/server-private.key.pem
-          LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/ca.crt.pem
-        volumes:
-          - ${{ github.workspace }}/tests/certs:/opt/bitnami/openldap/certs
+#          LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/server-cert.pem
+#          LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/server-private.key.pem
+#          LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/ca.crt.pem
+#        volumes:
+#          - ${{ github.workspace }}/tests/certs:/opt/bitnami/openldap/certs
         # Set health checks to wait until openldap has started
         ports:
           - 389:1389
