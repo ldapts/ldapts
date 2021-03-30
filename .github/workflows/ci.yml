@@ -8,6 +8,26 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      openldap-sasl:
+        image: bitnami/openldap
+        env:
+          LDAP_ENABLE_TLS: yes
+          LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/server-cert.pem
+          LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/server-private.key.pem
+          LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/ca.crt.pem
+        volumes:
+          - ${{ github.workspace }}/tests/certs:/opt/bitnami/openldap/certs
+        # Set health checks to wait until openldap has started
+        options: >-
+          --health-cmd "ldapsearch -x -b \"dc=example,dc=org\" -H ldap://:1389/ -D \"cn=admin,dc=example,dc=org\" -w adminpassword -LLL"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 389:1389
+          - 636:1636
+
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
@@ -18,6 +38,7 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
+
     - run: npm install
     - run: npm run build
     - run: npm test
