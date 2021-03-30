@@ -10,18 +10,10 @@ jobs:
 
     services:
       openldap-sasl:
-        image: bitnami/openldap
-        env:
-          LDAP_ENABLE_TLS: yes
-#          LDAP_TLS_CERT_FILE: /opt/bitnami/openldap/certs/server-cert.pem
-#          LDAP_TLS_KEY_FILE: /opt/bitnami/openldap/certs/server-private.key.pem
-#          LDAP_TLS_CA_FILE: /opt/bitnami/openldap/certs/ca.crt.pem
-#        volumes:
-#          - ${{ github.workspace }}/tests/certs:/opt/bitnami/openldap/certs
-        # Set health checks to wait until openldap has started
+        image: ldapts/openldap
         ports:
-          - 389:1389
-          - 636:1636
+          - 1389:1389
+          - 1636:1636
 
     strategy:
       matrix:
