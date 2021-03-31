@@ -1,3 +1,9 @@
+### 2.12.0
+  * Export error classes. Fix #93
+  * Redact password field from debug logging during send(). Fix #94
+  * Update npms
+  * Enable package-lock.json to speed up CI builds
+
 ### 2.11.1
   * Update npms
 
