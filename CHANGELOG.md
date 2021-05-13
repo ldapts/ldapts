@@ -1,3 +1,15 @@
+### 3.0.0
+  * Drop Node.js 10 support
+  * Add Node.js v16 to CI tests
+  * Update npms
+  * Allow `timeLimit: 0` in search options. Fix #97. Thanks @liudonghua123!
+
+### 2.12.0
+  * Export error classes. Fix #93
+  * Redact password field from debug logging during send(). Fix #94
+  * Update npms
+  * Enable package-lock.json to speed up CI builds
+
 ### 2.11.1
   * Update npms
 
