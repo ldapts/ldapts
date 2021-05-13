@@ -38,15 +38,15 @@ export class SearchRequest extends Message {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_SEARCH;
 
-    this.baseDN = options.baseDN || '';
-    this.scope = options.scope || 'sub';
-    this.derefAliases = options.derefAliases || 'never';
-    this.sizeLimit = options.sizeLimit || 0;
-    this.timeLimit = options.timeLimit || 10;
+    this.baseDN = options.baseDN ?? '';
+    this.scope = options.scope ?? 'sub';
+    this.derefAliases = options.derefAliases ?? 'never';
+    this.sizeLimit = options.sizeLimit ?? 0;
+    this.timeLimit = options.timeLimit ?? 10;
     this.returnAttributeValues = options.returnAttributeValues !== false;
     this.filter = options.filter;
-    this.attributes = options.attributes || [];
-    this.explicitBufferAttributes = options.explicitBufferAttributes || [];
+    this.attributes = options.attributes ?? [];
+    this.explicitBufferAttributes = options.explicitBufferAttributes ?? [];
   }
 
   public writeMessage(writer: BerWriter): void {
@@ -152,7 +152,7 @@ export class SearchRequest extends Message {
       reader.readSequence();
       const end = reader.offset + reader.length;
       while (reader.offset < end) {
-        this.attributes.push((reader.readString() || '').toLowerCase());
+        this.attributes.push((reader.readString() ?? '').toLowerCase());
       }
     }
   }
