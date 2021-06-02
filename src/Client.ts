@@ -838,6 +838,8 @@ export class Client {
       throw new Error('Socket connection not established');
     }
 
+    const messageContentBuffer = message.write();
+
     let messageResolve: (messageResponse?: MessageResponse) => void = () => {
       // Ignore this as a NOOP
     };
@@ -879,7 +881,7 @@ export class Client {
     }
 
     // Send the message to the socket
-    this.socket.write(message.write(), () => {
+    this.socket.write(messageContentBuffer, () => {
       if (message instanceof AbandonRequest) {
         logDebug(`Abandoned message: ${message.messageId}`);
         delete this.messageDetailsByMessageId[message.messageId.toString()];
