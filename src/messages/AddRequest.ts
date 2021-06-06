@@ -26,7 +26,7 @@ export class AddRequest extends Message {
     this.attributes = options.attributes || [];
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     writer.writeString(this.dn);
     writer.startSequence();
     for (const attribute of this.attributes) {
@@ -36,7 +36,7 @@ export class AddRequest extends Message {
     writer.endSequence();
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.dn = reader.readString();
 
     reader.readSequence();

@@ -29,7 +29,7 @@ export class ExtendedResponse extends MessageResponse {
     this.value = options.value;
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     super.parseMessage(reader);
 
     if (reader.peek() === ExtendedResponseProtocolOperations.oid) {

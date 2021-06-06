@@ -34,7 +34,7 @@ export class ExtensibleFilter extends Filter {
     this.value = options.value || '';
   }
 
-  public parseFilter(reader: BerReader): void {
+  public override parseFilter(reader: BerReader): void {
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
       const tag: number | null = reader.peek();
@@ -63,7 +63,7 @@ export class ExtensibleFilter extends Filter {
     }
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     if (this.rule) {
       writer.writeString(this.rule, 0x81);
     }
@@ -80,11 +80,11 @@ export class ExtensibleFilter extends Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public matches(_: { [index: string]: string } = {}, __: boolean): void {
+  public override matches(_: { [index: string]: string } = {}, __: boolean): void {
     throw new Error('Approximate match implementation unknown');
   }
 
-  public toString(): string {
+  public override toString(): string {
     let result = `(${this.escape(this.matchType)}:`;
 
     if (this.dnAttributes) {

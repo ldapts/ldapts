@@ -24,7 +24,7 @@ export class PagedResultsControl extends Control {
     this.value = options.value;
   }
 
-  public parseControl(reader: BerReader): void {
+  public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const size = reader.readInt();
       const cookie = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);
@@ -36,7 +36,7 @@ export class PagedResultsControl extends Control {
     }
   }
 
-  public writeControl(writer: BerWriter): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.value) {
       return;
     }

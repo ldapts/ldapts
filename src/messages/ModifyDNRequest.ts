@@ -33,7 +33,7 @@ export class ModifyDNRequest extends Message {
     this.newSuperior = options.newSuperior || '';
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     writer.writeString(this.dn);
     writer.writeString(this.newRdn);
     writer.writeBoolean(this.deleteOldRdn);
@@ -48,7 +48,7 @@ export class ModifyDNRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.dn = reader.readString();
     this.newRdn = reader.readString();
     this.deleteOldRdn = reader.readBoolean();

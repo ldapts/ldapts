@@ -25,7 +25,7 @@ export class ExtendedRequest extends Message {
     this.value = options.value || '';
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     writer.writeString(this.oid, 0x80);
     if (Buffer.isBuffer(this.value)) {
       writer.writeBuffer(this.value, 0x81);
@@ -34,7 +34,7 @@ export class ExtendedRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.oid = reader.readString(0x80);
     if (reader.peek() === 0x81) {
       try {

@@ -31,7 +31,7 @@ export class ServerSideSortingRequestControl extends Control {
     }
   }
 
-  public parseControl(reader: BerReader): void {
+  public override parseControl(reader: BerReader): void {
     if (reader.readSequence(0x30)) {
       while (reader.readSequence(0x30)) {
         const attributeType: string = reader.readString();
@@ -54,7 +54,7 @@ export class ServerSideSortingRequestControl extends Control {
     }
   }
 
-  public writeControl(writer: BerWriter): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.values.length) {
       return;
     }

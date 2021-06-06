@@ -18,15 +18,15 @@ export class NotFilter extends Filter {
     this.filter = options.filter;
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     this.filter.write(writer);
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
     return !this.filter.matches(objectToCheck, strictAttributeCase);
   }
 
-  public toString(): string {
+  public override toString(): string {
     return `(!${this.filter.toString()})`;
   }
 }

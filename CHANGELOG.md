@@ -1,3 +1,8 @@
+### 3.0.1
+  * Fix "Unhandled promise rejection" when calling modify without password. Fix #88. Thanks @ctaschereau!
+  * Enable typescript lint checks: [`noPropertyAccessFromIndexSignature`](https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature) and [`noImplicitOverride`](https://www.typescriptlang.org/tsconfig#noImplicitOverride)
+  * Update npms
+
 ### 3.0.0
   * Drop Node.js 10 support
   * Add Node.js v16 to CI tests

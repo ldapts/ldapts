@@ -25,7 +25,7 @@ export class PersistentSearchControl extends Control {
     this.value = options.value;
   }
 
-  public parseControl(reader: BerReader): void {
+  public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const changeTypes = reader.readInt();
       const changesOnly = reader.readBoolean();
@@ -39,7 +39,7 @@ export class PersistentSearchControl extends Control {
     }
   }
 
-  public writeControl(writer: BerWriter): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.value) {
       return;
     }

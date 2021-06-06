@@ -20,14 +20,14 @@ export class DeleteRequest extends Message {
     this.dn = options.dn || '';
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     const buffer = Buffer.from(this.dn);
     for (const byte of buffer) {
       writer.writeByte(byte);
     }
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     const { length } = reader;
     this.dn = reader.buffer.slice(0, length).toString('utf8');
     reader._offset += reader.length;

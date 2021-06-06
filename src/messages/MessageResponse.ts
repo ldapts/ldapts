@@ -23,7 +23,7 @@ export abstract class MessageResponse extends Message {
     this.errorMessage = options.errorMessage || '';
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.status = reader.readEnumeration();
     this.matchedDN = reader.readString();
     this.errorMessage = reader.readString();

@@ -30,7 +30,7 @@ export class SubstringFilter extends Filter {
     this.final = options.final || '';
   }
 
-  public parseFilter(reader: BerReader): void {
+  public override parseFilter(reader: BerReader): void {
     this.attribute = reader.readString().toLowerCase();
     reader.readSequence();
     const end = reader.offset + reader.length;
@@ -72,7 +72,7 @@ export class SubstringFilter extends Filter {
     }
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     writer.writeString(this.attribute);
     writer.startSequence();
     if (this.initial) {
@@ -92,7 +92,7 @@ export class SubstringFilter extends Filter {
     writer.endSequence();
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {
@@ -117,7 +117,7 @@ export class SubstringFilter extends Filter {
     return false;
   }
 
-  public toString(): string {
+  public override toString(): string {
     let result = `(${this.escape(this.attribute)}=${this.escape(this.initial)}*`;
 
     for (const anyItem of this.any) {

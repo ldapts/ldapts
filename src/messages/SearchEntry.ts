@@ -30,7 +30,7 @@ export class SearchEntry extends MessageResponse {
     this.attributes = options.attributes || [];
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.name = reader.readString();
     reader.readSequence();
     const end = reader.offset + reader.length;

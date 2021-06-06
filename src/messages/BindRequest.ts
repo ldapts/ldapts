@@ -31,7 +31,7 @@ export class BindRequest extends Message {
     this.mechanism = options.mechanism;
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     writer.writeInt(this.version);
     writer.writeString(this.dn);
     if (this.mechanism) {
@@ -49,7 +49,7 @@ export class BindRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.version = reader.readInt();
     this.dn = reader.readString();
 

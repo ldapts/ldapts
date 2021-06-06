@@ -22,22 +22,22 @@ export class ApproximateFilter extends Filter {
     this.value = options.value || '';
   }
 
-  public parseFilter(reader: BerReader): void {
+  public override parseFilter(reader: BerReader): void {
     this.attribute = (reader.readString() || '').toLowerCase();
     this.value = reader.readString();
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     writer.writeString(this.attribute);
     writer.writeString(this.value);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public matches(_: { [index: string]: string } = {}, __: boolean): void {
+  public override matches(_: { [index: string]: string } = {}, __: boolean): void {
     throw new Error('Approximate match implementation unknown');
   }
 
-  public toString(): string {
+  public override toString(): string {
     return `(${this.escape(this.attribute)}~=${this.escape(this.value)})`;
   }
 }

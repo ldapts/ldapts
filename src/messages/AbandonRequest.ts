@@ -23,7 +23,7 @@ export class AbandonRequest extends Message {
   }
 
   /* eslint-disable no-bitwise */
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     // Encode abandon request using different ASN.1 integer logic
     let i = this.abandonId;
     let intSize = 4;
@@ -43,7 +43,7 @@ export class AbandonRequest extends Message {
     }
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     const { length } = reader;
     if (length) {
       // Abandon request messages are encoded using different ASN.1 integer logic, forcing custom decoding logic

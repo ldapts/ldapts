@@ -49,7 +49,7 @@ export class SearchRequest extends Message {
     this.explicitBufferAttributes = options.explicitBufferAttributes ?? [];
   }
 
-  public writeMessage(writer: BerWriter): void {
+  public override writeMessage(writer: BerWriter): void {
     writer.writeString(this.baseDN);
 
     switch (this.scope) {
@@ -105,7 +105,7 @@ export class SearchRequest extends Message {
     writer.endSequence();
   }
 
-  public parseMessage(reader: BerReader): void {
+  public override parseMessage(reader: BerReader): void {
     this.baseDN = reader.readString();
     const scope = reader.readEnumeration();
     switch (scope) {

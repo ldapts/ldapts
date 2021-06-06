@@ -18,13 +18,13 @@ export class OrFilter extends Filter {
     this.filters = options.filters;
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     for (const filter of this.filters) {
       filter.write(writer);
     }
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
     if (!this.filters.length) {
       // per RFC4526
       return true;
@@ -39,7 +39,7 @@ export class OrFilter extends Filter {
     return false;
   }
 
-  public toString(): string {
+  public override toString(): string {
     let result = '(|';
     for (const filter of this.filters) {
       result += filter.toString();

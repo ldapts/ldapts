@@ -23,7 +23,7 @@ export class EqualityFilter extends Filter {
     this.value = options.value || '';
   }
 
-  public parseFilter(reader: BerReader): void {
+  public override parseFilter(reader: BerReader): void {
     this.attribute = (reader.readString() || '').toLowerCase();
     this.value = reader.readString();
 
@@ -32,12 +32,12 @@ export class EqualityFilter extends Filter {
     }
   }
 
-  public writeFilter(writer: BerWriter): void {
+  public override writeFilter(writer: BerWriter): void {
     writer.writeString(this.attribute);
     writer.writeString(this.value);
   }
 
-  public matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {
@@ -51,7 +51,7 @@ export class EqualityFilter extends Filter {
     return false;
   }
 
-  public toString(): string {
+  public override toString(): string {
     return `(${this.escape(this.attribute)}=${this.escape(this.value)})`;
   }
 }

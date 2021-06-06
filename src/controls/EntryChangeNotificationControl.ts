@@ -25,7 +25,7 @@ export class EntryChangeNotificationControl extends Control {
     this.value = options.value;
   }
 
-  public parseControl(reader: BerReader): void {
+  public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const changeType = reader.readInt();
       let previousDN;
@@ -44,7 +44,7 @@ export class EntryChangeNotificationControl extends Control {
     }
   }
 
-  public writeControl(writer: BerWriter): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.value) {
       return;
     }
