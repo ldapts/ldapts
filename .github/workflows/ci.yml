@@ -8,6 +8,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      openldap-sasl:
+        image: ldapts/openldap
+        ports:
+          - 1389:1389
+          - 1636:1636
+
     strategy:
       matrix:
         node-version: [12.x, 14.x, 16.x]

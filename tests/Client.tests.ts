@@ -1,3 +1,6 @@
+import { promises as fs } from 'fs';
+import * as path from 'path';
+
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
@@ -734,5 +737,34 @@ describe('Client', () => {
         ex.message.should.equal('Should not specify PagedResultsControl');
       }
     });
+  });
+
+  // NOTE: Start the docker image using utils/start.sh or with:
+  // docker run -p 1636:1636 -p 1389:1389 ldapts/openldap
+  describe('openldap', () => {
+    let ca: Buffer;
+    before(async () => {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
+      ca = await fs.readFile(path.join(__dirname, './utils/certs/ca.crt.pem'));
+    });
+
+    it('should succeed on basic bind', async () => {
+      // ldapsearch -x -b "dc=example,dc=org" -H ldaps://localhost:1636/ -D "cn=admin,dc=example,dc=org" -w adminpassword -LLL -Z
+      const client = new Client({
+        url: 'ldaps://localhost:1636',
+        tlsOptions: {
+          ca,
+        },
+      });
+
+      await client.bind('cn=admin,dc=example,dc=org', 'adminpassword');
+
+      try {
+        await client.unbind();
+      } catch {
+        // This can fail since it's not the part being tested
+      }
+    });
+    // TODO: Add test(s) for sasl
   });
 });
