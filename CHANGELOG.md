@@ -1,3 +1,6 @@
+### 3.0.4
+  * Fix relative path in source maps. Fixes #102. Thanks @stevenhair!
+
 ### 3.0.3
   * Update npms
 
