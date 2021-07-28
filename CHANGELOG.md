@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.0.5
+
+- Add documentation for `explicitBufferAttributes`
+- Format and lint markdown files
+
 ## 3.0.4
 
 - Fix relative path in source maps. Fixes #102. Thanks @stevenhair!
