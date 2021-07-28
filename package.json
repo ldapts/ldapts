@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc",
     "test": "mocha \"tests/**/*.tests.ts\"",
-    "lint": "eslint --fix --ext .ts src tests",
+    "lint:markdown": "prettier --write '*.md' '!(node_modules|dist)/**/*.md' && markdownlint '*.md' '!(node_modules|dist)/**/*.md' --config=.github/linters/.markdown-lint.yml --fix",
+    "lint:code": "eslint --fix --ext .ts src tests",
+    "lint": "run-p lint:*",
     "lint-staged": "lint-staged",
     "dist": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp package-lock.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish; fi",
     "prepublishOnly": "if [ -d \"src\" ]; then echo \"Please use: npm run dist\" && exit 125; fi && pinst --disable",
@@ -15,6 +17,9 @@
     "postpublish": "pinst --enable"
   },
   "lint-staged": {
+    "*.md": [
+      "markdownlint --config=.github/linters/.markdown-lint.yml --fix"
+    ],
     "*.js": [
       "eslint --fix"
     ],
@@ -71,7 +76,9 @@
     "eslint-plugin-security": "~1.4.0",
     "husky": "~7.0.1",
     "lint-staged": "~11.0.1",
+    "markdownlint-cli": "~0.28.1",
     "mocha": "~9.0.2",
+    "npm-run-all": "~4.1.5",
     "pinst": "~2.1.6",
     "prettier": "~2.3.2",
     "sinon": "~11.1.1",

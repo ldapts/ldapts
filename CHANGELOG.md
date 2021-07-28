@@ -1,235 +1,273 @@
-### 3.0.4
-  * Fix relative path in source maps. Fixes #102. Thanks @stevenhair!
+# Change Log
 
-### 3.0.3
-  * Update npms
+## 3.0.4
 
-### 3.0.2
-  * Update npms
+- Fix relative path in source maps. Fixes #102. Thanks @stevenhair!
 
-### 3.0.1
-  * Fix "Unhandled promise rejection" when calling modify without password. Fix #88. Thanks @ctaschereau!
-  * Enable typescript lint checks: [`noPropertyAccessFromIndexSignature`](https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature) and [`noImplicitOverride`](https://www.typescriptlang.org/tsconfig#noImplicitOverride)
-  * Update npms
-
-### 3.0.0
-  * Drop Node.js 10 support
-  * Add Node.js v16 to CI tests
-  * Update npms
-  * Allow `timeLimit: 0` in search options. Fix #97. Thanks @liudonghua123!
-
-### 2.12.0
-  * Export error classes. Fix #93
-  * Redact password field from debug logging during send(). Fix #94
-  * Update npms
-  * Enable package-lock.json to speed up CI builds
-
-### 2.11.1
-  * Update npms
-
-### 2.11.0
-  * Update npms
-  * Sort union/intersection members
-  * Revert remove sequence identifier for SASL authentication
-
-### 2.10.1
-  * Update npms
-  * Fix documentation for SASL authentication
-  * Remove sequence identifier for SASL authentication
-
-### 2.10.0
-  * Add support for PLAIN and EXTERNAL SASL authentication to bind request
-
-### 2.9.1
-  * Simplify control import directives
-
-### 2.9.0
-  * Update npms
-  * Improve Control usability and provide example test for search with a custom Control. Fix #91
-
-### 2.8.1
-  * Fix null/undefined values for attributes when calling add(). Fix #88
-
-### 2.8.0
-  * Fix modifyDN to ignore escaped commas when determining NewSuperior. PR #87 Thanks @hasegawa-jun!
-  * Add tests for modifyDN
-  * Update npms
-  * Format code with prettier
+## 3.0.3
 
-### 2.7.0
-  * Support NewSuperior with modifyDN. PR #84 Thanks @IsraelFrid!
-  * Update npms
+- Update npms
 
-### 2.6.1
-  * Added documentation for `explicitBufferAttributes` attribute
+## 3.0.2
 
-### 2.6.0
-  * Update npms
-  * Expose parsedBuffers on Attribute and added `explicitBufferAttributes` to search options. Fix #72 and Fix #82
+- Update npms
 
-### 2.5.1
-  * Update npms
+## 3.0.1
 
-### 2.5.0
-  * Update @types/node npm to latest version. Fix #73
-  * Add mocharc file
+- Fix "Unhandled promise rejection" when calling modify without password. Fix #88. Thanks @ctaschereau!
+- Enable typescript lint checks: [`noPropertyAccessFromIndexSignature`](https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature) and [`noImplicitOverride`](https://www.typescriptlang.org/tsconfig#noImplicitOverride)
+- Update npms
 
-### 2.4.0
-  * Add Buffer as value type for client.exop(). Fixes #74
+## 3.0.0
 
-### 2.3.0
-  * Update npms
-  * Update Typescript to v3.9
+- Drop Node.js 10 support
+- Add Node.js v16 to CI tests
+- Update npms
+- Allow `timeLimit: 0` in search options. Fix #97. Thanks @liudonghua123!
 
-### 2.2.1
-  * Update npms
+## 2.12.0
 
-### 2.2.0
-  * Support `startTLS` for upgrading an existing connection to be encrypted. Fix #71
-  * Fix type of `tlsOptions` to `tls.ConnectionOptions` in `Client` constructor options
-  * Fix sending exop with empty/undefined value
-  * Add `.id` to internal socket to allow cleanup when unbinding after startTLS
+- Export error classes. Fix #93
+- Redact password field from debug logging during send(). Fix #94
+- Update npms
+- Enable package-lock.json to speed up CI builds
 
-### 2.1.0
-  * Use secure connection if `tlsOptions` is specified or if url starts with `ldaps:` when constructing a client. Fix #71
+## 2.11.1
 
-### 2.0.3
-  * Update npms
-  * Make typescript lint rules more strict
+- Update npms
 
-### 2.0.2
-  * Ignore case when determining if attribute is binary. Fix #11
+## 2.11.0
 
-### 2.0.1
-  * Documentation updates
+- Update npms
+- Sort union/intersection members
+- Revert remove sequence identifier for SASL authentication
 
-### 2.0.0
-  * Drop support for nodejs v8
-  * Update to Typescript 3.7
-  * Fix exop response overwriting status and error message. Fixes #52
-  * Update npms
-  * Improve documentation. Lots of :heart: for ldapjs docs, [ldapwiki](https://ldapwiki.com/), and [ldap.com](https://ldap.com/ldapv3-wire-protocol-reference/) docs. Fix #31
+## 2.10.1
 
-### 1.10.0
-  * Include original error message with exceptions. Fix #36
-  * Include all requested attributes with search results. Fix #22
-  * Add isConnected to Client. Fix #25
-  * Try to fix socket ending and reference handling issues. Thanks @december1981! Fix #24
-  * Update npms
+- Update npms
+- Fix documentation for SASL authentication
+- Remove sequence identifier for SASL authentication
 
-### 1.9.0
-  * Export Change and Attribute classes. Thanks @willmcenaney!
-  * Parse search filter before sending partial request. Thanks @markhatchell!
+## 2.10.0
 
-### 1.8.0
-  * Remove "dist" folder from published npm
-  * Include type definitions as "dependencies" instead of "devDependencies"
-  * Update npms
+- Add support for PLAIN and EXTERNAL SASL authentication to bind request
 
-### 1.7.0
-  * Add DN class as alternate option for specifying DNs. Thanks @adrianplavka!
-  * Update npms
+## 2.9.1
 
-### 1.6.0
-  * Fix incorrectly escaping search filter names/values. Fix #18
+- Simplify control import directives
 
-### 1.5.1
-  * Do not throw "Size limit exceeded" error if `sizeLimit` is defined and the server responds with `4` (Size limit exceeded).
-     - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded).
+## 2.9.0
 
-       I'm not really sure what to do in that case. At this time, I decided against throwing an error and instead
-       just returning the results returned thus far. That approach works with JumpCloud and forumsys' ldap servers
+- Update npms
+- Improve Control usability and provide example test for search with a custom Control. Fix #91
 
-### 1.5.0
-  * Update dependencies
-  * Only include PagedResultsControl if `searchOptions.paged` is specified. Fixes #17
-  * Make Filter.escape() public. Thanks @stiller-leser!
-  * Fix FilterParser parsing of ExtensibleFilters to include attribute type. Hopefully fixes #16
+## 2.8.1
 
-### 1.4.2
+- Fix null/undefined values for attributes when calling add(). Fix #88
 
-  * Update dependencies
-  * Add documentation for search options
+## 2.8.0
 
-### 1.4.1
+- Fix modifyDN to ignore escaped commas when determining NewSuperior. PR #87 Thanks @hasegawa-jun!
+- Add tests for modifyDN
+- Update npms
+- Format code with prettier
 
-  * Fix 'Socket connection not established' when server closes the connection (Fix #13). Thanks @trevh3!
+## 2.7.0
 
-### 1.4.0
+- Support NewSuperior with modifyDN. PR #84 Thanks @IsraelFrid!
+- Update npms
 
-  * Support binary attribute values (Fix #11)
+## 2.6.1
 
-### 1.3.0
+- Added documentation for `explicitBufferAttributes` attribute
 
-  * Add Entry interface for SearchEntry. Thanks @hikaru7719!
+## 2.6.0
 
-### 1.2.3
+- Update npms
+- Expose parsedBuffers on Attribute and added `explicitBufferAttributes` to search options. Fix #72 and Fix #82
 
-  * Move asn1 type definitions to DefinitelyTyped
+## 2.5.1
 
-### 1.2.2
+- Update npms
 
-  * Fix error message for InvalidCredentialsError
+## 2.5.0
 
-### 1.2.1
+- Update @types/node npm to latest version. Fix #73
+- Add mocharc file
 
-  * Provide exports for public classes: errors, filters, and messages (Fix #4)
+## 2.4.0
 
-### 1.2.0
+- Add Buffer as value type for client.exop(). Fixes #74
 
-  * Fix escaping filter attribute names and values
+## 2.3.0
 
-### 1.1.4
+- Update npms
+- Update Typescript to v3.9
 
-  * Fix Add and Modify to handle the response from the server. Thanks @adrianplavka!
+## 2.2.1
 
-### 1.1.3
+- Update npms
 
-  * Update dev dependencies
+## 2.2.0
 
-### 1.1.2
+- Support `startTLS` for upgrading an existing connection to be encrypted. Fix #71
+- Fix type of `tlsOptions` to `tls.ConnectionOptions` in `Client` constructor options
+- Fix sending exop with empty/undefined value
+- Add `.id` to internal socket to allow cleanup when unbinding after startTLS
 
-  * Fix ECONNRESET issue connecting to non-secure endpoint
-  * Throw an error for each message on socket error
+## 2.1.0
 
-### 1.1.1
+- Use secure connection if `tlsOptions` is specified or if url starts with `ldaps:` when constructing a client. Fix #71
 
-  * Add original string to error message when parsing filters
-  * Adjust parsing & and | in filters
-  * Add more filter parsing tests
+## 2.0.3
 
-### 1.1.0
+- Update npms
+- Make typescript lint rules more strict
 
-  * Add client.add() and client.modify()
+## 2.0.2
 
-### 1.0.6
+- Ignore case when determining if attribute is binary. Fix #11
 
-  * Use hex for message type code in closed message error message
-  * Add additional test for calling unbind() multiple times
+## 2.0.1
 
-### 1.0.5
+- Documentation updates
 
-  * Add message name to error message when socket is closed before message response
+## 2.0.0
 
-### 1.0.4
+- Drop support for nodejs v8
+- Update to Typescript 3.7
+- Fix exop response overwriting status and error message. Fixes #52
+- Update npms
+- Improve documentation. Lots of :heart: for ldapjs docs, [ldapwiki](https://ldapwiki.com/), and [ldap.com](https://ldap.com/ldapv3-wire-protocol-reference/) docs. Fix #31
 
-  * Add type definitions for asn1
-  * Add message type id to error when cleaning pending messages.
-  * Force protocolOperation to be defined for Message types
+## 1.10.0
 
-### 1.0.3
+- Include original error message with exceptions. Fix #36
+- Include all requested attributes with search results. Fix #22
+- Add isConnected to Client. Fix #25
+- Try to fix socket ending and reference handling issues. Thanks @december1981! Fix #24
+- Update npms
 
-  * Verify the socket exists before sending unbind message
+## 1.9.0
 
-### 1.0.2
+- Export Change and Attribute classes. Thanks @willmcenaney!
+- Parse search filter before sending partial request. Thanks @markhatchell!
 
-  * Setup prepublish to always build.
-  * Push fix from 1.0.1
+## 1.8.0
 
-### 1.0.1
+- Remove "dist" folder from published npm
+- Include type definitions as "dependencies" instead of "devDependencies"
+- Update npms
 
-  * Fix search to return attribute values by default
+## 1.7.0
 
-### 1.0.0
+- Add DN class as alternate option for specifying DNs. Thanks @adrianplavka!
+- Update npms
 
-  * Initial release
+## 1.6.0
+
+- Fix incorrectly escaping search filter names/values. Fix #18
+
+## 1.5.1
+
+- Do not throw "Size limit exceeded" error if `sizeLimit` is defined and the server responds with `4` (Size limit exceeded).
+
+  - Note: It seems that items are returned even though the return status is `4` (Size limit exceeded).
+
+    I'm not really sure what to do in that case. At this time, I decided against throwing an error and instead
+    just returning the results returned thus far. That approach works with JumpCloud and forumsys' ldap servers
+
+## 1.5.0
+
+- Update dependencies
+- Only include PagedResultsControl if `searchOptions.paged` is specified. Fixes #17
+- Make Filter.escape() public. Thanks @stiller-leser!
+- Fix FilterParser parsing of ExtensibleFilters to include attribute type. Hopefully fixes #16
+
+## 1.4.2
+
+- Update dependencies
+- Add documentation for search options
+
+## 1.4.1
+
+- Fix 'Socket connection not established' when server closes the connection (Fix #13). Thanks @trevh3!
+
+## 1.4.0
+
+- Support binary attribute values (Fix #11)
+
+## 1.3.0
+
+- Add Entry interface for SearchEntry. Thanks @hikaru7719!
+
+## 1.2.3
+
+- Move asn1 type definitions to DefinitelyTyped
+
+## 1.2.2
+
+- Fix error message for InvalidCredentialsError
+
+## 1.2.1
+
+- Provide exports for public classes: errors, filters, and messages (Fix #4)
+
+## 1.2.0
+
+- Fix escaping filter attribute names and values
+
+## 1.1.4
+
+- Fix Add and Modify to handle the response from the server. Thanks @adrianplavka!
+
+## 1.1.3
+
+- Update dev dependencies
+
+## 1.1.2
+
+- Fix ECONNRESET issue connecting to non-secure endpoint
+- Throw an error for each message on socket error
+
+## 1.1.1
+
+- Add original string to error message when parsing filters
+- Adjust parsing & and | in filters
+- Add more filter parsing tests
+
+## 1.1.0
+
+- Add client.add() and client.modify()
+
+## 1.0.6
+
+- Use hex for message type code in closed message error message
+- Add additional test for calling unbind() multiple times
+
+## 1.0.5
+
+- Add message name to error message when socket is closed before message response
+
+## 1.0.4
+
+- Add type definitions for asn1
+- Add message type id to error when cleaning pending messages.
+- Force protocolOperation to be defined for Message types
+
+## 1.0.3
+
+- Verify the socket exists before sending unbind message
+
+## 1.0.2
+
+- Setup prepublish to always build.
+- Push fix from 1.0.1
+
+## 1.0.1
+
+- Fix search to return attribute values by default
+
+## 1.0.0
+
+- Initial release
