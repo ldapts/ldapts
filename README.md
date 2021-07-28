@@ -22,6 +22,7 @@ LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
   * [modifyDN](#modifydn)
   * [search](#search)
     * [Filter Strings](#filter-strings)
+    * [Return buffer for specific attribute](#return-buffer-for-specific-attribute)
   * [unbind](#unbind)
 * [Usage Examples](#usage-examples)
   * [Authenticate example](#authenticate-example)
@@ -33,7 +34,7 @@ LDAP client based on [LDAPjs](https://github.com/joyent/node-ldapjs).
 
 The code to create a new client looks like:
 
-```javascript
+```ts
 import { Client } from 'ldapts';
 
 const client = new Client({
@@ -97,16 +98,20 @@ Arguments:
 
 Simple Example:
 
-    await client.bind('cn=root', 'secret');
+```ts
+await client.bind('cn=root', 'secret');
+```
 
 SASL Example:
 
-    // No credentials
-    await client.bind("EXTERNAL");
+```ts
+// No credentials
+await client.bind("EXTERNAL");
 
-    // With credentials
-    const credentials = '...foo...';
-    await client.bind("PLAIN", credentials);
+// With credentials
+const credentials = '...foo...';
+await client.bind("PLAIN", credentials);
+```
 
 ## startTLS
 `startTLS(options, [controls])`
@@ -123,10 +128,11 @@ Arguments:
 
 Example:
 
-    await client.startTLS({
-      ca: [fs.readFileSync('mycacert.pem')],
-    });
-
+```ts
+await client.startTLS({
+  ca: [fs.readFileSync('mycacert.pem')],
+});
+```
 ## add
 `add(dn, entry, [controls])`
 
@@ -145,13 +151,15 @@ Arguments:
 
 Example:
 
-    var entry = {
-      cn: 'foo',
-      sn: 'bar',
-      email: ['foo@bar.com', 'foo1@bar.com'],
-      objectclass: 'fooPerson'
-    };
-    await client.add('cn=foo, o=example', entry);
+```ts
+var entry = {
+  cn: 'foo',
+  sn: 'bar',
+  email: ['foo@bar.com', 'foo1@bar.com'],
+  objectclass: 'fooPerson'
+};
+await client.add('cn=foo, o=example', entry);
+```
 
 ## compare
 `compare(dn, attribute, value, [controls])`
@@ -173,7 +181,9 @@ Returns:
 
 Example:
 
-    const hasValue = await client.compare('cn=foo, o=example', 'sn', 'bar');
+```ts
+const hasValue = await client.compare('cn=foo, o=example', 'sn', 'bar');
+```
 
 ## del
 `del(dn, [controls])`
@@ -189,7 +199,9 @@ Arguments:
 
 Example:
 
-    await client.del('cn=foo, o=example');
+```ts
+await client.del('cn=foo, o=example');
+```
 
 ## exop
 `exop(oid, [value], [controls])`
@@ -207,7 +219,9 @@ Arguments:
 
 Example (performs an LDAP 'whois' extended op):
 
-    const { value } = await client.exop('1.3.6.1.4.1.4203.1.11.3');
+```ts
+const { value } = await client.exop('1.3.6.1.4.1.4203.1.11.3');
+```
 
 ## modify
 `modify(name, changes, [controls])`
@@ -227,29 +241,32 @@ Arguments:
 
 Example (update multiple attributes):
 
-    import { Attribute, Change } from 'ldapts';
+```ts
+import { Attribute, Change } from 'ldapts';
 
-    await client.modify('cn=foo, o=example', [
-      new Change({ operation: 'replace', modification: new Attribute({ type: 'title', values: ['web tester'] })),
-      new Change({ operation: 'replace', modification: new Attribute({ type: 'displayName', values: ['John W Doe'] })),
-    ]);
-
+await client.modify('cn=foo, o=example', [
+  new Change({ operation: 'replace', modification: new Attribute({ type: 'title', values: ['web tester'] })}),
+  new Change({ operation: 'replace', modification: new Attribute({ type: 'displayName', values: ['John W Doe'] })}),
+]);
+```
 
 Example (update binary attribute):
 
-    import { Attribute, Change } from 'ldapts';
+```ts
+import { Attribute, Change } from 'ldapts';
 
-    const thumbnailPhotoBuffer = await fs.readFile(path.join(__dirname, './groot_100.jpg'));
+const thumbnailPhotoBuffer = await fs.readFile(path.join(__dirname, './groot_100.jpg'));
 
-    var change = new Change({
-      operation: 'replace',
-      modification: new Attribute({
-        type: 'thumbnailPhoto;binary',
-        values: [thumbnailPhotoBuffer]
-      }),
-    });
+var change = new Change({
+  operation: 'replace',
+  modification: new Attribute({
+    type: 'thumbnailPhoto;binary',
+    values: [thumbnailPhotoBuffer]
+  }),
+});
 
-    await client.modify('cn=foo, o=example', change);
+await client.modify('cn=foo, o=example', change);
+```
 
 ### Change
 `Change({ operation, modification })`
@@ -295,7 +312,9 @@ Arguments:
 
 Example:
 
-    await client.modifyDN('cn=foo, o=example', 'cn=bar');
+```ts
+await client.modifyDN('cn=foo, o=example', 'cn=bar');
+```
 
 ## search
 `search(baseDN, options, [controls])`
@@ -328,16 +347,16 @@ Options:
 |[explicitBufferAttributes=] (string[])         |List of explicit attribute names to return as Buffer objects
 
 
-
 Example:
 
-    const {
-      searchEntries,
-      searchReferences,
-    } = await client.search(searchDN, {
-      filter: '(mail=peter.parker@marvel.com)',
-    });
-
+```ts
+const {
+  searchEntries,
+  searchReferences,
+} = await client.search(searchDN, {
+  filter: '(mail=peter.parker@marvel.com)',
+});
+```
 Please see [Client tests](https://github.com/ldapts/ldapts/blob/master/tests/Client.tests.ts) for more search examples
 
 ### Filter Strings
@@ -375,6 +394,31 @@ The `not` character is represented as a `!`, the `or` as a single pipe `|`.
 It gets a little bit complicated, but it's actually quite powerful, and lets you
 find almost anything you're looking for.
 
+### Return buffer for specific attribute
+
+Sometimes you may want to get a buffer back instead of a string for an attribute value. Depending on the server software,
+you may be able to append `;binary` (the [binary attribute subtype](https://docs.oracle.com/cd/E19424-01/820-4809/bcacz/index.html)) to the attribute name, to have the value returned as a Buffer.
+
+```ts
+const searchResults = await ldapClient.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+  filter: '(mail=peter.parker@marvel.com)',
+	attributes: [
+		'jpegPhoto;binary',
+	],
+});
+```
+
+However, some servers are very strict when it comes to the binary attribute subtype and will only acknowledge it if
+there is an associated AN.1 type or valid BER encoding. In those cases, you can tell ldapts to explicitly return a
+Buffer for an attribute:
+
+```ts
+const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+  filter: '(mail=peter.parker@marvel.com)',
+  explicitBufferAttributes: ['jpegPhoto'],
+});
+```
+
 ## unbind
 `unbind()`
 
@@ -382,15 +426,16 @@ Used to indicate that the client wants to close the connection to the directory 
 
 Example:
 
-    await client.unbind();
-
+```ts
+await client.unbind();
+```
 
 
 # Usage Examples
 
 ## Authenticate example
 
-```javascript
+```ts
 const { Client } = require('ldapts');
 
 const url = 'ldap://ldap.forumsys.com:389';
@@ -410,12 +455,11 @@ try {
 } finally {
   await client.unbind();
 }
-
 ```
 
 ## Search example
 
-```javascript
+```ts
 const { Client } = require('ldapts');
 
 const url = 'ldaps://ldap.jumpcloud.com';
@@ -445,12 +489,11 @@ try {
 } finally {
   await client.unbind();
 }
-
 ```
 
 ## Delete Active Directory entry example
 
-```javascript
+```ts
 const { Client } = require('ldapts');
 
 const url = 'ldap://127.0.0.1:1389';
@@ -467,7 +510,7 @@ try {
 
   await client.del(dnToDelete);
 } catch (ex) {
-  if (ex typeof InvalidCredentialsError) {
+  if (ex instanceof InvalidCredentialsError) {
     // Handle authentication specifically
   }
 
@@ -475,5 +518,4 @@ try {
 } finally {
   await client.unbind();
 }
-
 ```
