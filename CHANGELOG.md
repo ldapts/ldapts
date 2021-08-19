@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.6
+
+- Update npms
+
 ## 3.0.5
 
 - Add documentation for `explicitBufferAttributes`
