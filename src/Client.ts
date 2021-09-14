@@ -360,6 +360,7 @@ export class Client {
     });
 
     const response = await this._send<CompareResponse>(req);
+
     switch (response.status) {
       case CompareResult.compareTrue:
         return true;
@@ -692,6 +693,7 @@ export class Client {
           this._onConnect(resolve);
         });
       }
+
       this.socket.once('error', (err: Error) => {
         if (this.connectTimer) {
           clearTimeout(this.connectTimer);
@@ -719,6 +721,7 @@ export class Client {
     if (this.connectTimer) {
       clearTimeout(this.connectTimer);
     }
+
     // Clear out event listeners from _connect()
     if (this.socket) {
       this.socket.removeAllListeners('error');
@@ -843,9 +846,11 @@ export class Client {
     let messageResolve: (messageResponse?: MessageResponse) => void = () => {
       // Ignore this as a NOOP
     };
+
     let messageReject: (err: Error) => void = () => {
       // Ignore this as a NOOP
     };
+
     const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore

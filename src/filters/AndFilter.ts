@@ -44,6 +44,7 @@ export class AndFilter extends Filter {
     for (const filter of this.filters) {
       result += filter.toString();
     }
+
     result += ')';
 
     return result;

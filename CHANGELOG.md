@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.7 - 2020-09-14
+
+- Update npms
+
 ## 3.0.6
 
 - Update npms

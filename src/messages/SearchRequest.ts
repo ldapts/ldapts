@@ -108,6 +108,7 @@ export class SearchRequest extends Message {
   public override parseMessage(reader: BerReader): void {
     this.baseDN = reader.readString();
     const scope = reader.readEnumeration();
+
     switch (scope) {
       case 0:
         this.scope = 'base';
@@ -126,6 +127,7 @@ export class SearchRequest extends Message {
     }
 
     const derefAliases = reader.readEnumeration();
+
     switch (scope) {
       case 0:
         this.derefAliases = 'never';

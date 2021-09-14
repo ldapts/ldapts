@@ -38,6 +38,7 @@ export abstract class Message {
       for (const control of this.controls) {
         control.write(writer);
       }
+
       writer.endSequence();
     }
 

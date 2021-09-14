@@ -30,10 +30,11 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
 
     const reader = new BerReader(this.buffer);
     let foundSequence: number | null = null;
+
     try {
       foundSequence = reader.readSequence();
     } catch (ex) {
-      this.emit('error', ex);
+      this.emit('error', ex as Error);
     }
 
     if (!foundSequence || reader.remain < reader.length) {
@@ -54,6 +55,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
 
     let messageId: number | undefined;
     let protocolOperation: ProtocolOperation | undefined;
+
     try {
       messageId = reader.readInt();
       protocolOperation = reader.readSequence() as ProtocolOperation;
@@ -75,7 +77,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
         return;
       }
 
-      this.emit('error', ex);
+      this.emit('error', ex as Error);
       return;
     }
 
@@ -86,6 +88,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
 
   private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperation, reader: BerReader): MessageResponse {
     let message: MessageResponse;
+
     switch (protocolOperation) {
       case ProtocolOperation.LDAP_RES_BIND:
         message = new BindResponse({

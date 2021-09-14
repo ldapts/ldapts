@@ -1,3 +1,5 @@
+import assert from 'assert';
+
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
@@ -29,6 +31,7 @@ describe('Client', () => {
   const bindDN = new DN({
     uid: 'tony.stark',
     ou: 'Users',
+    // eslint-disable-next-line id-length
     o: '5be4c382c583e54de6a3ff52',
     dc: ['jumpcloud', 'com'],
   }).toString();
@@ -361,8 +364,13 @@ describe('Client', () => {
         await client.exop('1.2.840.113556.1.4.1781');
         false.should.equal(true);
       } catch (ex) {
-        ex.message.should.equal('unsupported extended operation Code: 0x2');
+        if (ex instanceof Error) {
+          ex.message.should.equal('unsupported extended operation Code: 0x2');
+        } else {
+          assert.fail('Exception was not of type Error');
+        }
       }
+
       await client.bind(bindDN, bindPassword);
       await client.unbind();
     });
@@ -399,7 +407,11 @@ describe('Client', () => {
         await searchRequest;
         false.should.equal(true);
       } catch (ex) {
-        ex.message.should.equal('Connection closed before message response was received. Message type: SearchRequest (0x63)');
+        if (ex instanceof Error) {
+          ex.message.should.equal('Connection closed before message response was received. Message type: SearchRequest (0x63)');
+        } else {
+          assert.fail('Exception was not of type Error');
+        }
       } finally {
         await testClient.unbind();
       }
@@ -506,6 +518,7 @@ describe('Client', () => {
       });
 
       await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+
       try {
         const searchResult = await testClient.search('dc=example,dc=com', {
           filter: '(uid=einstein)',
@@ -523,8 +536,7 @@ describe('Client', () => {
           },
         ]);
       } catch (ex) {
-        // Shouldn't get here
-        ex.should.equal(false);
+        assert.fail('This should not occur');
       } finally {
         await testClient.unbind();
       }
@@ -613,6 +625,7 @@ describe('Client', () => {
       });
 
       await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+
       try {
         const searchResult = await testClient.search('dc=example,dc=com', {
           filter: 'cn=*',
@@ -621,8 +634,7 @@ describe('Client', () => {
 
         searchResult.searchEntries.length.should.equal(3);
       } catch (ex) {
-        // Shouldn't get here
-        ex.should.equal(false);
+        assert.fail('This should not occur');
       } finally {
         await testClient.unbind();
       }
@@ -646,6 +658,7 @@ describe('Client', () => {
       });
 
       await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+
       try {
         const searchResult = await testClient.search('dc=example,dc=com', {
           filter: 'cn=*',
@@ -657,8 +670,7 @@ describe('Client', () => {
 
         searchResult.searchEntries.length.should.equal(4);
       } catch (ex) {
-        // Shouldn't get here
-        ex.should.equal(false);
+        assert.fail('This should not occur');
       } finally {
         await testClient.unbind();
       }
@@ -718,20 +730,30 @@ describe('Client', () => {
     });
     it('should throw if a PagedResultsControl is specified', async () => {
       const pagedResultsControl = new PagedResultsControl({});
+
       try {
         await client.search('cn=test', {}, pagedResultsControl);
         true.should.equal(false);
       } catch (ex) {
-        ex.message.should.equal('Should not specify PagedResultsControl');
+        if (ex instanceof Error) {
+          ex.message.should.equal('Should not specify PagedResultsControl');
+        } else {
+          assert.fail('Exception was not of type Error');
+        }
       }
     });
     it('should throw if a PagedResultsControl is specified in the controls array', async () => {
       const pagedResultsControl = new PagedResultsControl({});
+
       try {
         await client.search('cn=test', {}, [pagedResultsControl]);
         true.should.equal(false);
       } catch (ex) {
-        ex.message.should.equal('Should not specify PagedResultsControl');
+        if (ex instanceof Error) {
+          ex.message.should.equal('Should not specify PagedResultsControl');
+        } else {
+          assert.fail('Exception was not of type Error');
+        }
       }
     });
   });

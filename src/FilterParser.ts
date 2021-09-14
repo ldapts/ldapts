@@ -74,6 +74,7 @@ export class FilterParser {
     const type: number | null = reader.readSequence();
 
     let filter: Filter;
+
     switch (type) {
       case SearchFilter.and: {
         const andFilters = FilterParser._parseSet(reader);
@@ -82,6 +83,7 @@ export class FilterParser {
         });
         break;
       }
+
       case SearchFilter.approxMatch:
         filter = new ApproximateFilter();
         filter.parse(reader);
@@ -109,6 +111,7 @@ export class FilterParser {
         });
         break;
       }
+
       case SearchFilter.or: {
         const orFilters = FilterParser._parseSet(reader);
         filter = new OrFilter({
@@ -116,6 +119,7 @@ export class FilterParser {
         });
         break;
       }
+
       case SearchFilter.present:
         filter = new PresenceFilter();
         filter.parse(reader);
@@ -141,6 +145,7 @@ export class FilterParser {
     }
 
     cursor += 1;
+
     switch (filterString[cursor]) {
       case '&': {
         cursor += 1;
@@ -157,6 +162,7 @@ export class FilterParser {
 
         break;
       }
+
       case '|': {
         cursor += 1;
         const children: Filter[] = [];
@@ -172,6 +178,7 @@ export class FilterParser {
 
         break;
       }
+
       case '!': {
         const childResult = FilterParser._parseString(filterString, cursor + 1, fullString);
         filter = new NotFilter({
@@ -181,6 +188,7 @@ export class FilterParser {
 
         break;
       }
+
       default: {
         const end = filterString.indexOf(')', cursor);
         if (end === -1) {
@@ -320,6 +328,7 @@ export class FilterParser {
 
     while (index < end) {
       const char = input[index];
+
       switch (char) {
         case '(':
           throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
@@ -334,6 +343,7 @@ export class FilterParser {
 
           break;
         }
+
         default:
           result += char;
           index += 1;

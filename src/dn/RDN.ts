@@ -59,6 +59,7 @@ export class RDN {
         return false;
       }
     }
+
     return true;
   }
 
@@ -119,6 +120,7 @@ export class RDN {
       if (escaped.test(value[current]) || (!quoted && special.test(value[current]))) {
         str += '\\';
       }
+
       str += value[current];
       current += 1;
     }

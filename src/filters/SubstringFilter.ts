@@ -37,6 +37,7 @@ export class SubstringFilter extends Filter {
 
     while (reader.offset < end) {
       const tag: number | null = reader.peek();
+
       switch (tag) {
         case 0x80:
           this.initial = reader.readString(tag);
@@ -54,11 +55,13 @@ export class SubstringFilter extends Filter {
           this.any.push(anyValue);
           break;
         }
+
         case 0x82:
           this.final = reader.readString(tag);
           if (this.attribute === 'objectclass') {
             this.final = this.final.toLowerCase();
           }
+
           break;
         default: {
           let type = '<null>';

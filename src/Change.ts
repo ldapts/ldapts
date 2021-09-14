@@ -23,6 +23,7 @@ export class Change {
 
   public write(writer: BerWriter): void {
     writer.startSequence();
+
     switch (this.operation) {
       case 'add':
         writer.writeEnumeration(0x00);
@@ -47,6 +48,7 @@ export class Change {
     reader.readSequence();
 
     const operation = reader.readEnumeration();
+
     switch (operation) {
       case 0x00:
         this.operation = 'add';

@@ -29,6 +29,7 @@ export class ControlParser {
     }
 
     let control: Control;
+
     switch (type) {
       case EntryChangeNotificationControl.type:
         control = new EntryChangeNotificationControl({

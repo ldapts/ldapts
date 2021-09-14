@@ -38,6 +38,7 @@ export class ExtensibleFilter extends Filter {
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
       const tag: number | null = reader.peek();
+
       switch (tag) {
         case 0x81:
           this.rule = reader.readString(tag);
