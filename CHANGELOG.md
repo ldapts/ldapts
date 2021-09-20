@@ -1,6 +1,10 @@
 # Change Log
 
-## 3.0.7 - 2020-09-14
+## 3.1.0 - 2021-09-20
+
+- Allow EqualityFilter to accept Buffer as a value
+
+## 3.0.7 - 2021-09-14
 
 - Update npms
 

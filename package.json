@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "3.0.7",
+  "version": "3.1.0",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
