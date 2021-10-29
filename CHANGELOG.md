@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.1.1 - 2021-10-29
+
+- Update npms
+- Format markdown files
+
 ## 3.1.0 - 2021-09-20
 
 - Allow EqualityFilter to accept Buffer as a value

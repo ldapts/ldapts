@@ -233,7 +233,7 @@ export class Client {
 
         resolve(secureSocket);
       });
-      secureSocket.once('error', (err) => {
+      secureSocket.once('error', (err: Error) => {
         secureSocket.removeAllListeners();
         reject(err);
       });
