@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.1.2 - 2021-11-16
+
+- Update npms
+
 ## 3.1.1 - 2021-10-29
 
 - Update npms
