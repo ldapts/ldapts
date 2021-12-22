@@ -95,7 +95,7 @@ export class SubstringFilter extends Filter {
     writer.endSequence();
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {

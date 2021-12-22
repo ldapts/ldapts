@@ -24,7 +24,7 @@ export class OrFilter extends Filter {
     }
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
     if (!this.filters.length) {
       // per RFC4526
       return true;

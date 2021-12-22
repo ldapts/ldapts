@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.0 - 2021-12-21
+
+- Fix SASL authentication. Thanks @wattry!
+- Update npms
+
 ## 3.1.2 - 2021-11-16
 
 - Update npms

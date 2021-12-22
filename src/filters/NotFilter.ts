@@ -22,7 +22,7 @@ export class NotFilter extends Filter {
     this.filter.write(writer);
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase: boolean): boolean {
+  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
     return !this.filter.matches(objectToCheck, strictAttributeCase);
   }
 

@@ -33,7 +33,7 @@ export class ApproximateFilter extends Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override matches(_: { [index: string]: string } = {}, __: boolean): void {
+  public override matches(_: { [index: string]: string } = {}, __?: boolean): void {
     throw new Error('Approximate match implementation unknown');
   }
 

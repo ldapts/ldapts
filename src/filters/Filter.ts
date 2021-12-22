@@ -16,7 +16,7 @@ export abstract class Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public matches(_: { [index: string]: string } = {}, __: boolean): boolean | void {
+  public matches(_: { [index: string]: string } = {}, __?: boolean): boolean | void {
     return true;
   }
 
@@ -77,7 +77,7 @@ export abstract class Filter {
     // Do nothing as the default action
   }
 
-  protected getObjectValue(objectToCheck: { [index: string]: string } = {}, key: string, strictAttributeCase: boolean): string | undefined {
+  protected getObjectValue(objectToCheck: { [index: string]: string }, key: string, strictAttributeCase?: boolean): string | undefined {
     let objectKey;
     if (typeof objectToCheck[key] !== 'undefined') {
       objectKey = key;
