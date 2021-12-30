@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.1 - 2021-12-30
+
+- Update npms
+- Expand type definition version constraints. Fix #108
+
 ## 3.2.0 - 2021-12-21
 
 - Fix SASL authentication. Thanks @wattry!
