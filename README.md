@@ -87,10 +87,6 @@ Look at [PagedResultsControl](src/controls/PagedResultsControl.ts) for an exampl
 
 Performs a bind operation against the LDAP server.
 
-The bind API only allows LDAP 'simple' binds (equivalent to HTTP Basic
-Authentication) for now. Note that all client APIs can optionally take a single `Control` object or array
-of `Control` objects. You probably don't need them though...
-
 Arguments:
 
 | Argument                              | Description                                                                                                     |
