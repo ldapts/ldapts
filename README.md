@@ -83,7 +83,7 @@ Look at [PagedResultsControl](src/controls/PagedResultsControl.ts) for an exampl
 
 ### bind
 
-`bind(dn, password, [controls])`
+`bind(dnOrSaslMechanism, [password], [controls])`
 
 Performs a bind operation against the LDAP server.
 
@@ -92,7 +92,7 @@ Arguments:
 | Argument                              | Description                                                                                                     |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
 | `dnOrSaslMechanism` (string)          | The name (DN) of the directory object that the client wishes to bind as or the SASL mechanism (PLAIN, EXTERNAL) |
-| `[password]` (string)                 | Password for the target bind DN                                                                                 |
+| `[password]` (string)                 | Password for the target bind DN. For SASL this is instead an optional set of encoded SASL credentials.          |
 | `[controls]` (Control&#124;Control[]) | Optional `Control` object or array of `Control` objects                                                         |
 
 Simple Example:
