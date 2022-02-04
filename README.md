@@ -221,7 +221,7 @@ Arguments:
 | `[value]` (string)                    | Optional value - based on the type of operation         |
 | `[controls]` (Control&#124;Control[]) | Optional `Control` object or array of `Control` objects |
 
-Example (performs an LDAP 'whois' extended op):
+Example (performs an LDAP 'whoami' extended op):
 
 ```ts
 const { value } = await client.exop('1.3.6.1.4.1.4203.1.11.3');
