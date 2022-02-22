@@ -1,5 +1,10 @@
 # Change Log
 
+## 3.2.2 - 2022-02-22
+
+- Update npms
+- Update husky to support Apple silicon homebrew package links
+
 ## 3.2.1 - 2021-12-30
 
 - Update npms
