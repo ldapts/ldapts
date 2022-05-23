@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.0.0 - 2022-05-23
+
+- Drop Node.js 12 support
+- Update npms
+
 ## 3.2.4 - 2022-04-13
 
 - Update npms
