@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.1.0 - 2022-06-24
+
+- Remove automatically appending ;binary to attributes. Fix #114
+- Update npms
+
 ## 4.0.0 - 2022-05-23
 
 - Drop Node.js 12 support
