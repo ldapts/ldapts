@@ -26,12 +26,7 @@ export class Attribute {
 
   public write(writer: BerWriter): void {
     writer.startSequence();
-    let { type } = this;
-    const isBinaryType = this._isBinaryType();
-    // If the value is a buffer and the type does not end in ;binary, append it
-    if (!isBinaryType && this.values.length && Buffer.isBuffer(this.values[0])) {
-      type += ';binary';
-    }
+    const { type } = this;
 
     writer.writeString(type);
     writer.startSequence(ProtocolOperation.LBER_SET);
