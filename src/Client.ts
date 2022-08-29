@@ -31,6 +31,7 @@ import {
   SearchEntry,
   AddRequest,
   ModifyRequest,
+  SASL_MECHANISMS,
 } from './messages';
 import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse, SaslMechanism } from './messages';
 import type { Message } from './messages/Message';
@@ -252,35 +253,43 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async bind(dnOrSaslMechanism: DN | SaslMechanism | string, password?: string, controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
-      await this._connect();
-    }
-
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
     }
 
-    let req: BindRequest;
-    if (dnOrSaslMechanism === 'PLAIN' || dnOrSaslMechanism === 'EXTERNAL') {
-      req = new BindRequest({
-        messageId: this._nextMessageId(),
-        mechanism: dnOrSaslMechanism,
-        password,
-        controls,
-      });
-    } else {
-      req = new BindRequest({
-        messageId: this._nextMessageId(),
-        dn: typeof dnOrSaslMechanism === 'string' ? dnOrSaslMechanism : dnOrSaslMechanism.toString(),
-        password,
-        controls,
-      });
+    if (typeof dnOrSaslMechanism === 'string' && SASL_MECHANISMS.includes(dnOrSaslMechanism as SaslMechanism)) {
+      await this.bindSASL(dnOrSaslMechanism, password, controls);
+      return;
     }
 
-    const result = await this._send<BindResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
-      throw StatusCodeParser.parse(result.status, result.errorMessage);
+    const req = new BindRequest({
+      messageId: this._nextMessageId(),
+      dn: typeof dnOrSaslMechanism === 'string' ? dnOrSaslMechanism : dnOrSaslMechanism.toString(),
+      password,
+      controls,
+    });
+    await this._sendBind(req);
+  }
+
+  /**
+   * Performs a sasl authentication against the server.
+   * @param {string|SaslMechanism} mechanism
+   * @param {string|DN} [dn]
+   * @param {string} [password]
+   * @param {Control|Control[]} [controls]
+   */
+  public async bindSASL(mechanism: SaslMechanism | string, password?: string, controls?: Control | Control[]): Promise<void> {
+    if (controls && !Array.isArray(controls)) {
+      controls = [controls];
     }
+
+    const req = new BindRequest({
+      messageId: this._nextMessageId(),
+      mechanism,
+      password,
+      controls,
+    });
+    await this._sendBind(req);
   }
 
   /**
@@ -614,6 +623,17 @@ export class Client {
     });
 
     await this._send(req);
+  }
+
+  private async _sendBind(req: BindRequest): Promise<void> {
+    if (!this.connected) {
+      await this._connect();
+    }
+
+    const result = await this._send<BindResponse>(req);
+    if (result.status !== MessageResponseStatus.Success) {
+      throw StatusCodeParser.parse(result.status, result.errorMessage);
+    }
   }
 
   private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl): Promise<void> {

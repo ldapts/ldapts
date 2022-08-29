@@ -6,12 +6,13 @@ import { ProtocolOperation } from '../ProtocolOperation';
 import type { MessageOptions } from './Message';
 import { Message } from './Message';
 
-export type SaslMechanism = 'EXTERNAL' | 'PLAIN';
+export const SASL_MECHANISMS = ['EXTERNAL', 'PLAIN', 'DIGEST-MD5', 'SCRAM-SHA-1'] as const;
+export type SaslMechanism = typeof SASL_MECHANISMS[number];
 
 export interface BindRequestMessageOptions extends MessageOptions {
   dn?: string;
   password?: string;
-  mechanism?: SaslMechanism;
+  mechanism?: string;
 }
 
 export class BindRequest extends Message {
@@ -21,7 +22,7 @@ export class BindRequest extends Message {
 
   public password: string;
 
-  public mechanism: SaslMechanism | undefined;
+  public mechanism: string | undefined;
 
   public constructor(options: BindRequestMessageOptions) {
     super(options);
