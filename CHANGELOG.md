@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.1.1 - 2022-08-30
+
+- Update npms
+
 ## 4.1.0 - 2022-06-24
 
 - Remove automatically appending ;binary to attributes. Fix #114

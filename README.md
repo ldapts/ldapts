@@ -12,7 +12,7 @@ Providing an API to access LDAP directory servers from Node.js programs.
   - [Create a client](#create-a-client)
   - [Specifying Controls](#specifying-controls)
   - [bind](#bind)
-  - [startTLS](#startTLS)
+  - [startTLS](#starttls)
   - [add](#add)
   - [compare](#compare)
   - [del](#del)
