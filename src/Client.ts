@@ -863,10 +863,12 @@ export class Client {
 
     const messageContentBuffer = message.write();
 
+    // eslint-disable-next-line func-style
     let messageResolve: (messageResponse?: MessageResponse) => void = () => {
       // Ignore this as a NOOP
     };
 
+    // eslint-disable-next-line func-style
     let messageReject: (err: Error) => void = () => {
       // Ignore this as a NOOP
     };
