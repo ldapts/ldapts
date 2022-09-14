@@ -6,12 +6,13 @@ import { ProtocolOperation } from '../ProtocolOperation';
 import type { MessageOptions } from './Message';
 import { Message } from './Message';
 
-export type SaslMechanism = 'EXTERNAL' | 'PLAIN';
+export const SASL_MECHANISMS = ['EXTERNAL', 'PLAIN', 'DIGEST-MD5', 'SCRAM-SHA-1'] as const;
+export type SaslMechanism = typeof SASL_MECHANISMS[number];
 
 export interface BindRequestMessageOptions extends MessageOptions {
   dn?: string;
   password?: string;
-  mechanism?: SaslMechanism;
+  mechanism?: string;
 }
 
 export class BindRequest extends Message {
@@ -19,15 +20,15 @@ export class BindRequest extends Message {
 
   public dn: string;
 
-  public password: string;
+  public password?: string;
 
-  public mechanism: SaslMechanism | undefined;
+  public mechanism: string | undefined;
 
   public constructor(options: BindRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
     this.dn = options.dn || '';
-    this.password = options.password || '';
+    this.password = options.password;
     this.mechanism = options.mechanism;
   }
 
@@ -38,9 +39,10 @@ export class BindRequest extends Message {
       // SASL authentication
       writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
       writer.writeString(this.mechanism);
-      writer.writeString(this.password);
+      if (typeof this.password === 'string') writer.writeString(this.password);
+
       writer.endSequence();
-    } else {
+    } else if (typeof this.password === 'string') {
       // Simple authentication
       writer.writeString(this.password, Ber.Context); // 128
     }

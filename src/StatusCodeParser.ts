@@ -39,87 +39,89 @@ import {
   TLSNotSupportedError,
   SaslBindInProgressError,
 } from './errors/resultCodeErrors';
+import type { BindResponse } from './messages';
+import type { MessageResponse } from './messages/MessageResponse';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StatusCodeParser {
-  public static parse(code: number, message?: string): ResultCodeError {
-    switch (code) {
+  public static parse(result: MessageResponse): ResultCodeError {
+    switch (result.status) {
       case 1:
-        return new OperationsError(message);
+        return new OperationsError(result.errorMessage);
       case 2:
-        return new ProtocolError(message);
+        return new ProtocolError(result.errorMessage);
       case 3:
-        return new TimeLimitExceededError(message);
+        return new TimeLimitExceededError(result.errorMessage);
       case 4:
-        return new SizeLimitExceededError(message);
+        return new SizeLimitExceededError(result.errorMessage);
       case 7:
-        return new AuthMethodNotSupportedError(message);
+        return new AuthMethodNotSupportedError(result.errorMessage);
       case 8:
-        return new StrongAuthRequiredError(message);
+        return new StrongAuthRequiredError(result.errorMessage);
       case 11:
-        return new AdminLimitExceededError(message);
+        return new AdminLimitExceededError(result.errorMessage);
       case 12:
-        return new UnavailableCriticalExtensionError(message);
+        return new UnavailableCriticalExtensionError(result.errorMessage);
       case 13:
-        return new ConfidentialityRequiredError(message);
+        return new ConfidentialityRequiredError(result.errorMessage);
       case 14:
-        return new SaslBindInProgressError(message);
+        return new SaslBindInProgressError(result as BindResponse);
       case 16:
-        return new NoSuchAttributeError(message);
+        return new NoSuchAttributeError(result.errorMessage);
       case 17:
-        return new UndefinedTypeError(message);
+        return new UndefinedTypeError(result.errorMessage);
       case 18:
-        return new InappropriateMatchingError(message);
+        return new InappropriateMatchingError(result.errorMessage);
       case 19:
-        return new ConstraintViolationError(message);
+        return new ConstraintViolationError(result.errorMessage);
       case 20:
-        return new TypeOrValueExistsError(message);
+        return new TypeOrValueExistsError(result.errorMessage);
       case 21:
-        return new InvalidSyntaxError(message);
+        return new InvalidSyntaxError(result.errorMessage);
       case 32:
-        return new NoSuchObjectError(message);
+        return new NoSuchObjectError(result.errorMessage);
       case 33:
-        return new AliasProblemError(message);
+        return new AliasProblemError(result.errorMessage);
       case 34:
-        return new InvalidDNSyntaxError(message);
+        return new InvalidDNSyntaxError(result.errorMessage);
       case 35:
-        return new IsLeafError(message);
+        return new IsLeafError(result.errorMessage);
       case 36:
-        return new AliasDerefProblemError(message);
+        return new AliasDerefProblemError(result.errorMessage);
       case 48:
-        return new InappropriateAuthError(message);
+        return new InappropriateAuthError(result.errorMessage);
       case 49:
-        return new InvalidCredentialsError(message);
+        return new InvalidCredentialsError(result.errorMessage);
       case 50:
-        return new InsufficientAccessError(message);
+        return new InsufficientAccessError(result.errorMessage);
       case 51:
-        return new BusyError(message);
+        return new BusyError(result.errorMessage);
       case 52:
-        return new UnavailableError(message);
+        return new UnavailableError(result.errorMessage);
       case 53:
-        return new UnwillingToPerformError(message);
+        return new UnwillingToPerformError(result.errorMessage);
       case 54:
-        return new LoopDetectError(message);
+        return new LoopDetectError(result.errorMessage);
       case 64:
-        return new NamingViolationError(message);
+        return new NamingViolationError(result.errorMessage);
       case 65:
-        return new ObjectClassViolationError(message);
+        return new ObjectClassViolationError(result.errorMessage);
       case 66:
-        return new NotAllowedOnNonLeafError(message);
+        return new NotAllowedOnNonLeafError(result.errorMessage);
       case 67:
-        return new NotAllowedOnRDNError(message);
+        return new NotAllowedOnRDNError(result.errorMessage);
       case 68:
-        return new AlreadyExistsError(message);
+        return new AlreadyExistsError(result.errorMessage);
       case 69:
-        return new NoObjectClassModsError(message);
+        return new NoObjectClassModsError(result.errorMessage);
       case 70:
-        return new ResultsTooLargeError(message);
+        return new ResultsTooLargeError(result.errorMessage);
       case 71:
-        return new AffectsMultipleDSAsError(message);
+        return new AffectsMultipleDSAsError(result.errorMessage);
       case 112:
-        return new TLSNotSupportedError(message);
+        return new TLSNotSupportedError(result.errorMessage);
       default:
-        return new UnknownStatusCodeError(code, message);
+        return new UnknownStatusCodeError(result.status, result.errorMessage);
     }
   }
 }
