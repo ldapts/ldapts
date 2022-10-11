@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.2.1 - 2022-10-11
+
+- Update npms
+
 ## 4.2.0 - 2022-09-14
 
 - Add DIGEST-MD5 and SCRAM-SHA-1 SASL mechanisms (PR #120). Thanks @TimoHocker!
