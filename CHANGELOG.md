@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.2.2 - 2023-01-03
+
+- Update npms
+- Enable noUncheckedIndexedAccess compiler option
+
 ## 4.2.1 - 2022-10-11
 
 - Update npms
