@@ -50,12 +50,14 @@ export class AbandonRequest extends Message {
       let offset = 1;
       let value: number;
 
-      const fb = reader.buffer[offset];
+      const fb = reader.buffer[offset] ?? 0;
       value = fb & 0x7f;
       for (let i = 1; i < length; i += 1) {
         value <<= 8;
         offset += 1;
-        value |= reader.buffer[offset] & 0xff;
+
+        const bufferValue = reader.buffer[offset] ?? 0;
+        value |= bufferValue & 0xff;
       }
       if ((fb & 0x80) === 0x80) {
         value = -value;

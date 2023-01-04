@@ -102,7 +102,7 @@ export class DN {
     return this.rdns;
   }
 
-  public get(index: number): RDN {
+  public get(index: number): RDN | undefined {
     return this.rdns[index];
   }
 
@@ -130,7 +130,14 @@ export class DN {
     }
 
     for (let i = 0; i < this.rdns.length; i += 1) {
-      if (!this.rdns[i].equals(other.rdns[i])) {
+      const rdn = this.rdns[i];
+      const otherRdn = other.rdns[i];
+
+      if (rdn == null && otherRdn == null) {
+        continue;
+      }
+
+      if (rdn == null || otherRdn == null || !rdn.equals(otherRdn)) {
         return false;
       }
     }
@@ -138,6 +145,9 @@ export class DN {
     return true;
   }
 
+  /**
+   * @deprecated
+   */
   public parent(): DN | null {
     if (this.rdns.length !== 0) {
       const save = this.rdns.shift() as RDN;
@@ -149,6 +159,10 @@ export class DN {
     return null;
   }
 
+  /**
+   * @deprecated
+   * @param {object} dn
+   */
   public parentOf(dn: DN): boolean {
     if (this.rdns.length >= dn.rdns.length) {
       return false;
@@ -159,7 +173,11 @@ export class DN {
       const myRDN = this.rdns[i];
       const theirRDN = dn.rdns[i + diff];
 
-      if (!myRDN.equals(theirRDN)) {
+      if (myRDN == null && theirRDN == null) {
+        continue;
+      }
+
+      if (myRDN == null || theirRDN == null || !myRDN.equals(theirRDN)) {
         return false;
       }
     }

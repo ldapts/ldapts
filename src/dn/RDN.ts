@@ -3,7 +3,7 @@ export interface RDNAttributes {
 }
 
 /**
- * RDN is a part of DN and it consists of key & value pair. This class also supports
+ * RDN is a part of DN, and it consists of key & value pair. This class also supports
  * compound RDNs, meaning that one RDN can hold multiple key & value pairs.
  */
 export class RDN {
@@ -11,7 +11,9 @@ export class RDN {
 
   public constructor(attrs?: RDNAttributes) {
     if (attrs) {
-      Object.keys(attrs).forEach((name) => this.set(name, attrs[name]));
+      for (const [key, value] of Object.entries(attrs)) {
+        this.set(key, value);
+      }
     }
   }
 
@@ -29,9 +31,9 @@ export class RDN {
   /**
    * Get an RDN value at the specified name.
    * @param {string} name
-   * @returns {string} value
+   * @returns {string | undefined} value
    */
-  public get(name: string): string {
+  public get(name: string): string | undefined {
     return this.attrs[name];
   }
 
@@ -51,11 +53,20 @@ export class RDN {
     otherKeys.sort();
 
     for (let i = 0; i < ourKeys.length; i += 1) {
-      if (ourKeys[i] !== otherKeys[i]) {
+      const key = ourKeys[i];
+
+      if (key == null || ourKeys[i] !== otherKeys[i]) {
         return false;
       }
 
-      if (this.attrs[ourKeys[i]] !== other.attrs[ourKeys[i]]) {
+      const ourValue = this.attrs[key];
+      const otherValue = other.attrs[key];
+
+      if (ourValue == null && otherValue == null) {
+        continue;
+      }
+
+      if (ourValue == null || otherValue == null || ourValue !== otherValue) {
         return false;
       }
     }
@@ -70,15 +81,13 @@ export class RDN {
   public toString(): string {
     let str = '';
 
-    const keys = Object.keys(this.attrs);
-
-    keys.forEach((key) => {
-      if (str.length) {
+    for (const [key, value] of Object.entries(this.attrs)) {
+      if (str) {
         str += '+';
       }
 
-      str += `${key}=${this._escape(this.attrs[key])}`;
-    });
+      str += `${key}=${this._escape(value)}`;
+    }
 
     return str;
   }
@@ -102,7 +111,7 @@ export class RDN {
    * @param {string} value - RDN value to be escaped
    * @returns {string} Escaped string representation of RDN
    */
-  private _escape(value: string): string {
+  private _escape(value = ''): string {
     let str = '';
     let current = 0;
     let quoted = false;
@@ -117,7 +126,7 @@ export class RDN {
     }
 
     while (current < len) {
-      if (escaped.test(value[current]) || (!quoted && special.test(value[current]))) {
+      if (escaped.test(value[current] ?? '') || (!quoted && special.test(value[current] ?? ''))) {
         str += '\\';
       }
 

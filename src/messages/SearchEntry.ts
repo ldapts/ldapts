@@ -55,8 +55,7 @@ export class SearchEntry extends MessageResponse {
 
       if (values && values.length) {
         if (values.length === 1) {
-          // eslint-disable-next-line prefer-destructuring
-          result[attribute.type] = values[0];
+          result[attribute.type] = values[0] ?? [];
         } else {
           result[attribute.type] = values;
         }

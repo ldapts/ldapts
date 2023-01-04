@@ -288,16 +288,16 @@ export class FilterParser {
     // Remove first entry, since it should be empty
     fields.shift();
 
-    if (fields[0].toLowerCase() === 'dn') {
+    if (fields[0]?.toLowerCase() === 'dn') {
       dnAttributes = true;
       fields.shift();
     }
 
-    if (fields.length && !fields[0].startsWith('=')) {
+    if (fields.length && !fields[0]?.startsWith('=')) {
       rule = fields.shift();
     }
 
-    if (fields.length && !fields[0].startsWith('=')) {
+    if (fields.length && !fields[0]?.startsWith('=')) {
       throw new Error(`Missing := in extensible filter: ${filterString}`);
     }
 
