@@ -7,7 +7,7 @@ import type { MessageOptions } from './Message';
 import { Message } from './Message';
 
 export const SASL_MECHANISMS = ['EXTERNAL', 'PLAIN', 'DIGEST-MD5', 'SCRAM-SHA-1'] as const;
-export type SaslMechanism = typeof SASL_MECHANISMS[number];
+export type SaslMechanism = (typeof SASL_MECHANISMS)[number];
 
 export interface BindRequestMessageOptions extends MessageOptions {
   dn?: string;
