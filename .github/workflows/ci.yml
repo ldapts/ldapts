@@ -1,6 +1,10 @@
 name: Continuous Integration
 
-on: [push]
+on:
+  push:
+    branches:
+      - 'main'
+      - 'issue-**'
 
 jobs:
   build_and_test:
