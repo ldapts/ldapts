@@ -202,11 +202,11 @@ export class Client {
   }
 
   public get isConnected(): boolean {
-    return this.connected;
+    return !!this.socket && this.connected;
   }
 
   public async startTLS(options: tls.ConnectionOptions = {}, controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -299,7 +299,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async add(dn: DN | string, attributes: Attribute[] | { [index: string]: string[] | string }, controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -352,7 +352,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async compare(dn: DN | string, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -386,7 +386,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async del(dn: DN | string, controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -413,7 +413,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async exop(oid: string, value?: Buffer | string, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -446,7 +446,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async modify(dn: DN | string, changes: Change | Change[], controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -478,7 +478,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async modifyDN(dn: DN | string, newDN: DN | string, controls?: Control | Control[]): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -533,7 +533,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
@@ -626,7 +626,7 @@ export class Client {
   }
 
   private async _sendBind(req: BindRequest): Promise<void> {
-    if (!this.connected) {
+    if (!this.isConnected) {
       await this._connect();
     }
 
