@@ -17,8 +17,14 @@ export class BindResponse extends MessageResponse {
 
   public override parseMessage(reader: BerReader): void {
     super.parseMessage(reader);
+
+    // Parse SASL response
     while (reader.remain > 0) {
       const type = reader.peek();
+      if (type === ProtocolOperation.LDAP_CONTROLS) {
+        break;
+      }
+
       this.data.push(reader.readString(typeof type === 'number' ? type : undefined));
     }
   }

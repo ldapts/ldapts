@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.3.0 - 2023-02-19
+
+- Update npms
+- Fix parsing specified controls from response. Fix #106
+
 ## 4.2.2 - 2023-01-03
 
 - Update npms

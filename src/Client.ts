@@ -153,9 +153,9 @@ export class Client {
 
   private connectTimer?: NodeJS.Timer;
 
-  private readonly messageParser = new MessageParser();
+  private readonly messageDetailsByMessageId: Record<string, MessageDetails> = {};
 
-  private readonly messageDetailsByMessageId: { [index: string]: MessageDetails } = {};
+  private readonly messageParser = new MessageParser(this.messageDetailsByMessageId);
 
   public constructor(options: ClientOptions) {
     this.clientOptions = options || {};
@@ -210,6 +210,7 @@ export class Client {
       await this._connect();
     }
 
+    // Start TLS extended operation: Request that the server start using encrypted communications over the connection
     await this.exop('1.3.6.1.4.1.1466.20037', undefined, controls);
 
     const originalSocket = this.socket;
@@ -274,7 +275,6 @@ export class Client {
   /**
    * Performs a sasl authentication against the server.
    * @param {string|SaslMechanism} mechanism
-   * @param {string|DN} [dn]
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
@@ -874,8 +874,7 @@ export class Client {
     };
 
     const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error - Resolving with MessageResponse | undefined is expected.
       messageResolve = resolve;
       messageReject = reject;
     });
@@ -927,7 +926,7 @@ export class Client {
     return sendPromise;
   }
 
-  private _handleSendResponse(message: Message): void {
+  private _handleSendResponse(message: MessageResponse): void {
     const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
     if (messageDetails) {
       // When performing a search, an arbitrary number of SearchEntry and SearchReference messages come through with the
@@ -949,10 +948,10 @@ export class Client {
         }
 
         delete this.messageDetailsByMessageId[message.messageId.toString()];
-        messageDetails.resolve(message as MessageResponse);
+        messageDetails.resolve(message);
       } else {
         delete this.messageDetailsByMessageId[message.messageId.toString()];
-        messageDetails.resolve(message as MessageResponse);
+        messageDetails.resolve(message);
       }
     } else {
       logDebug(`Unable to find details related to message response: ${JSON.stringify(message)}`);

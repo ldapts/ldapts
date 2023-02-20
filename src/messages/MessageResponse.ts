@@ -1,4 +1,4 @@
-import type { BerReader } from 'asn1';
+import type { BerReader, BerWriter } from 'asn1';
 
 import type { MessageOptions } from './Message';
 import { Message } from './Message';
@@ -27,5 +27,11 @@ export abstract class MessageResponse extends Message {
     this.status = reader.readEnumeration();
     this.matchedDN = reader.readString();
     this.errorMessage = reader.readString();
+  }
+
+  public override writeMessage(writer: BerWriter): void {
+    writer.writeEnumeration(this.status);
+    writer.writeString(this.matchedDN || '');
+    writer.writeString(this.errorMessage || '');
   }
 }

@@ -6,6 +6,7 @@ import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
 import { MessageParserError } from './errors';
 import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages';
+import type { Message } from './messages/Message';
 import type { MessageResponse } from './messages/MessageResponse';
 import { ProtocolOperation } from './ProtocolOperation';
 
@@ -16,8 +17,20 @@ interface MessageParserEvents {
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
+export interface MessageDetails {
+  readonly message: Readonly<Message>;
+}
+
 export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
+
+  private readonly messageDetailsByMessageId: Record<string, MessageDetails>;
+
+  public constructor(messageDetailsByMessageId: Readonly<Record<string, MessageDetails>>) {
+    super();
+
+    this.messageDetailsByMessageId = messageDetailsByMessageId;
+  }
 
   public read(data: Buffer): void {
     let nextMessage;
@@ -151,7 +164,10 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
       }
     }
 
-    message.parse(reader);
+    // Try to get controls specified with the message request
+    const messageDetails = this.messageDetailsByMessageId[messageId];
+    message.parse(reader, messageDetails?.message.controls);
+
     return message;
   }
 }
