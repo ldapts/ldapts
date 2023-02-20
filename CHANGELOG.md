@@ -1,5 +1,10 @@
 # Change Log
 
+## 4.2.3 - 2023-01-03
+
+- Update npms
+- Fix socket connection not established error. Fix #127 Thanks @Templum!
+
 ## 4.2.2 - 2023-01-03
 
 - Update npms
