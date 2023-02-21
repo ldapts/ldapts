@@ -694,9 +694,9 @@ export class Client {
    * @returns {Promise<void>}
    * @private
    */
-  private _connect(): Promise<void> {
-    if (this.connected) {
-      return Promise.resolve();
+  private _connect(): Promise<void> | void {
+    if (this.isConnected) {
+      return;
     }
 
     return new Promise((resolve, reject) => {
