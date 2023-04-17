@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.2.5 - 2023-04-17
+
+- Update npms
+
 ## 4.2.4 - 2023-02-21
 
 - Check for socket if short-circuiting `_connect()`
