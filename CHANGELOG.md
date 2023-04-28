@@ -1,5 +1,9 @@
 # Change Log
 
+## 4.2.6 - 2023-04-28
+
+- Update npms
+
 ## 4.2.5 - 2023-04-17
 
 - Update npms
