@@ -28,7 +28,7 @@ export class BindRequest extends Message {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
     this.dn = options.dn || '';
-    this.password = options.password;
+    this.password = options.password || '';
     this.mechanism = options.mechanism;
   }
 
