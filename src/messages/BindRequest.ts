@@ -39,12 +39,10 @@ export class BindRequest extends Message {
       // SASL authentication
       writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
       writer.writeString(this.mechanism);
-      if (typeof this.password === 'string') {
-        writer.writeString(this.password);
-      }
+      writer.writeString(this.password);
 
       writer.endSequence();
-    } else if (typeof this.password === 'string') {
+    } else {
       // Simple authentication
       writer.writeString(this.password, Ber.Context); // 128
     }
