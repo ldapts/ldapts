@@ -20,7 +20,7 @@ export class BindRequest extends Message {
 
   public dn: string;
 
-  public password?: string;
+  public password: string;
 
   public mechanism: string | undefined;
 
