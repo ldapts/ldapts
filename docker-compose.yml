@@ -1,0 +1,13 @@
+services:
+  openldap:
+    build: tests/openldap
+    ports:
+      - '389:389'
+      - '636:636'
+    environment:
+      - LDAP_TLS_CERT_FILE=/certs/server.pem
+      - LDAP_TLS_KEY_FILE=/certs/server-key.pem
+      - LDAP_TLS_CA_FILE=/certs/client-ca.pem
+      - LDAP_TLS_VERIFY_CLIENTS=allow
+    volumes:
+      - ${LDAP_CERTS_DIR:-./dist/test-data/certs}:/certs:ro
