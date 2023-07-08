@@ -20,7 +20,7 @@ export class BindRequest extends Message {
 
   public dn: string;
 
-  public password?: string;
+  public password: string;
 
   public mechanism: string | undefined;
 
@@ -28,7 +28,7 @@ export class BindRequest extends Message {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
     this.dn = options.dn || '';
-    this.password = options.password;
+    this.password = options.password || '';
     this.mechanism = options.mechanism;
   }
 
@@ -39,12 +39,10 @@ export class BindRequest extends Message {
       // SASL authentication
       writer.startSequence(ProtocolOperation.LDAP_REQ_BIND_SASL);
       writer.writeString(this.mechanism);
-      if (typeof this.password === 'string') {
-        writer.writeString(this.password);
-      }
+      writer.writeString(this.password);
 
       writer.endSequence();
-    } else if (typeof this.password === 'string') {
+    } else {
       // Simple authentication
       writer.writeString(this.password, Ber.Context); // 128
     }
