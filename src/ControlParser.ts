@@ -5,7 +5,7 @@ import { EntryChangeNotificationControl, PagedResultsControl, PersistentSearchCo
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ControlParser {
-  public static parse(reader: BerReader): Control | null {
+  public static parse(reader: BerReader, requestControls: Control[]): Control | null {
     if (reader.readSequence() === null) {
       return null;
     }
@@ -28,7 +28,7 @@ export class ControlParser {
       }
     }
 
-    let control: Control;
+    let control: Control | undefined;
 
     switch (type) {
       case EntryChangeNotificationControl.type:
@@ -52,7 +52,12 @@ export class ControlParser {
         });
         break;
       default:
-        return null;
+        control = requestControls.find((requestControl) => requestControl.type === type);
+        break;
+    }
+
+    if (!control) {
+      return null;
     }
 
     const controlReader = new BerReader(value);

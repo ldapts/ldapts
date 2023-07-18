@@ -1,25 +1,26 @@
 import assert from 'assert';
 
+import type { BerReader, BerWriter } from 'asn1';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
+import type { AddRequest, ModifyDNRequest } from '../src';
 import {
+  AddResponse,
+  AndFilter,
   Attribute,
   Client,
-  DN,
-  InvalidCredentialsError,
-  UndefinedTypeError,
-  NoSuchObjectError,
-  InvalidDNSyntaxError,
-  AndFilter,
-  EqualityFilter,
-  AddResponse,
-  ModifyDNResponse,
   Control,
+  DN,
+  EqualityFilter,
+  InvalidCredentialsError,
+  InvalidDNSyntaxError,
+  ModifyDNResponse,
+  NoSuchObjectError,
   PagedResultsControl,
+  UndefinedTypeError,
 } from '../src';
-import type { ModifyDNRequest, AddRequest } from '../src';
 
 describe('Client', () => {
   let should: Chai.Should;
@@ -141,6 +142,48 @@ describe('Client', () => {
       } catch {
         // This can fail since it's not the part being tested
       }
+    });
+    it('should bind with a custom control', async () => {
+      // Get list of supported controls and extensions:
+      // ldapsearch -H ldaps://ldap.jumpcloud.com -b "" -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -s base supportedFeatures supportedControl supportedExtension
+      let hasParsed = false;
+      let hasWritten = false;
+
+      class PasswordPolicyControl extends Control {
+        public constructor() {
+          super('1.3.6.1.4.1.42.2.27.8.5.1');
+        }
+
+        public override parseControl(reader: BerReader): void {
+          // Should be called as part of the response from the server
+          hasParsed = true;
+
+          super.parseControl(reader);
+        }
+
+        public override writeControl(writer: BerWriter): void {
+          // Should be called as part of the request to the server
+          hasWritten = true;
+          super.writeControl(writer);
+        }
+      }
+
+      const testControl = new PasswordPolicyControl();
+
+      const client = new Client({
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      await client.bind(bindDN, bindPassword, testControl);
+
+      try {
+        await client.unbind();
+      } catch {
+        // This can fail since it's not the part being tested
+      }
+
+      hasWritten.should.equal(true, 'Did not call PasswordPolicyControl#writeControl');
+      hasParsed.should.equal(true, 'Did not call PasswordPolicyControl#parseControl');
     });
   });
   describe('#startTLS()', () => {
@@ -290,7 +333,16 @@ describe('Client', () => {
       stub.restore();
       stub.calledOnce.should.equal(true);
       const args = stub.getCall(0).args[0] as AddRequest;
-      args.attributes.should.deep.equal([new Attribute({ type: 'userPassword', values: [] }), new Attribute({ type: 'foo', values: [] })]);
+      args.attributes.should.deep.equal([
+        new Attribute({
+          type: 'userPassword',
+          values: [],
+        }),
+        new Attribute({
+          type: 'foo',
+          values: [],
+        }),
+      ]);
     });
   });
   describe('#modifyDN()', () => {

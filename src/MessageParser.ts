@@ -6,6 +6,7 @@ import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
 import { MessageParserError } from './errors';
 import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages';
+import type { Message } from './messages/Message';
 import type { MessageResponse } from './messages/MessageResponse';
 import { ProtocolOperation } from './ProtocolOperation';
 
@@ -19,7 +20,7 @@ type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents
 export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
 
-  public read(data: Buffer): void {
+  public read(data: Buffer, messageDetailsByMessageId: Record<string, { message: Message }>): void {
     let nextMessage;
 
     if (this.buffer) {
@@ -59,8 +60,9 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
     try {
       messageId = reader.readInt();
       protocolOperation = reader.readSequence() as ProtocolOperation;
+      const messageDetails = messageDetailsByMessageId[`${messageId}`];
 
-      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader);
+      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader, messageDetails?.message);
 
       if (message) {
         this.emit('message', message);
@@ -82,11 +84,11 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
     }
 
     if (nextMessage) {
-      this.read(nextMessage);
+      this.read(nextMessage, messageDetailsByMessageId);
     }
   }
 
-  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperation, reader: BerReader): MessageResponse {
+  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperation, reader: BerReader, messageDetails?: Message): MessageResponse {
     let message: MessageResponse;
 
     switch (protocolOperation) {
@@ -151,7 +153,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
       }
     }
 
-    message.parse(reader);
+    message.parse(reader, messageDetails?.controls ?? []);
     return message;
   }
 }

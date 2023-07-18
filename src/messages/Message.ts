@@ -46,7 +46,7 @@ export abstract class Message {
     return writer.buffer;
   }
 
-  public parse(reader: BerReader): void {
+  public parse(reader: BerReader, requestControls: Control[]): void {
     this.controls = [];
     this.parseMessage(reader);
 
@@ -54,7 +54,7 @@ export abstract class Message {
       reader.readSequence();
       const end = reader.offset + reader.length;
       while (reader.offset < end) {
-        const control = ControlParser.parse(reader);
+        const control = ControlParser.parse(reader, requestControls);
         if (control) {
           this.controls.push(control);
         }

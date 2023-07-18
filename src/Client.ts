@@ -155,7 +155,7 @@ export class Client {
 
   private readonly messageParser = new MessageParser();
 
-  private readonly messageDetailsByMessageId: { [index: string]: MessageDetails } = {};
+  private readonly messageDetailsByMessageId: Record<string, MessageDetails> = {};
 
   public constructor(options: ClientOptions) {
     this.clientOptions = options || {};
@@ -274,7 +274,6 @@ export class Client {
   /**
    * Performs a sasl authentication against the server.
    * @param {string|SaslMechanism} mechanism
-   * @param {string|DN} [dn]
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
@@ -676,7 +675,7 @@ export class Client {
 
   private readonly socketDataHandler = (data: Buffer): void => {
     if (this.messageParser) {
-      this.messageParser.read(data);
+      this.messageParser.read(data, this.messageDetailsByMessageId);
     }
   };
 
