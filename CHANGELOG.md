@@ -1,5 +1,13 @@
 # Change Log
 
+## 5.0.0 - 2023-07-18
+
+- Drop Node.js 14 support
+- Update npms
+- Add OpenLDAP test server! Fix #135 Thanks @tsaarni!
+- Allow for optional password by setting a default empty string. Fix #134 Thanks @wattry, @TimoHocker, and @thernstig!
+- Fix reading controls from responses. Fix #106
+
 ## 4.2.6 - 2023-04-28
 
 - Update npms

@@ -93,7 +93,7 @@ dn: cn=expiring,ou=ppolicy,dc=example,dc=org
 objectClass: pwdPolicy
 objectClass: organizationalRole
 cn: expiring
-# How long after change (in seconds) before pssword is condsidered expired.
+# How long after change (in seconds) before password is considered expired.
 pwdMaxAge: 31559999
 # How long before expiry (in seconds) to warn users.
 pwdExpireWarning: 31560000
