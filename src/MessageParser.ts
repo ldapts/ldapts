@@ -8,6 +8,7 @@ import { MessageParserError } from './errors';
 import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages';
 import type { Message } from './messages/Message';
 import type { MessageResponse } from './messages/MessageResponse';
+import type { ProtocolOperationValues } from './ProtocolOperation';
 import { ProtocolOperation } from './ProtocolOperation';
 
 interface MessageParserEvents {
@@ -20,7 +21,7 @@ type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents
 export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
 
-  public read(data: Buffer, messageDetailsByMessageId: Record<string, { message: Message }>): void {
+  public read(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): void {
     let nextMessage;
 
     if (this.buffer) {
@@ -54,26 +55,36 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
     // at the next sequence of data (if it exists)
     delete this.buffer;
 
-    let messageId: number | undefined;
-    let protocolOperation: ProtocolOperation | undefined;
+    let messageId: number | null | undefined;
+    let protocolOperation: number | null | undefined;
 
     try {
       messageId = reader.readInt();
-      protocolOperation = reader.readSequence() as ProtocolOperation;
-      const messageDetails = messageDetailsByMessageId[`${messageId}`];
+      if (messageId == null) {
+        throw new Error(`Unable to read message id`);
+      }
+
+      protocolOperation = reader.readSequence();
+
+      if (protocolOperation == null) {
+        throw new Error(`Unable to read protocol operation sequence for message: ${messageId}`);
+      }
+
+      const messageDetails = messageDetailsByMessageId.get(`${messageId}`);
 
       const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader, messageDetails?.message);
 
-      if (message) {
-        this.emit('message', message);
-      }
+      this.emit('message', message);
     } catch (ex) {
       if (messageId) {
         const errorWithMessageDetails = ex as MessageParserError;
         errorWithMessageDetails.messageDetails = {
           messageId,
-          protocolOperation,
         };
+
+        if (protocolOperation) {
+          errorWithMessageDetails.messageDetails.protocolOperation = protocolOperation;
+        }
 
         this.emit('error', errorWithMessageDetails);
         return;
@@ -88,7 +99,8 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
     }
   }
 
-  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperation, reader: BerReader, messageDetails?: Message): MessageResponse {
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperationValues | number, reader: BerReader, messageDetails?: Message): MessageResponse {
     let message: MessageResponse;
 
     switch (protocolOperation) {

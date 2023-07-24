@@ -129,7 +129,7 @@ export class FilterParser {
         filter.parse(reader);
         break;
       default:
-        throw new Error(`Invalid search filter type: 0x${type || '<null>'}`);
+        throw new Error(`Invalid search filter type: 0x${type ?? '<null>'}`);
     }
 
     return filter;
@@ -216,7 +216,7 @@ export class FilterParser {
       remainingExpression = filterString;
     } else {
       const matches = /^[-\w]+/.exec(filterString);
-      if (matches && matches.length) {
+      if (matches?.length) {
         [attribute] = matches;
         remainingExpression = filterString.substr(attribute.length);
       } else {
@@ -361,8 +361,8 @@ export class FilterParser {
     }
 
     return {
-      initial: FilterParser._unescapeHexValues(fields.shift() || ''),
-      final: FilterParser._unescapeHexValues(fields.pop() || ''),
+      initial: FilterParser._unescapeHexValues(fields.shift() ?? ''),
+      final: FilterParser._unescapeHexValues(fields.pop() ?? ''),
       any: fields.map((field) => FilterParser._unescapeHexValues(field)),
     };
   }

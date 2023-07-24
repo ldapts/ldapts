@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -12,7 +13,7 @@ export interface SubstringFilterOptions {
 }
 
 export class SubstringFilter extends Filter {
-  public type: SearchFilter = SearchFilter.substrings;
+  public type: SearchFilterValues = SearchFilter.substrings;
 
   public attribute: string;
 
@@ -24,14 +25,14 @@ export class SubstringFilter extends Filter {
 
   public constructor(options: SubstringFilterOptions = {}) {
     super();
-    this.attribute = options.attribute || '';
-    this.initial = options.initial || '';
-    this.any = options.any || [];
-    this.final = options.final || '';
+    this.attribute = options.attribute ?? '';
+    this.initial = options.initial ?? '';
+    this.any = options.any ?? [];
+    this.final = options.final ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
-    this.attribute = reader.readString().toLowerCase();
+    this.attribute = reader.readString()?.toLowerCase() ?? '';
     reader.readSequence();
     const end = reader.offset + reader.length;
 
@@ -40,14 +41,14 @@ export class SubstringFilter extends Filter {
 
       switch (tag) {
         case 0x80:
-          this.initial = reader.readString(tag);
+          this.initial = reader.readString(tag) ?? '';
           if (this.attribute === 'objectclass') {
             this.initial = this.initial.toLowerCase();
           }
 
           break;
         case 0x81: {
-          let anyValue: string = reader.readString(tag);
+          let anyValue: string = reader.readString(tag) ?? '';
           if (this.attribute === 'objectclass') {
             anyValue = anyValue.toLowerCase();
           }
@@ -57,7 +58,7 @@ export class SubstringFilter extends Filter {
         }
 
         case 0x82:
-          this.final = reader.readString(tag);
+          this.final = reader.readString(tag) ?? '';
           if (this.attribute === 'objectclass') {
             this.final = this.final.toLowerCase();
           }
@@ -82,10 +83,8 @@ export class SubstringFilter extends Filter {
       writer.writeString(this.initial, 0x80);
     }
 
-    if (this.any && this.any.length) {
-      for (const anyItem of this.any) {
-        writer.writeString(anyItem, 0x81);
-      }
+    for (const anyItem of this.any) {
+      writer.writeString(anyItem, 0x81);
     }
 
     if (this.final) {
@@ -95,7 +94,7 @@ export class SubstringFilter extends Filter {
     writer.endSequence();
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
+  public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {

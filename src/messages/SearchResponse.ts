@@ -1,3 +1,4 @@
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
@@ -11,7 +12,7 @@ export interface SearchResponseOptions extends MessageResponseOptions {
 }
 
 export class SearchResponse extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public searchEntries: SearchEntry[];
 
@@ -20,7 +21,7 @@ export class SearchResponse extends MessageResponse {
   public constructor(options: SearchResponseOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH;
-    this.searchEntries = options.searchEntries || [];
-    this.searchReferences = options.searchReferences || [];
+    this.searchEntries = options.searchEntries ?? [];
+    this.searchReferences = options.searchReferences ?? [];
   }
 }

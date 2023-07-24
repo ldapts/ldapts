@@ -26,8 +26,8 @@ export class PagedResultsControl extends Control {
 
   public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
-      const size = reader.readInt();
-      const cookie = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);
+      const size = reader.readInt() ?? 0;
+      const cookie = reader.readString(Ber.OctetString, true) ?? Buffer.alloc(0);
 
       this.value = {
         size,
@@ -44,7 +44,7 @@ export class PagedResultsControl extends Control {
     const controlWriter = new BerWriter();
     controlWriter.startSequence();
     controlWriter.writeInt(this.value.size);
-    if (this.value.cookie && this.value.cookie.length) {
+    if (this.value.cookie?.length) {
       controlWriter.writeBuffer(this.value.cookie, Ber.OctetString);
     } else {
       controlWriter.writeString('');

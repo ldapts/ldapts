@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -13,7 +14,7 @@ export interface ModifyDNRequestMessageOptions extends MessageOptions {
 }
 
 export class ModifyDNRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public deleteOldRdn: boolean;
 
@@ -28,9 +29,9 @@ export class ModifyDNRequest extends Message {
     this.protocolOperation = ProtocolOperation.LDAP_REQ_MODRDN;
 
     this.deleteOldRdn = options.deleteOldRdn !== false;
-    this.dn = options.dn || '';
-    this.newRdn = options.newRdn || '';
-    this.newSuperior = options.newSuperior || '';
+    this.dn = options.dn ?? '';
+    this.newRdn = options.newRdn ?? '';
+    this.newSuperior = options.newSuperior ?? '';
   }
 
   public override writeMessage(writer: BerWriter): void {
@@ -49,11 +50,11 @@ export class ModifyDNRequest extends Message {
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.dn = reader.readString();
-    this.newRdn = reader.readString();
-    this.deleteOldRdn = reader.readBoolean();
+    this.dn = reader.readString() ?? '';
+    this.newRdn = reader.readString() ?? '';
+    this.deleteOldRdn = reader.readBoolean() ?? false;
     if (reader.peek() === 0x80) {
-      this.newSuperior = reader.readString(0x80);
+      this.newSuperior = reader.readString(0x80) ?? '';
     }
   }
 }

@@ -1,6 +1,7 @@
 import type { BerReader, BerWriter } from 'asn1';
 import { Ber } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -11,7 +12,7 @@ export interface EqualityFilterOptions {
 }
 
 export class EqualityFilter extends Filter {
-  public type: SearchFilter = SearchFilter.equalityMatch;
+  public type: SearchFilterValues = SearchFilter.equalityMatch;
 
   public attribute: string;
 
@@ -20,13 +21,13 @@ export class EqualityFilter extends Filter {
   public constructor(options: EqualityFilterOptions = {}) {
     super();
 
-    this.attribute = options.attribute || '';
-    this.value = options.value || '';
+    this.attribute = options.attribute ?? '';
+    this.value = options.value ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
-    this.attribute = (reader.readString() || '').toLowerCase();
-    this.value = reader.readString();
+    this.attribute = (reader.readString() ?? '').toLowerCase();
+    this.value = reader.readString() ?? '';
 
     if (this.attribute === 'objectclass') {
       this.value = this.value.toLowerCase();
@@ -42,7 +43,7 @@ export class EqualityFilter extends Filter {
     }
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
+  public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {

@@ -5,10 +5,6 @@ export abstract class ResultCodeError extends Error {
     super();
 
     this.code = code;
-    if (typeof code === 'undefined' || code === null) {
-      this.message = message;
-    } else {
-      this.message = `${message} Code: 0x${code.toString(16)}`;
-    }
+    this.message = `${message} Code: 0x${code.toString(16)}`;
   }
 }

@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -10,7 +11,7 @@ export interface ApproximateFilterOptions {
 }
 
 export class ApproximateFilter extends Filter {
-  public type: SearchFilter = SearchFilter.approxMatch;
+  public type: SearchFilterValues = SearchFilter.approxMatch;
 
   public attribute: string;
 
@@ -18,13 +19,13 @@ export class ApproximateFilter extends Filter {
 
   public constructor(options: ApproximateFilterOptions = {}) {
     super();
-    this.attribute = options.attribute || '';
-    this.value = options.value || '';
+    this.attribute = options.attribute ?? '';
+    this.value = options.value ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
-    this.attribute = (reader.readString() || '').toLowerCase();
-    this.value = reader.readString();
+    this.attribute = (reader.readString() ?? '').toLowerCase();
+    this.value = reader.readString() ?? '';
   }
 
   public override writeFilter(writer: BerWriter): void {
@@ -33,7 +34,7 @@ export class ApproximateFilter extends Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override matches(_: { [index: string]: string } = {}, __?: boolean): void {
+  public override matches(_: Record<string, string> = {}, __?: boolean): boolean {
     throw new Error('Approximate match implementation unknown');
   }
 

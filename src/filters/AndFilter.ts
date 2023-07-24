@@ -1,5 +1,6 @@
 import type { BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -9,7 +10,7 @@ export interface AndFilterOptions {
 }
 
 export class AndFilter extends Filter {
-  public type: SearchFilter = SearchFilter.and;
+  public type: SearchFilterValues = SearchFilter.and;
 
   public filters: Filter[];
 
@@ -24,7 +25,7 @@ export class AndFilter extends Filter {
     }
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
+  public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     if (!this.filters.length) {
       // per RFC4526
       return true;

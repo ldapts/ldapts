@@ -1,6 +1,4 @@
-export interface RDNAttributes {
-  [name: string]: string;
-}
+export type RDNAttributes = Record<string, string>;
 
 /**
  * RDN is a part of DN, and it consists of key & value pair. This class also supports
@@ -23,7 +21,7 @@ export class RDN {
    * @param {string} value
    * @returns {object} RDN class
    */
-  public set(name: string, value: string): RDN {
+  public set(name: string, value: string): this {
     this.attrs[name] = value;
     return this;
   }

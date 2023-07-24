@@ -27,9 +27,9 @@ export class PersistentSearchControl extends Control {
 
   public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
-      const changeTypes = reader.readInt();
-      const changesOnly = reader.readBoolean();
-      const returnECs = reader.readBoolean();
+      const changeTypes = reader.readInt() ?? 0;
+      const changesOnly = reader.readBoolean() ?? false;
+      const returnECs = reader.readBoolean() ?? false;
 
       this.value = {
         changeTypes,

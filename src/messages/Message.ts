@@ -3,6 +3,7 @@ import { BerWriter } from 'asn1';
 
 import { ControlParser } from '../ControlParser';
 import type { Control } from '../controls';
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 export interface MessageOptions {
@@ -11,11 +12,11 @@ export interface MessageOptions {
 }
 
 export abstract class Message {
-  public version: ProtocolOperation = ProtocolOperation.LDAP_VERSION_3;
+  public version: number = ProtocolOperation.LDAP_VERSION_3;
 
   public messageId = 0;
 
-  public abstract protocolOperation: ProtocolOperation;
+  public abstract protocolOperation: ProtocolOperationValues;
 
   public controls?: Control[];
 
@@ -33,7 +34,7 @@ export abstract class Message {
     this.writeMessage(writer);
     writer.endSequence();
 
-    if (this.controls && this.controls.length) {
+    if (this.controls?.length) {
       writer.startSequence(ProtocolOperation.LDAP_CONTROLS);
       for (const control of this.controls) {
         control.write(writer);

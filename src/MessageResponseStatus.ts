@@ -1,4 +1,4 @@
-export enum MessageResponseStatus {
-  Success = 0,
-  SizeLimitExceeded = 4,
-}
+export const MessageResponseStatus = {
+  Success: 0 as const,
+  SizeLimitExceeded: 4 as const,
+};

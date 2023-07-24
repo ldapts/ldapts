@@ -1,5 +1,14 @@
 # Change Log
 
+## 6.0.0 - 2023-07-24
+
+- Update npms
+- Fix lots of lint issues
+- Change `Client.messageDetailsByMessageId` to be a map
+- Fix `Client._send` signature to return `undefined`
+- Change `MessageResponseStatus`, `ProtocolOperation`, and `SearchFilter` from enum to a const
+- Enforce `toString()` definition for filters
+
 ## 5.0.0 - 2023-07-18
 
 - Drop Node.js 14 support

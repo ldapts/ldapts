@@ -21,6 +21,7 @@ export * from './NoSuchAttributeError';
 export * from './NoSuchObjectError';
 export * from './NotAllowedOnNonLeafError';
 export * from './NotAllowedOnRDNError';
+export * from './NoResultError';
 export * from './ObjectClassViolationError';
 export * from './OperationsError';
 export * from './ProtocolError';

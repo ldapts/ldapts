@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -11,7 +12,7 @@ export interface ExtendedRequestMessageOptions extends MessageOptions {
 }
 
 export class ExtendedRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public oid: string;
 
@@ -21,8 +22,8 @@ export class ExtendedRequest extends Message {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_EXTENSION;
 
-    this.oid = options.oid || '';
-    this.value = options.value || '';
+    this.oid = options.oid ?? '';
+    this.value = options.value ?? '';
   }
 
   public override writeMessage(writer: BerWriter): void {
@@ -35,12 +36,12 @@ export class ExtendedRequest extends Message {
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.oid = reader.readString(0x80);
+    this.oid = reader.readString(0x80) ?? '';
     if (reader.peek() === 0x81) {
       try {
-        this.value = reader.readString(0x81);
+        this.value = reader.readString(0x81) ?? '';
       } catch (ex) {
-        this.value = reader.readString(0x81, true);
+        this.value = reader.readString(0x81, true) ?? Buffer.alloc(0);
       }
     }
   }

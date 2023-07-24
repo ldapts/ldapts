@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -10,14 +11,14 @@ export interface DeleteRequestMessageOptions extends MessageOptions {
 }
 
 export class DeleteRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public dn: string;
 
   public constructor(options: DeleteRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_DELETE;
-    this.dn = options.dn || '';
+    this.dn = options.dn ?? '';
   }
 
   public override writeMessage(writer: BerWriter): void {

@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -12,7 +13,7 @@ export interface CompareRequestMessageOptions extends MessageOptions {
 }
 
 export class CompareRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public dn: string;
 
@@ -23,9 +24,9 @@ export class CompareRequest extends Message {
   public constructor(options: CompareRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_COMPARE;
-    this.attribute = options.attribute || '';
-    this.value = options.value || '';
-    this.dn = options.dn || '';
+    this.attribute = options.attribute ?? '';
+    this.value = options.value ?? '';
+    this.dn = options.dn ?? '';
   }
 
   public override writeMessage(writer: BerWriter): void {
@@ -37,10 +38,10 @@ export class CompareRequest extends Message {
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.dn = reader.readString();
+    this.dn = reader.readString() ?? '';
     reader.readSequence();
 
-    this.attribute = (reader.readString() || '').toLowerCase();
-    this.value = reader.readString();
+    this.attribute = (reader.readString() ?? '').toLowerCase();
+    this.value = reader.readString() ?? '';
   }
 }

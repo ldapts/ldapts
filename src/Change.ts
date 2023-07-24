@@ -17,7 +17,7 @@ export class Change {
       modification: new Attribute(),
     },
   ) {
-    this.operation = options.operation || 'add';
+    this.operation = options.operation ?? 'add';
     this.modification = options.modification;
   }
 
@@ -59,6 +59,8 @@ export class Change {
       case 0x02:
         this.operation = 'replace';
         break;
+      case null:
+        throw new Error(`Unknown change operation - <null> operation value`);
       default:
         throw new Error(`Unknown change operation: 0x${operation.toString(16)}`);
     }

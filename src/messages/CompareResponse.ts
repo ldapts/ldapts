@@ -1,3 +1,4 @@
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
@@ -23,7 +24,7 @@ export enum CompareResult {
 }
 
 export class CompareResponse extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public constructor(options: MessageResponseOptions) {
     super(options);

@@ -28,6 +28,9 @@ Providing an API to access LDAP directory servers from Node.js programs.
   - [Authenticate example](#authenticate-example)
   - [Search example](#search-example)
   - [Delete Active Directory entry example](#delete-active-directory-entry-example)
+- [Development](#development)
+  - [Start test OpenLDAP server](#start-test-openldap-server)
+  - [Close test OpenLDAP server](#close-test-openldap-server)
 
 ## API details
 
@@ -532,4 +535,18 @@ try {
 } finally {
   await client.unbind();
 }
+```
+
+## Development
+
+### Start test OpenLDAP server
+
+```shell
+docker-compose up -d
+```
+
+### Close test OpenLDAP server
+
+```shell
+docker-compose down
 ```

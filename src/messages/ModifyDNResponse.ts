@@ -1,10 +1,11 @@
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
 import { MessageResponse } from './MessageResponse';
 
 export class ModifyDNResponse extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public constructor(options: MessageResponseOptions) {
     super(options);

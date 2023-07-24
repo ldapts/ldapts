@@ -7,9 +7,7 @@ import { RDN } from './RDN';
  * Value can be either a string or a list of strings, where every value in the list will
  * get applied to the same key of an RDN.
  */
-export interface RDNMap {
-  [name: string]: string[] | string;
-}
+export type RDNMap = Record<string, string[] | string>;
 
 /**
  * DN class provides chain building of multiple RDNs, which can be later build into
@@ -34,7 +32,7 @@ export class DN {
    * @param {string} value
    * @returns {object} DN
    */
-  public addPairRDN(key: string, value: string): DN {
+  public addPairRDN(key: string, value: string): this {
     this.rdns.push(new RDN({ [key]: value }));
 
     return this;
@@ -47,7 +45,7 @@ export class DN {
    * @param {object} rdn
    * @returns {object} DN
    */
-  public addRDN(rdn: RDN | RDNAttributes): DN {
+  public addRDN(rdn: RDN | RDNAttributes): this {
     if (rdn instanceof RDN) {
       this.rdns.push(rdn);
     } else {
@@ -68,7 +66,7 @@ export class DN {
    * @param {object|object[]} rdns
    * @returns {object} DN
    */
-  public addRDNs(rdns: DN | RDN[] | RDNAttributes[] | RDNMap): DN {
+  public addRDNs(rdns: DN | RDN[] | RDNAttributes[] | RDNMap): this {
     if (rdns instanceof DN) {
       this.rdns.push(...rdns.rdns);
     } else if (Array.isArray(rdns)) {
@@ -106,7 +104,7 @@ export class DN {
     return this.rdns[index];
   }
 
-  public set(rdn: RDN | RDNAttributes, index: number): DN {
+  public set(rdn: RDN | RDNAttributes, index: number): this {
     if (rdn instanceof RDN) {
       this.rdns[index] = rdn;
     } else {
@@ -145,51 +143,11 @@ export class DN {
     return true;
   }
 
-  /**
-   * @deprecated
-   */
-  public parent(): DN | null {
-    if (this.rdns.length !== 0) {
-      const save = this.rdns.shift() as RDN;
-      const dn = new DN(this.rdns);
-      this.rdns.unshift(save);
-      return dn;
-    }
-
-    return null;
-  }
-
-  /**
-   * @deprecated
-   * @param {object} dn
-   */
-  public parentOf(dn: DN): boolean {
-    if (this.rdns.length >= dn.rdns.length) {
-      return false;
-    }
-
-    const diff = dn.rdns.length - this.rdns.length;
-    for (let i = this.rdns.length - 1; i >= 0; i -= 1) {
-      const myRDN = this.rdns[i];
-      const theirRDN = dn.rdns[i + diff];
-
-      if (myRDN == null && theirRDN == null) {
-        continue;
-      }
-
-      if (myRDN == null || theirRDN == null || !myRDN.equals(theirRDN)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
   public clone(): DN {
     return new DN(this.rdns);
   }
 
-  public reverse(): DN {
+  public reverse(): this {
     this.rdns.reverse();
 
     return this;

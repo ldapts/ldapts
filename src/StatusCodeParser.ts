@@ -1,50 +1,55 @@
-import type { ResultCodeError } from './errors/resultCodeErrors';
+import type { ResultCodeError } from './errors';
 import {
-  OperationsError,
-  UnknownStatusCodeError,
-  ProtocolError,
-  TimeLimitExceededError,
-  SizeLimitExceededError,
-  AuthMethodNotSupportedError,
-  StrongAuthRequiredError,
   AdminLimitExceededError,
-  UnavailableCriticalExtensionError,
-  ConfidentialityRequiredError,
-  NoSuchAttributeError,
-  UndefinedTypeError,
-  InappropriateMatchingError,
-  ConstraintViolationError,
-  TypeOrValueExistsError,
-  InvalidSyntaxError,
-  NoSuchObjectError,
-  AliasProblemError,
-  InvalidDNSyntaxError,
-  IsLeafError,
+  AffectsMultipleDSAsError,
   AliasDerefProblemError,
+  AliasProblemError,
+  AlreadyExistsError,
+  AuthMethodNotSupportedError,
+  BusyError,
+  ConfidentialityRequiredError,
+  ConstraintViolationError,
   InappropriateAuthError,
+  InappropriateMatchingError,
   InsufficientAccessError,
   InvalidCredentialsError,
-  BusyError,
-  UnavailableError,
-  UnwillingToPerformError,
+  InvalidDNSyntaxError,
+  InvalidSyntaxError,
+  IsLeafError,
   LoopDetectError,
   NamingViolationError,
-  ObjectClassViolationError,
+  NoObjectClassModsError,
+  NoResultError,
+  NoSuchAttributeError,
+  NoSuchObjectError,
   NotAllowedOnNonLeafError,
   NotAllowedOnRDNError,
-  AlreadyExistsError,
-  NoObjectClassModsError,
+  ObjectClassViolationError,
+  OperationsError,
+  ProtocolError,
   ResultsTooLargeError,
-  AffectsMultipleDSAsError,
-  TLSNotSupportedError,
   SaslBindInProgressError,
-} from './errors/resultCodeErrors';
+  SizeLimitExceededError,
+  StrongAuthRequiredError,
+  TimeLimitExceededError,
+  TLSNotSupportedError,
+  TypeOrValueExistsError,
+  UnavailableCriticalExtensionError,
+  UnavailableError,
+  UndefinedTypeError,
+  UnknownStatusCodeError,
+  UnwillingToPerformError,
+} from './errors';
 import type { BindResponse } from './messages';
 import type { MessageResponse } from './messages/MessageResponse';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StatusCodeParser {
-  public static parse(result: MessageResponse): ResultCodeError {
+  public static parse(result?: MessageResponse): ResultCodeError {
+    if (!result) {
+      return new NoResultError();
+    }
+
     switch (result.status) {
       case 1:
         return new OperationsError(result.errorMessage);
@@ -120,6 +125,8 @@ export class StatusCodeParser {
         return new AffectsMultipleDSAsError(result.errorMessage);
       case 112:
         return new TLSNotSupportedError(result.errorMessage);
+      case 248:
+        return new NoResultError(result.errorMessage);
       default:
         return new UnknownStatusCodeError(result.status, result.errorMessage);
     }

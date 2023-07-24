@@ -340,7 +340,7 @@ describe('Client', () => {
 
     it('should allow adding entry with null or undefined attribute value. Issue #88', async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       const stub = sinon.stub(client, '_send').returns(
         new AddResponse({
           messageId: 123,
@@ -349,10 +349,10 @@ describe('Client', () => {
 
       await client.add('uid=reed.richards,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error
         userPassword: null,
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
+        // @ts-expect-error
         foo: undefined,
       });
 
@@ -385,7 +385,7 @@ describe('Client', () => {
 
     it('should set newSuperior when newDN is a string and contains a comma', async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       const stub = sinon.stub(client, '_send').returns(
         new ModifyDNResponse({
           messageId: 123,
@@ -409,7 +409,7 @@ describe('Client', () => {
     });
     it('should handle escaped comma in newDN. Issue #87', async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+      // @ts-expect-error
       const stub = sinon.stub(client, '_send').returns(
         new ModifyDNResponse({
           messageId: 123,

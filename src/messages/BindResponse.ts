@@ -1,12 +1,13 @@
 import type { BerReader } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
 import { MessageResponse } from './MessageResponse';
 
 export class BindResponse extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public data: string[] = [];
 
@@ -23,7 +24,7 @@ export class BindResponse extends MessageResponse {
         break;
       }
 
-      this.data.push(reader.readString(typeof type === 'number' ? type : undefined));
+      this.data.push(reader.readString(typeof type === 'number' ? type : undefined) ?? '');
     }
   }
 }

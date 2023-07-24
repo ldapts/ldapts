@@ -1,6 +1,7 @@
 import type { BerReader } from 'asn1';
 
 import { Attribute } from '../Attribute';
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
@@ -17,7 +18,7 @@ export interface Entry {
 }
 
 export class SearchEntry extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public name: string;
 
@@ -26,12 +27,12 @@ export class SearchEntry extends MessageResponse {
   public constructor(options: SearchEntryOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH_ENTRY;
-    this.name = options.name || '';
-    this.attributes = options.attributes || [];
+    this.name = options.name ?? '';
+    this.attributes = options.attributes ?? [];
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.name = reader.readString();
+    this.name = reader.readString() ?? '';
     reader.readSequence();
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
@@ -46,14 +47,14 @@ export class SearchEntry extends MessageResponse {
       dn: this.name,
     };
 
-    const hasExplicitBufferAttributes = explicitBufferAttributes && explicitBufferAttributes.length;
+    const hasExplicitBufferAttributes = explicitBufferAttributes.length;
     for (const attribute of this.attributes) {
       let { values } = attribute;
       if (hasExplicitBufferAttributes && explicitBufferAttributes.includes(attribute.type)) {
         values = attribute.parsedBuffers;
       }
 
-      if (values && values.length) {
+      if (values.length) {
         if (values.length === 1) {
           result[attribute.type] = values[0] ?? [];
         } else {

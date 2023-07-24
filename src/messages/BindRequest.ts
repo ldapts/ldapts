@@ -1,6 +1,7 @@
 import type { BerReader, BerWriter } from 'asn1';
 import { Ber } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -16,7 +17,7 @@ export interface BindRequestMessageOptions extends MessageOptions {
 }
 
 export class BindRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public dn: string;
 
@@ -27,8 +28,8 @@ export class BindRequest extends Message {
   public constructor(options: BindRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_BIND;
-    this.dn = options.dn || '';
-    this.password = options.password || '';
+    this.dn = options.dn ?? '';
+    this.password = options.password ?? '';
     this.mechanism = options.mechanism;
   }
 
@@ -49,8 +50,8 @@ export class BindRequest extends Message {
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.version = reader.readInt();
-    this.dn = reader.readString();
+    this.version = reader.readInt() ?? ProtocolOperation.LDAP_VERSION_3;
+    this.dn = reader.readString() ?? '';
 
     const contextCheck: number | null = reader.peek();
     if (contextCheck !== Ber.Context) {
@@ -62,6 +63,6 @@ export class BindRequest extends Message {
       throw new Error(`Authentication type not supported: ${type}`);
     }
 
-    this.password = reader.readString(Ber.Context);
+    this.password = reader.readString(Ber.Context) ?? '';
   }
 }

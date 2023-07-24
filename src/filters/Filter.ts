@@ -1,9 +1,9 @@
 import type { BerReader, BerWriter } from 'asn1';
 
-import type { SearchFilter } from '../SearchFilter';
+import type { SearchFilterValues } from '../SearchFilter';
 
 export abstract class Filter {
-  public abstract type: SearchFilter;
+  public abstract type: SearchFilterValues;
 
   public write(writer: BerWriter): void {
     writer.startSequence(this.type);
@@ -12,11 +12,11 @@ export abstract class Filter {
   }
 
   public parse(reader: BerReader): void {
-    return this.parseFilter(reader);
+    this.parseFilter(reader);
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public matches(_: { [index: string]: string } = {}, __?: boolean): boolean | void {
+  public matches(_: Record<string, string> = {}, __?: boolean): boolean {
     return true;
   }
 
@@ -67,6 +67,8 @@ export abstract class Filter {
     return escapedResult;
   }
 
+  public abstract toString(): string;
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected parseFilter(_: BerReader): void {
     // Do nothing as the default action
@@ -77,7 +79,7 @@ export abstract class Filter {
     // Do nothing as the default action
   }
 
-  protected getObjectValue(objectToCheck: { [index: string]: string }, key: string, strictAttributeCase?: boolean): string | undefined {
+  protected getObjectValue(objectToCheck: Record<string, string>, key: string, strictAttributeCase?: boolean): string | undefined {
     let objectKey;
     if (typeof objectToCheck[key] !== 'undefined') {
       objectKey = key;

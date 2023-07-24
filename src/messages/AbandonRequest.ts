@@ -2,6 +2,7 @@ import * as assert from 'assert';
 
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -12,14 +13,14 @@ export interface AbandonRequestMessageOptions extends MessageOptions {
 }
 
 export class AbandonRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public abandonId: number;
 
   public constructor(options: AbandonRequestMessageOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_REQ_ABANDON;
-    this.abandonId = options.abandonId || 0;
+    this.abandonId = options.abandonId ?? 0;
   }
 
   /* eslint-disable no-bitwise */

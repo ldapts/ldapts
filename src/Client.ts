@@ -155,10 +155,10 @@ export class Client {
 
   private readonly messageParser = new MessageParser();
 
-  private readonly messageDetailsByMessageId: Record<string, MessageDetails> = {};
+  private readonly messageDetailsByMessageId = new Map<string, MessageDetails>();
 
   public constructor(options: ClientOptions) {
-    this.clientOptions = options || {};
+    this.clientOptions = options;
     if (!this.clientOptions.timeout) {
       this.clientOptions.timeout = 0;
     }
@@ -176,7 +176,7 @@ export class Client {
 
     const isSecureProtocol = parsedUrl.protocol === 'ldaps:';
     this.secure = isSecureProtocol || !!this.clientOptions.tlsOptions;
-    this.host = parsedUrl.hostname || 'localhost';
+    this.host = parsedUrl.hostname ?? 'localhost';
     if (parsedUrl.port) {
       this.port = Number(parsedUrl.port);
     } else if (isSecureProtocol) {
@@ -186,10 +186,10 @@ export class Client {
     }
 
     this.messageParser.on('error', (err: MessageParserError) => {
-      if (err.messageDetails && err.messageDetails.messageId) {
-        const messageDetails = this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
+      if (err.messageDetails?.messageId) {
+        const messageDetails = this.messageDetailsByMessageId.get(err.messageDetails.messageId.toString());
         if (messageDetails) {
-          delete this.messageDetailsByMessageId[err.messageDetails.messageId.toString()];
+          this.messageDetailsByMessageId.delete(err.messageDetails.messageId.toString());
           messageDetails.reject(err);
           return;
         }
@@ -252,6 +252,7 @@ export class Client {
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   public async bind(dnOrSaslMechanism: DN | SaslMechanism | string, password?: string, controls?: Control | Control[]): Promise<void> {
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -277,6 +278,7 @@ export class Client {
    * @param {string} [password]
    * @param {Control|Control[]} [controls]
    */
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   public async bindSASL(mechanism: SaslMechanism | string, password?: string, controls?: Control | Control[]): Promise<void> {
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -297,7 +299,7 @@ export class Client {
    * @param {Attribute[]|object} attributes - Array of attributes or object where keys are the name of each attribute
    * @param {Control|Control[]} [controls]
    */
-  public async add(dn: DN | string, attributes: Attribute[] | { [index: string]: string[] | string }, controls?: Control | Control[]): Promise<void> {
+  public async add(dn: DN | string, attributes: Attribute[] | Record<string, string[] | string>, controls?: Control | Control[]): Promise<void> {
     if (!this.isConnected) {
       await this._connect();
     }
@@ -315,6 +317,7 @@ export class Client {
         let values;
         if (Array.isArray(value)) {
           values = value;
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
         } else if (value == null) {
           values = [] as string[];
         } else {
@@ -338,7 +341,8 @@ export class Client {
     });
 
     const result = await this._send<AddResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
   }
@@ -369,7 +373,7 @@ export class Client {
 
     const response = await this._send<CompareResponse>(req);
 
-    switch (response.status) {
+    switch (response?.status) {
       case CompareResult.compareTrue:
         return true;
       case CompareResult.compareFalse:
@@ -400,7 +404,7 @@ export class Client {
     });
 
     const result = await this._send<DeleteResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
   }
@@ -428,7 +432,7 @@ export class Client {
     });
 
     const result = await this._send<ExtendedResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
 
@@ -449,7 +453,7 @@ export class Client {
       await this._connect();
     }
 
-    if (changes && !Array.isArray(changes)) {
+    if (!Array.isArray(changes)) {
       changes = [changes];
     }
 
@@ -465,7 +469,7 @@ export class Client {
     });
 
     const result = await this._send<ModifyResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
   }
@@ -502,7 +506,7 @@ export class Client {
     });
 
     const result = await this._send<ModifyDNResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
   }
@@ -630,7 +634,7 @@ export class Client {
     }
 
     const result = await this._send<BindResponse>(req);
-    if (result.status !== MessageResponseStatus.Success) {
+    if (result?.status !== MessageResponseStatus.Success) {
       throw StatusCodeParser.parse(result);
     }
   }
@@ -640,7 +644,7 @@ export class Client {
 
     const result = await this._send<SearchResponse>(searchRequest);
 
-    if (result.status !== MessageResponseStatus.Success && !(result.status === MessageResponseStatus.SizeLimitExceeded && searchRequest.sizeLimit)) {
+    if (result?.status !== MessageResponseStatus.Success && !(result?.status === MessageResponseStatus.SizeLimitExceeded && searchRequest.sizeLimit)) {
       throw StatusCodeParser.parse(result);
     }
 
@@ -655,16 +659,16 @@ export class Client {
     // Recursively search if paging is specified
     if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
       let pagedResultsFromResponse: PagedResultsControl | undefined;
-      for (const control of result.controls || []) {
+      for (const control of result.controls ?? []) {
         if (control instanceof PagedResultsControl) {
           pagedResultsFromResponse = control;
           break;
         }
       }
 
-      if (pagedResultsFromResponse && pagedResultsFromResponse.value && pagedResultsFromResponse.value.cookie && pagedResultsFromResponse.value.cookie.length) {
+      if (pagedResultsFromResponse?.value?.cookie?.length) {
         // Recursively keep searching
-        pagedResultsControl.value = pagedResultsControl.value || {
+        pagedResultsControl.value = pagedResultsControl.value ?? {
           size: pageSize,
         };
         pagedResultsControl.value.cookie = pagedResultsFromResponse.value.cookie;
@@ -674,6 +678,7 @@ export class Client {
   }
 
   private readonly socketDataHandler = (data: Buffer): void => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (this.messageParser) {
       this.messageParser.read(data, this.messageDetailsByMessageId);
     }
@@ -730,7 +735,7 @@ export class Client {
             delete this.socket;
           }
 
-          return reject(new Error('Connection timeout'));
+          reject(new Error('Connection timeout'));
         }, this.clientOptions.connectTimeout);
       }
     });
@@ -753,17 +758,21 @@ export class Client {
     // region Socket events handlers
     const socketError = (err: Error): void => {
       // Clean up any pending messages
-      for (const [key, messageDetails] of Object.entries(this.messageDetailsByMessageId)) {
+      for (const [key, messageDetails] of this.messageDetailsByMessageId.entries()) {
         if (messageDetails.message instanceof UnbindRequest) {
           // Consider unbind as success since the connection is closed.
           messageDetails.resolve();
         } else {
           messageDetails.reject(
-            new Error(`Socket error. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})\n${err.message || err.stack || 'Unknown'}`),
+            new Error(
+              `Socket error. Message type: ${messageDetails.message.constructor.name} (0x${messageDetails.message.protocolOperation.toString(16)})\n${
+                err.message || (err.stack ?? 'Unknown socket error')
+              }`,
+            ),
           );
         }
 
-        delete this.messageDetailsByMessageId[key];
+        this.messageDetailsByMessageId.delete(key);
       }
 
       if (this.socket) {
@@ -772,6 +781,7 @@ export class Client {
     };
 
     function socketEnd(this: SocketWithId): void {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
@@ -779,6 +789,7 @@ export class Client {
     }
 
     function socketTimeout(this: SocketWithId): void {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (this) {
         // Acknowledge to other end of the connection that the connection is ended.
         this.end();
@@ -789,6 +800,7 @@ export class Client {
     const clientInstance = this;
 
     function socketClose(this: SocketWithId): void {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (this) {
         this.removeListener('error', socketError);
         this.removeListener('close', socketClose);
@@ -803,7 +815,7 @@ export class Client {
       }
 
       // Clean up any pending messages
-      for (const [key, messageDetails] of Object.entries(clientInstance.messageDetailsByMessageId)) {
+      for (const [key, messageDetails] of clientInstance.messageDetailsByMessageId.entries()) {
         if (messageDetails.socket.id === this.id) {
           if (messageDetails.message instanceof UnbindRequest) {
             // Consider unbind as success since the connection is closed.
@@ -816,7 +828,7 @@ export class Client {
             );
           }
 
-          delete clientInstance.messageDetailsByMessageId[key];
+          clientInstance.messageDetailsByMessageId.delete(key);
         }
       }
     }
@@ -831,7 +843,7 @@ export class Client {
       this.socket.on('timeout', socketTimeout);
     }
 
-    return next();
+    next();
   }
 
   private _endSocket(socket: SocketWithId): void {
@@ -855,7 +867,7 @@ export class Client {
    * @private
    * @param {object} message
    */
-  private _send<TMessageResponse extends MessageResponse>(message: Message): Promise<TMessageResponse> {
+  private _send<TMessageResponse extends MessageResponse>(message: Message): Promise<TMessageResponse | undefined> {
     if (!this.connected || !this.socket) {
       throw new Error('Socket connection not established');
     }
@@ -863,7 +875,7 @@ export class Client {
     const messageContentBuffer = message.write();
 
     // eslint-disable-next-line func-style
-    let messageResolve: (messageResponse?: MessageResponse) => void = () => {
+    let messageResolve: (messageResponse?: TMessageResponse) => void = () => {
       // Ignore this as a NOOP
     };
 
@@ -872,20 +884,19 @@ export class Client {
       // Ignore this as a NOOP
     };
 
-    const sendPromise = new Promise<TMessageResponse>((resolve, reject) => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+    const sendPromise = new Promise<TMessageResponse | undefined>((resolve, reject) => {
       messageResolve = resolve;
       messageReject = reject;
     });
 
-    this.messageDetailsByMessageId[message.messageId.toString()] = {
+    this.messageDetailsByMessageId.set(message.messageId.toString(), {
       message,
+      // @ts-expect-error - Both parameter types extend MessageResponse but typescript sees them as different types
       resolve: messageResolve,
       reject: messageReject,
       timeoutTimer: this.clientOptions.timeout
         ? setTimeout(() => {
-            const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
+            const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
             if (messageDetails) {
               this._endSocket(messageDetails.socket);
               messageReject(new Error(`${message.constructor.name}: Operation timed out`));
@@ -893,7 +904,7 @@ export class Client {
           }, this.clientOptions.timeout)
         : null,
       socket: this.socket,
-    };
+    });
 
     if ((message as BindRequest).password) {
       logDebug(
@@ -910,7 +921,7 @@ export class Client {
     this.socket.write(messageContentBuffer, () => {
       if (message instanceof AbandonRequest) {
         logDebug(`Abandoned message: ${message.messageId}`);
-        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        this.messageDetailsByMessageId.delete(message.messageId.toString());
         messageResolve();
       } else if (message instanceof UnbindRequest) {
         logDebug('Unbind success. Ending socket');
@@ -927,15 +938,15 @@ export class Client {
   }
 
   private _handleSendResponse(message: Message): void {
-    const messageDetails = this.messageDetailsByMessageId[message.messageId.toString()];
+    const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
     if (messageDetails) {
       // When performing a search, an arbitrary number of SearchEntry and SearchReference messages come through with the
       // same messageId as the SearchRequest. Finally, a SearchResponse will come through to complete the request.
       if (message instanceof SearchEntry) {
-        messageDetails.searchEntries = messageDetails.searchEntries || [];
+        messageDetails.searchEntries = messageDetails.searchEntries ?? [];
         messageDetails.searchEntries.push(message);
       } else if (message instanceof SearchReference) {
-        messageDetails.searchReferences = messageDetails.searchReferences || [];
+        messageDetails.searchReferences = messageDetails.searchReferences ?? [];
         messageDetails.searchReferences.push(message);
       } else if (message instanceof SearchResponse) {
         // Assign any previously collected entries & references
@@ -947,10 +958,10 @@ export class Client {
           message.searchReferences.push(...messageDetails.searchReferences);
         }
 
-        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        this.messageDetailsByMessageId.delete(message.messageId.toString());
         messageDetails.resolve(message as MessageResponse);
       } else {
-        delete this.messageDetailsByMessageId[message.messageId.toString()];
+        this.messageDetailsByMessageId.delete(message.messageId.toString());
         messageDetails.resolve(message as MessageResponse);
       }
     } else {

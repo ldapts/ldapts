@@ -1,5 +1,6 @@
 import type { BerReader } from 'asn1';
 
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageResponseOptions } from './MessageResponse';
@@ -10,20 +11,20 @@ export interface SearchReferenceOptions extends MessageResponseOptions {
 }
 
 export class SearchReference extends MessageResponse {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public uris: string[];
 
   public constructor(options: SearchReferenceOptions) {
     super(options);
     this.protocolOperation = ProtocolOperation.LDAP_RES_SEARCH_REF;
-    this.uris = options.uris || [];
+    this.uris = options.uris ?? [];
   }
 
   public override parseMessage(reader: BerReader): void {
     const end = reader.offset + reader.length;
     while (reader.offset < end) {
-      const url = reader.readString();
+      const url = reader.readString() ?? '';
       this.uris.push(url);
     }
   }

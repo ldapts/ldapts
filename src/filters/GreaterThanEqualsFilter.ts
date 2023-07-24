@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -10,7 +11,7 @@ export interface GreaterThanEqualsFilterOptions {
 }
 
 export class GreaterThanEqualsFilter extends Filter {
-  public type: SearchFilter = SearchFilter.greaterOrEqual;
+  public type: SearchFilterValues = SearchFilter.greaterOrEqual;
 
   public attribute: string;
 
@@ -19,13 +20,13 @@ export class GreaterThanEqualsFilter extends Filter {
   public constructor(options: GreaterThanEqualsFilterOptions = {}) {
     super();
 
-    this.attribute = options.attribute || '';
-    this.value = options.value || '';
+    this.attribute = options.attribute ?? '';
+    this.value = options.value ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
-    this.attribute = reader.readString().toLowerCase();
-    this.value = reader.readString();
+    this.attribute = reader.readString()?.toLowerCase() ?? '';
+    this.value = reader.readString() ?? '';
   }
 
   public override writeFilter(writer: BerWriter): void {
@@ -33,7 +34,7 @@ export class GreaterThanEqualsFilter extends Filter {
     writer.writeString(this.value);
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
+  public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {

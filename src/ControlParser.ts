@@ -16,15 +16,15 @@ export class ControlParser {
     if (reader.length) {
       const end = reader.offset + reader.length;
 
-      type = reader.readString();
+      type = reader.readString() ?? '';
       if (reader.offset < end) {
         if (reader.peek() === Ber.Boolean) {
-          critical = reader.readBoolean();
+          critical = reader.readBoolean() ?? false;
         }
       }
 
       if (reader.offset < end) {
-        value = reader.readString(Ber.OctetString, true);
+        value = reader.readString(Ber.OctetString, true) ?? Buffer.alloc(0);
       }
     }
 

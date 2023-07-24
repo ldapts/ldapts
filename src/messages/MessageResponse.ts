@@ -18,14 +18,14 @@ export abstract class MessageResponse extends Message {
 
   protected constructor(options: MessageResponseOptions) {
     super(options);
-    this.status = options.status || 0; // LDAP Success
-    this.matchedDN = options.matchedDN || '';
-    this.errorMessage = options.errorMessage || '';
+    this.status = options.status ?? 0; // LDAP Success
+    this.matchedDN = options.matchedDN ?? '';
+    this.errorMessage = options.errorMessage ?? '';
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.status = reader.readEnumeration();
-    this.matchedDN = reader.readString();
-    this.errorMessage = reader.readString();
+    this.status = reader.readEnumeration() ?? 0;
+    this.matchedDN = reader.readString() ?? '';
+    this.errorMessage = reader.readString() ?? '';
   }
 }

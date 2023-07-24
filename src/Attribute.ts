@@ -16,8 +16,8 @@ export class Attribute {
   public values: Buffer[] | string[];
 
   public constructor(options: AttributeOptions = {}) {
-    this.type = options.type || '';
-    this.values = options.values || [];
+    this.type = options.type ?? '';
+    this.values = options.values ?? [];
   }
 
   public get parsedBuffers(): Buffer[] {
@@ -50,14 +50,14 @@ export class Attribute {
   public parse(reader: BerReader): void {
     reader.readSequence();
 
-    this.type = reader.readString();
+    this.type = reader.readString() ?? '';
     const isBinaryType = this._isBinaryType();
 
     if (reader.peek() === ProtocolOperation.LBER_SET) {
       if (reader.readSequence(ProtocolOperation.LBER_SET)) {
         const end = reader.offset + reader.length;
         while (reader.offset < end) {
-          const buffer = reader.readString(Ber.OctetString, true) || Buffer.alloc(0);
+          const buffer = reader.readString(Ber.OctetString, true) ?? Buffer.alloc(0);
           this.buffers.push(buffer);
           if (isBinaryType) {
             (this.values as Buffer[]).push(buffer);

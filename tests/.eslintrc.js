@@ -15,6 +15,7 @@ module.exports = {
   rules: {
     'max-classes-per-file': 'off',
     '@typescript-eslint/unbound-method': 'off',
+    '@typescript-eslint/no-confusing-void-expression': 'off',
     '@typescript-eslint/no-unsafe-call': 'off',
     '@typescript-eslint/no-unsafe-argument': 'off',
     '@typescript-eslint/no-unsafe-member-access': 'off',

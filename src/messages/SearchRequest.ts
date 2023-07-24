@@ -3,6 +3,7 @@ import type { BerReader, BerWriter } from 'asn1';
 import type { SearchOptions } from '../Client';
 import { FilterParser } from '../FilterParser';
 import type { Filter } from '../filters/Filter';
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -14,7 +15,7 @@ export interface SearchRequestMessageOptions extends MessageOptions, SearchOptio
 }
 
 export class SearchRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public baseDN: string;
 
@@ -96,17 +97,15 @@ export class SearchRequest extends Message {
 
     writer.startSequence();
 
-    if (this.attributes && this.attributes.length) {
-      for (const attribute of this.attributes) {
-        writer.writeString(attribute);
-      }
+    for (const attribute of this.attributes) {
+      writer.writeString(attribute);
     }
 
     writer.endSequence();
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.baseDN = reader.readString();
+    this.baseDN = reader.readString() ?? '';
     const scope = reader.readEnumeration();
 
     switch (scope) {
@@ -123,7 +122,7 @@ export class SearchRequest extends Message {
         this.scope = 'children';
         break;
       default:
-        throw new Error(`Invalid search scope: ${scope}`);
+        throw new Error(`Invalid search scope: ${scope ?? '<null>'}`);
     }
 
     const derefAliases = reader.readEnumeration();
@@ -142,12 +141,12 @@ export class SearchRequest extends Message {
         this.derefAliases = 'always';
         break;
       default:
-        throw new Error(`Invalid deref alias: ${derefAliases}`);
+        throw new Error(`Invalid deref alias: ${derefAliases ?? '<null>'}`);
     }
 
-    this.sizeLimit = reader.readInt();
-    this.timeLimit = reader.readInt();
-    this.returnAttributeValues = !reader.readBoolean();
+    this.sizeLimit = reader.readInt() ?? 0;
+    this.timeLimit = reader.readInt() ?? 0;
+    this.returnAttributeValues = !(reader.readBoolean() ?? false);
     this.filter = FilterParser.parse(reader);
 
     if (reader.peek() === 0x30) {

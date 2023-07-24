@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -9,13 +10,13 @@ export interface PresenceFilterOptions {
 }
 
 export class PresenceFilter extends Filter {
-  public type: SearchFilter = SearchFilter.present;
+  public type: SearchFilterValues = SearchFilter.present;
 
   public attribute: string;
 
   public constructor(options: PresenceFilterOptions = {}) {
     super();
-    this.attribute = options.attribute || '';
+    this.attribute = options.attribute ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
@@ -29,7 +30,7 @@ export class PresenceFilter extends Filter {
     }
   }
 
-  public override matches(objectToCheck: { [index: string]: string } = {}, strictAttributeCase?: boolean): boolean {
+  public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     return typeof objectToCheckValue !== 'undefined';

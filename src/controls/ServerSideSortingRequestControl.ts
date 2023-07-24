@@ -34,11 +34,11 @@ export class ServerSideSortingRequestControl extends Control {
   public override parseControl(reader: BerReader): void {
     if (reader.readSequence(0x30)) {
       while (reader.readSequence(0x30)) {
-        const attributeType: string = reader.readString();
+        const attributeType = reader.readString() ?? '';
         let orderingRule = '';
         let reverseOrder = false;
         if (reader.peek() === 0x80) {
-          orderingRule = reader.readString(0x80);
+          orderingRule = reader.readString(0x80) ?? '';
         }
 
         if (reader.peek() === 0x81) {

@@ -6,7 +6,7 @@ import { Control } from './Control';
 
 export interface EntryChangeNotificationControlValue {
   changeType: number;
-  previousDN?: string;
+  previousDN?: string | null;
   changeNumber: number;
 }
 
@@ -27,14 +27,14 @@ export class EntryChangeNotificationControl extends Control {
 
   public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
-      const changeType = reader.readInt();
+      const changeType = reader.readInt() ?? 0;
       let previousDN;
 
       if (changeType === 8) {
         previousDN = reader.readString();
       }
 
-      const changeNumber = reader.readInt();
+      const changeNumber = reader.readInt() ?? 0;
 
       this.value = {
         changeType,

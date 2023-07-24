@@ -1,6 +1,7 @@
 import type { BerReader, BerWriter } from 'asn1';
 
 import { Attribute } from '../Attribute';
+import type { ProtocolOperationValues } from '../ProtocolOperation';
 import { ProtocolOperation } from '../ProtocolOperation';
 
 import type { MessageOptions } from './Message';
@@ -12,7 +13,7 @@ export interface AddMessageOptions extends MessageOptions {
 }
 
 export class AddRequest extends Message {
-  public protocolOperation: ProtocolOperation;
+  public protocolOperation: ProtocolOperationValues;
 
   public dn: string;
 
@@ -23,7 +24,7 @@ export class AddRequest extends Message {
     this.protocolOperation = ProtocolOperation.LDAP_REQ_ADD;
 
     this.dn = options.dn;
-    this.attributes = options.attributes || [];
+    this.attributes = options.attributes ?? [];
   }
 
   public override writeMessage(writer: BerWriter): void {
@@ -37,7 +38,7 @@ export class AddRequest extends Message {
   }
 
   public override parseMessage(reader: BerReader): void {
-    this.dn = reader.readString();
+    this.dn = reader.readString() ?? '';
 
     reader.readSequence();
     const end = reader.offset + reader.length;

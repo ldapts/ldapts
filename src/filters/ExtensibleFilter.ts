@@ -1,5 +1,6 @@
 import type { BerReader, BerWriter } from 'asn1';
 
+import type { SearchFilterValues } from '../SearchFilter';
 import { SearchFilter } from '../SearchFilter';
 
 import { Filter } from './Filter';
@@ -15,7 +16,7 @@ export interface ExtensibleFilterOptions {
 }
 
 export class ExtensibleFilter extends Filter {
-  public type: SearchFilter = SearchFilter.extensibleMatch;
+  public type: SearchFilterValues = SearchFilter.extensibleMatch;
 
   public value: string;
 
@@ -28,10 +29,10 @@ export class ExtensibleFilter extends Filter {
   public constructor(options: ExtensibleFilterOptions = {}) {
     super();
 
-    this.matchType = options.matchType || '';
-    this.rule = options.rule || '';
+    this.matchType = options.matchType ?? '';
+    this.rule = options.rule ?? '';
     this.dnAttributes = options.dnAttributes === true;
-    this.value = options.value || '';
+    this.value = options.value ?? '';
   }
 
   public override parseFilter(reader: BerReader): void {
@@ -41,16 +42,16 @@ export class ExtensibleFilter extends Filter {
 
       switch (tag) {
         case 0x81:
-          this.rule = reader.readString(tag);
+          this.rule = reader.readString(tag) ?? '';
           break;
         case 0x82:
-          this.matchType = reader.readString(tag);
+          this.matchType = reader.readString(tag) ?? '';
           break;
         case 0x83:
-          this.value = reader.readString(tag);
+          this.value = reader.readString(tag) ?? '';
           break;
         case 0x84:
-          this.dnAttributes = reader.readBoolean();
+          this.dnAttributes = reader.readBoolean() ?? false;
           break;
         default: {
           let type = '<null>';
@@ -81,7 +82,7 @@ export class ExtensibleFilter extends Filter {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  public override matches(_: { [index: string]: string } = {}, __?: boolean): void {
+  public override matches(_: Record<string, string> = {}, __?: boolean): boolean {
     throw new Error('Approximate match implementation unknown');
   }
 
