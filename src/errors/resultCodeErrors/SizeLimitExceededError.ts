@@ -1,4 +1,4 @@
-import { ResultCodeError } from './ResultCodeError';
+import { ResultCodeError } from './ResultCodeError.js';
 
 export class SizeLimitExceededError extends ResultCodeError {
   public constructor(message?: string) {

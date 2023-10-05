@@ -1,2 +1,2 @@
-export * from './MessageParserError';
-export * from './resultCodeErrors';
+export * from './MessageParserError.js';
+export * from './resultCodeErrors/index.js';

@@ -1,9 +1,20 @@
 import type { BerReader } from 'asn1';
 
-import type { ExtensibleFilterOptions } from './filters';
-import { PresenceFilter, AndFilter, GreaterThanEqualsFilter, ExtensibleFilter, NotFilter, SubstringFilter, EqualityFilter, ApproximateFilter, OrFilter, LessThanEqualsFilter } from './filters';
-import type { Filter } from './filters/Filter';
-import { SearchFilter } from './SearchFilter';
+import type { ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
+import type { Filter } from './filters/Filter.js';
+import {
+  PresenceFilter,
+  AndFilter,
+  GreaterThanEqualsFilter,
+  ExtensibleFilter,
+  NotFilter,
+  SubstringFilter,
+  EqualityFilter,
+  ApproximateFilter,
+  OrFilter,
+  LessThanEqualsFilter,
+} from './filters/index.js';
+import { SearchFilter } from './SearchFilter.js';
 
 interface ParseStringResult {
   end: number;

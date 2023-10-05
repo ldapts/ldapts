@@ -1,7 +1,7 @@
 import { Ber, BerReader } from 'asn1';
 
-import type { Control } from './controls';
-import { EntryChangeNotificationControl, PagedResultsControl, PersistentSearchControl, ServerSideSortingRequestControl } from './controls';
+import type { Control } from './controls/Control.js';
+import { EntryChangeNotificationControl, PagedResultsControl, PersistentSearchControl, ServerSideSortingRequestControl } from './controls/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ControlParser {

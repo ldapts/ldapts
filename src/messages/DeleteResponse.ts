@@ -1,8 +1,8 @@
-import type { ProtocolOperationValues } from '../ProtocolOperation';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { ProtocolOperation } from '../ProtocolOperation.js';
 
-import type { MessageResponseOptions } from './MessageResponse';
-import { MessageResponse } from './MessageResponse';
+import type { MessageResponseOptions } from './MessageResponse.js';
+import { MessageResponse } from './MessageResponse.js';
 
 export class DeleteResponse extends MessageResponse {
   public protocolOperation: ProtocolOperationValues;

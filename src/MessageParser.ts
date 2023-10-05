@@ -4,12 +4,12 @@ import { EventEmitter } from 'events';
 import { BerReader } from 'asn1';
 import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
-import { MessageParserError } from './errors';
-import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages';
-import type { Message } from './messages/Message';
-import type { MessageResponse } from './messages/MessageResponse';
-import type { ProtocolOperationValues } from './ProtocolOperation';
-import { ProtocolOperation } from './ProtocolOperation';
+import { MessageParserError } from './errors/MessageParserError.js';
+import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages/index.js';
+import type { Message } from './messages/Message.js';
+import type { MessageResponse } from './messages/MessageResponse.js';
+import type { ProtocolOperationValues } from './ProtocolOperation.js';
+import { ProtocolOperation } from './ProtocolOperation.js';
 
 interface MessageParserEvents {
   message: (message: MessageResponse) => void;

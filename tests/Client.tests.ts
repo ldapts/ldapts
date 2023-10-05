@@ -7,7 +7,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
-import type { AddRequest, ModifyDNRequest } from '../src';
+import type { AddRequest, ModifyDNRequest } from '../src/index.js';
 import {
   AddResponse,
   AndFilter,
@@ -22,7 +22,7 @@ import {
   NoSuchObjectError,
   PagedResultsControl,
   UndefinedTypeError,
-} from '../src';
+} from '../src/index.js';
 
 describe('Client', () => {
   let should: Chai.Should;

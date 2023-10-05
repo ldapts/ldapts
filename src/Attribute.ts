@@ -1,7 +1,7 @@
 import type { BerReader, BerWriter } from 'asn1';
 import { Ber } from 'asn1';
 
-import { ProtocolOperation } from './ProtocolOperation';
+import { ProtocolOperation } from './ProtocolOperation.js';
 
 export interface AttributeOptions {
   type?: string;

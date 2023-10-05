@@ -1,11 +1,11 @@
 import type { BerReader, BerWriter } from 'asn1';
 
 import { Attribute } from '../Attribute';
-import type { ProtocolOperationValues } from '../ProtocolOperation';
-import { ProtocolOperation } from '../ProtocolOperation';
+import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { ProtocolOperation } from '../ProtocolOperation.js';
 
-import type { MessageOptions } from './Message';
-import { Message } from './Message';
+import type { MessageOptions } from './Message.js';
+import { Message } from './Message.js';
 
 export interface AddMessageOptions extends MessageOptions {
   dn: string;

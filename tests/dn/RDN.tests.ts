@@ -1,4 +1,4 @@
-import { RDN } from '../../src';
+import { RDN } from '../../src/dn/RDN.js';
 
 describe('RDN', () => {
   describe('#toString()', () => {

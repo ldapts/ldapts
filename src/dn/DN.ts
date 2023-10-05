@@ -1,5 +1,5 @@
-import type { RDNAttributes } from './RDN';
-import { RDN } from './RDN';
+import type { RDNAttributes } from './RDN.js';
+import { RDN } from './RDN.js';
 
 /**
  * RDNMap is an interface, that maps every key & value to a specified RDN.

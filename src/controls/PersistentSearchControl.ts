@@ -1,8 +1,8 @@
 import type { BerReader } from 'asn1';
 import { BerWriter } from 'asn1';
 
-import type { ControlOptions } from './Control';
-import { Control } from './Control';
+import type { ControlOptions } from './Control.js';
+import { Control } from './Control.js';
 
 export interface PersistentSearchValue {
   changeTypes: number;

@@ -5,17 +5,17 @@ import { parse as parseUrl } from 'url';
 import debug from 'debug';
 import { v4 } from 'uuid';
 
-import { Attribute } from './Attribute';
-import type { Change } from './Change';
-import type { Control } from './controls';
-import { PagedResultsControl } from './controls';
-import type { DN } from './dn';
-import type { MessageParserError } from './errors';
-import { FilterParser } from './FilterParser';
-import { PresenceFilter } from './filters';
-import type { Filter } from './filters/Filter';
-import { MessageParser } from './MessageParser';
-import { MessageResponseStatus } from './MessageResponseStatus';
+import { Attribute } from './Attribute.js';
+import type { Change } from './Change.js';
+import type { Control } from './controls/Control.js';
+import { PagedResultsControl } from './controls/PagedResultsControl.js';
+import type { DN } from './dn/DN.js';
+import type { MessageParserError } from './errors/MessageParserError.js';
+import { FilterParser } from './FilterParser.js';
+import type { Filter } from './filters/Filter.js';
+import { PresenceFilter } from './filters/PresenceFilter.js';
+import { MessageParser } from './MessageParser.js';
+import { MessageResponseStatus } from './MessageResponseStatus.js';
 import {
   BindRequest,
   UnbindRequest,
@@ -32,11 +32,11 @@ import {
   AddRequest,
   ModifyRequest,
   SASL_MECHANISMS,
-} from './messages';
-import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse, SaslMechanism } from './messages';
-import type { Message } from './messages/Message';
-import type { MessageResponse } from './messages/MessageResponse';
-import { StatusCodeParser } from './StatusCodeParser';
+} from './messages/index.js';
+import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse, SaslMechanism } from './messages/index.js';
+import type { Message } from './messages/Message.js';
+import type { MessageResponse } from './messages/MessageResponse.js';
+import { StatusCodeParser } from './StatusCodeParser.js';
 
 const MAX_MESSAGE_ID = 2 ** 31 - 1;
 const logDebug = debug('ldapts');

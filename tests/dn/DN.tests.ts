@@ -1,4 +1,4 @@
-import { DN } from '../../src';
+import { DN } from '../../src/index.js';
 
 describe('DN', () => {
   describe('#toString()', () => {

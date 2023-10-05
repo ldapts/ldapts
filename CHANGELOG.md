@@ -1,6 +1,10 @@
 # Change Log
 
-## 7.0.0 - 2023-10-10
+## 7.0.1 - 2023-10-05
+
+- Update import/export statements to include extensions
+
+## 7.0.0 - 2023-10-05
 
 - Drop Node.js 16 support
 - Updated to ES module

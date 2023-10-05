@@ -13,7 +13,7 @@ import {
   PresenceFilter,
   OrFilter,
   ApproximateFilter,
-} from '../src';
+} from '../src/index.js';
 
 describe('FilterParser', () => {
   before(() => {

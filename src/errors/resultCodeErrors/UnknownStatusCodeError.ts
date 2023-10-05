@@ -1,4 +1,4 @@
-import { ResultCodeError } from './ResultCodeError';
+import { ResultCodeError } from './ResultCodeError.js';
 
 export class UnknownStatusCodeError extends ResultCodeError {
   public constructor(code: number, message?: string) {

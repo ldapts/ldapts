@@ -1,6 +1,6 @@
 import type { BindResponse } from '../../messages/BindResponse';
 
-import { ResultCodeError } from './ResultCodeError';
+import { ResultCodeError } from './ResultCodeError.js';
 
 export class SaslBindInProgressError extends ResultCodeError {
   public response: BindResponse;

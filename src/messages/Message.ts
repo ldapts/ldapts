@@ -1,10 +1,10 @@
 import type { BerReader } from 'asn1';
 import { BerWriter } from 'asn1';
 
-import { ControlParser } from '../ControlParser';
-import type { Control } from '../controls';
-import type { ProtocolOperationValues } from '../ProtocolOperation';
-import { ProtocolOperation } from '../ProtocolOperation';
+import { ControlParser } from '../ControlParser.js';
+import type { Control } from '../controls/Control.js';
+import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { ProtocolOperation } from '../ProtocolOperation.js';
 
 export interface MessageOptions {
   messageId: number;
