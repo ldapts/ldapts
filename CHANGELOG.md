@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.0.0 - 2023-10-10
+
+- Drop Node.js 16 support
+- Updated to ES module
+- Changed mocha test runner to use tsx instead of ts-node
+- Update npms
+
 ## 6.0.0 - 2023-07-24
 
 - Update npms

@@ -146,27 +146,33 @@ describe('Client', () => {
       }
     });
     it('should bind using EXTERNAL sasl mechanism', async () => {
-      const client = new Client({
-        url: 'ldap://localhost:389',
-      });
-
-      const [ca, cert, key] = await Promise.all([
-        fs.readFile(path.join(__dirname, './certs/server-ca.pem')), //
-        fs.readFile(path.join(__dirname, './certs/user.pem')),
-        fs.readFile(path.join(__dirname, './certs/user-key.pem')),
-      ]);
-
-      await client.startTLS({
-        ca,
-        cert,
-        key,
-      });
-      await client.bind('EXTERNAL');
-
       try {
-        await client.unbind();
-      } catch {
-        // This can fail since it's not the part being tested
+        const client = new Client({
+          url: 'ldap://localhost:389',
+        });
+
+        const [ca, cert, key] = await Promise.all([
+          fs.readFile(path.join(__dirname, './certs/server-ca.pem')), //
+          fs.readFile(path.join(__dirname, './certs/user.pem')),
+          fs.readFile(path.join(__dirname, './certs/user-key.pem')),
+        ]);
+
+        await client.startTLS({
+          ca,
+          cert,
+          key,
+        });
+        await client.bind('EXTERNAL');
+
+        try {
+          await client.unbind();
+        } catch {
+          // This can fail since it's not the part being tested
+        }
+      } catch (ex) {
+        // eslint-disable-next-line no-console
+        console.warn(`Ensure the local ldap service is running. See ../README.md#development`);
+        throw ex;
       }
     });
     it('should bind with a custom control', async () => {
