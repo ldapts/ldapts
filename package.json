@@ -4,6 +4,7 @@
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
     "test": "mocha \"tests/**/*.tests.ts\"",
@@ -22,7 +23,7 @@
       "prettier --write",
       "markdownlint --config=.github/linters/.markdown-lint.yml --fix"
     ],
-    "*.js": [
+    "*.cjs": [
       "eslint --fix"
     ],
     "*.ts": [
@@ -34,7 +35,7 @@
     "url": "git+https://github.com/ldapts/ldapts.git"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "keywords": [
     "ldap",
@@ -85,7 +86,7 @@
     "prettier": "~3.0.0",
     "sinon": "~15.2.0",
     "ts-mockito": "~2.6.1",
-    "ts-node": "~10.9.1",
+    "tsx": "~3.13.0",
     "typescript": "~5.1.6"
   }
 }

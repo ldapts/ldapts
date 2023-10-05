@@ -5,7 +5,7 @@
 .github
 .idea
 .netbeans
-.mocharc.js
+.mocharc.cjs
 
 tests
 src
