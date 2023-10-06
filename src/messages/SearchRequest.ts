@@ -1,8 +1,8 @@
 import type { BerReader, BerWriter } from 'asn1';
 
-import type { SearchOptions } from '../Client';
-import { FilterParser } from '../FilterParser';
-import type { Filter } from '../filters/Filter';
+import type { SearchOptions } from '../Client.js';
+import { FilterParser } from '../FilterParser.js';
+import type { Filter } from '../filters/Filter.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 

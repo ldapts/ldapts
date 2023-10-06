@@ -1,4 +1,4 @@
-import type { BindResponse } from '../../messages/BindResponse';
+import type { BindResponse } from '../../messages/BindResponse.js';
 
 import { ResultCodeError } from './ResultCodeError.js';
 

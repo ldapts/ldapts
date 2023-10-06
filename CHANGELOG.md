@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.0.2 - 2023-10-06
+
+- Update some missing import/export statements to include extensions
+- Enable `allowSyntheticDefaultImports` to fix asn1 import statements
+
 ## 7.0.1 - 2023-10-05
 
 - Update import/export statements to include extensions

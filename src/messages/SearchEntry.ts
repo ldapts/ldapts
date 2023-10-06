@@ -1,6 +1,6 @@
 import type { BerReader } from 'asn1';
 
-import { Attribute } from '../Attribute';
+import { Attribute } from '../Attribute.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 

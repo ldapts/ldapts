@@ -2,9 +2,10 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "ES2022",
-    "lib": ["esnext"],
+    "lib": ["ESNext"],
     "moduleResolution": "node",
 
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
 
     "outDir": "dist",

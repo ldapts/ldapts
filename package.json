@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "description": "LDAP client",
   "main": "index.js",
   "types": "index.d.ts",
@@ -12,6 +12,8 @@
     "lint:code": "eslint --fix --ext .ts src tests",
     "lint": "run-p lint:*",
     "lint-staged": "lint-staged",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
     "dist": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp package-lock.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish; fi",
     "beta": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp package-lock.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish --tag beta; fi",
     "prepublishOnly": "if [ -d \"src\" ]; then echo \"Please use: npm run dist\" && exit 125; fi && pinst --disable",

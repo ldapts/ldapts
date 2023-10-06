@@ -3,8 +3,8 @@ import { ProtocolOperation } from '../ProtocolOperation.js';
 
 import type { MessageResponseOptions } from './MessageResponse.js';
 import { MessageResponse } from './MessageResponse.js';
-import type { SearchEntry } from './SearchEntry';
-import type { SearchReference } from './SearchReference';
+import type { SearchEntry } from './SearchEntry.js';
+import type { SearchReference } from './SearchReference.js';
 
 export interface SearchResponseOptions extends MessageResponseOptions {
   searchEntries?: SearchEntry[];
