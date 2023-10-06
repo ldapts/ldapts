@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.0.3 - 2023-10-06
+
+- Fix asn1 import statements
+
 ## 7.0.2 - 2023-10-06
 
 - Update some missing import/export statements to include extensions

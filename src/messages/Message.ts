@@ -1,10 +1,12 @@
-import type { BerReader } from 'asn1';
-import { BerWriter } from 'asn1';
+import type { BerReader, BerWriter as BerWriterType } from 'asn1';
+import asn1 from 'asn1';
 
 import { ControlParser } from '../ControlParser.js';
 import type { Control } from '../controls/Control.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
+
+const { BerWriter } = asn1;
 
 export interface MessageOptions {
   messageId: number;
@@ -80,7 +82,7 @@ export abstract class Message {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  protected writeMessage(_: BerWriter): void {
+  protected writeMessage(_: BerWriterType): void {
     // Do nothing as the default action
   }
 }

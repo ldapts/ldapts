@@ -1,8 +1,11 @@
-import { BerWriter } from 'asn1';
+import type { BerWriter as BerWriterType } from 'asn1';
+import asn1 from 'asn1';
 import chai from 'chai';
 import { anyString, mock, capture, verify, anything, when, instance, reset } from 'ts-mockito';
 
 import { ExtensibleFilter } from '../../src/index.js';
+
+const { BerWriter } = asn1;
 
 describe('ExtensibleFilter', () => {
   before(() => {
@@ -10,7 +13,7 @@ describe('ExtensibleFilter', () => {
   });
 
   describe('#writeFilter()', () => {
-    const mockedWriter: BerWriter = mock(BerWriter);
+    const mockedWriter: BerWriterType = mock(BerWriter);
     const berWriterInstance = instance(mockedWriter);
 
     before(() => {

@@ -1,7 +1,8 @@
 import * as assert from 'assert';
 import { EventEmitter } from 'events';
 
-import { BerReader } from 'asn1';
+import type { BerReader as BerReaderType } from 'asn1';
+import asn1 from 'asn1';
 import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
 import { MessageParserError } from './errors/MessageParserError.js';
@@ -17,6 +18,8 @@ interface MessageParserEvents {
 }
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
+
+const { BerReader } = asn1;
 
 export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
@@ -100,7 +103,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
   }
 
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperationValues | number, reader: BerReader, messageDetails?: Message): MessageResponse {
+  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperationValues | number, reader: BerReaderType, messageDetails?: Message): MessageResponse {
     let message: MessageResponse;
 
     switch (protocolOperation) {

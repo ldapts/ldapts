@@ -1,11 +1,14 @@
-import { Ber, BerReader } from 'asn1';
+import type { BerReader as BerReaderType } from 'asn1';
+import asn1 from 'asn1';
 
 import type { Control } from './controls/Control.js';
 import { EntryChangeNotificationControl, PagedResultsControl, PersistentSearchControl, ServerSideSortingRequestControl } from './controls/index.js';
 
+const { Ber, BerReader } = asn1;
+
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class ControlParser {
-  public static parse(reader: BerReader, requestControls: Control[]): Control | null {
+  public static parse(reader: BerReaderType, requestControls: Control[]): Control | null {
     if (reader.readSequence() === null) {
       return null;
     }
