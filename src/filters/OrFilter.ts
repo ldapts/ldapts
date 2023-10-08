@@ -43,7 +43,7 @@ export class OrFilter extends Filter {
   public override toString(): string {
     let result = '(|';
     for (const filter of this.filters) {
-      result += filter.constructor.name;
+      result += filter.toString();
     }
 
     result += ')';

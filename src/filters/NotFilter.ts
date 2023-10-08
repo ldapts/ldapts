@@ -28,6 +28,6 @@ export class NotFilter extends Filter {
   }
 
   public override toString(): string {
-    return `(!${this.filter.constructor.name})`;
+    return `(!${this.filter.toString()})`;
   }
 }
