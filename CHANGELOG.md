@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.0.4 - 2023-10-09
+
+- Fix toString output for OrFilter and NotFilter
+
 ## 7.0.3 - 2023-10-06
 
 - Fix asn1 import statements
