@@ -1,24 +1,41 @@
 {
   "name": "ldapts",
-  "version": "7.0.4",
+  "version": "7.0.5",
   "description": "LDAP client",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
   "scripts": {
-    "build": "tsc",
-    "test": "mocha \"tests/**/*.tests.ts\"",
+    "build": "unbuild",
+    "test": "npm run test:types && mocha \"tests/**/*.tests.ts\"",
+    "test:types": "tsc --noEmit --skipLibCheck",
     "lint:markdown": "prettier --write '*.md' '!(node_modules|dist)/**/*.md' && markdownlint '*.md' '!(node_modules|dist)/**/*.md' --config=.github/linters/.markdown-lint.yml --fix",
     "lint:code": "eslint --fix --ext .ts src tests",
     "lint": "run-p lint:*",
     "lint-staged": "lint-staged",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "dist": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp package-lock.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish; fi",
-    "beta": "if [ -d \"src\" ]; then rm -rf dist && npm run lint && npm run build && npm run test && cp package.json dist && cp package-lock.json dist && cp *.md dist && cp .npmignore dist && cd dist && npm publish --tag beta; fi",
-    "prepublishOnly": "if [ -d \"src\" ]; then echo \"Please use: npm run dist\" && exit 125; fi && pinst --disable",
-    "postinstall": "husky install",
-    "postpublish": "pinst --enable"
+    "beta": "npm publish --tag beta",
+    "prepublishOnly": "npm run lint && npm run build && npm run test && pinst --disable",
+    "postpublish": "pinst --enable",
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "*.md": [
@@ -89,6 +106,7 @@
     "sinon": "~16.1.0",
     "ts-mockito": "~2.6.1",
     "tsx": "~3.13.0",
-    "typescript": "~5.2.2"
+    "typescript": "~5.2.2",
+    "unbuild": "2.0.0"
   }
 }

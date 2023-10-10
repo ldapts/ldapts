@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.0.5 - 2023-10-10
+
+- Fix CommonJS package issues. NOTE: All exports are at the root level now. For example:
+  `import { Control } from 'ldapts/controls';` is now `import { Control } from 'ldapts';`
+- Include `src` in npm package
+
 ## 7.0.4 - 2023-10-09
 
 - Fix toString output for OrFilter and NotFilter
