@@ -1,6 +1,7 @@
 import assert from 'assert';
 import { promises as fs } from 'fs';
 import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import type { BerReader, BerWriter } from 'asn1';
 import chai from 'chai';
@@ -151,10 +152,14 @@ describe('Client', () => {
           url: 'ldap://localhost:389',
         });
 
+        const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
         const [ca, cert, key] = await Promise.all([
-          fs.readFile(path.join(__dirname, './certs/server-ca.pem')), //
-          fs.readFile(path.join(__dirname, './certs/user.pem')),
-          fs.readFile(path.join(__dirname, './certs/user-key.pem')),
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.readFile(path.join(testsDirectory, './certs/server-ca.pem')),
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.readFile(path.join(testsDirectory, './certs/user.pem')),
+          // eslint-disable-next-line security/detect-non-literal-fs-filename
+          fs.readFile(path.join(testsDirectory, './certs/user-key.pem')),
         ]);
 
         await client.startTLS({

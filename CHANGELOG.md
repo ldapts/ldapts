@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.0.6 - 2023-10-27
+
+- Update npms
+
 ## 7.0.5 - 2023-10-10
 
 - Fix CommonJS package issues. NOTE: All exports are at the root level now. For example:
