@@ -248,6 +248,7 @@ module.exports = {
           {
             selector: 'enumMember',
             format: ['camelCase', 'PascalCase', 'UPPER_CASE'],
+            trailingUnderscore: 'forbid',
           },
         ],
         '@typescript-eslint/member-ordering': [
