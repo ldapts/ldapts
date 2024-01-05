@@ -172,7 +172,7 @@ export class DN {
         str += ',';
       }
 
-      str += `${rdn.toString()}`;
+      str += rdn.toString();
     }
 
     return str;
