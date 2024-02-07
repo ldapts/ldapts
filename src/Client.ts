@@ -151,7 +151,7 @@ export class Client {
 
   private socket?: SocketWithId;
 
-  private connectTimer?: NodeJS.Timer;
+  private connectTimer?: NodeJS.Timeout;
 
   private readonly messageParser = new MessageParser();
 
