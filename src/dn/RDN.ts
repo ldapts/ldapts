@@ -124,11 +124,15 @@ export class RDN {
     }
 
     while (current < len) {
-      if (escaped.test(value[current] ?? '') || (!quoted && special.test(value[current] ?? ''))) {
+      const character = value[current] ?? '';
+      if (escaped.test(character) || (!quoted && special.test(character))) {
         str += '\\';
       }
 
-      str += value[current];
+      if (character) {
+        str += character;
+      }
+
       current += 1;
     }
 

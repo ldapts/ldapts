@@ -296,6 +296,7 @@ module.exports = {
         '@typescript-eslint/promise-function-async': 'off',
         '@typescript-eslint/require-await': 'error',
         '@typescript-eslint/restrict-plus-operands': 'error',
+        '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
         '@typescript-eslint/sort-type-constituents': 'error',
         '@typescript-eslint/unbound-method': 'error',
         '@typescript-eslint/unified-signatures': 'error',
@@ -306,7 +307,6 @@ module.exports = {
       rules: {
         '@typescript-eslint/no-unsafe-member-access': 'off',
         '@typescript-eslint/no-unsafe-call': 'off',
-        '@typescript-eslint/restrict-template-expressions': 'off',
 
         'mocha/no-async-describe': 'error',
         'mocha/no-exclusive-tests': 'error',

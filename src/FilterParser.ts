@@ -356,7 +356,10 @@ export class FilterParser {
         }
 
         default:
-          result += char;
+          if (char) {
+            result += char;
+          }
+
           index += 1;
           break;
       }
