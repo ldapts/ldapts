@@ -144,7 +144,7 @@ export class DN {
   }
 
   public clone(): DN {
-    return new DN(this.rdns);
+    return new DN([...this.rdns]);
   }
 
   public reverse(): this {
