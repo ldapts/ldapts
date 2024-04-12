@@ -1,5 +1,5 @@
 {
-  "name": "ldapts",
+  "name": "@jupiterone/ldapts",
   "version": "7.0.11",
   "description": "LDAP client",
   "main": "./dist/index.cjs",

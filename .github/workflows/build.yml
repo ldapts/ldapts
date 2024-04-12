@@ -1,0 +1,53 @@
+name: Build
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code repository source code
+        uses: actions/checkout@v3
+
+      - id: setup-node
+        name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Run tests
+        run: yarn test:ci
+
+      - name: Run build
+        run: yarn build
+
+  # Publishing is done in a separate job to allow
+  # for all matrix builds to complete.
+  BuildRelease:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    name: Checkout Code
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.AUTO_GITHUB_PAT_TOKEN }}
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: yarn
+      - name: Build and Release
+        uses: jupiterone/action-npm-build-release@v1
+        with:
+          npm_auth_token: ${{ secrets.NPM_AUTH_TOKEN }}
+          gh_token: ${{ secrets.AUTO_GITHUB_PAT_TOKEN }}

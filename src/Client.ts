@@ -534,7 +534,7 @@ export class Client {
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResponse> {
+  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<{ searchEntries: Entry[]; controls: Control[] | undefined }> {
     if (!this.isConnected) {
       await this._connect();
     }
@@ -573,7 +573,11 @@ export class Client {
       controls,
     });
 
-    return this._sendSearch(searchRequest);
+    const result = await this._sendSearch(searchRequest);
+    return {
+      controls: result.controls,
+      searchEntries: result.searchEntries.map((e) => e.toObject(options.attributes ?? [], options.explicitBufferAttributes ?? [])),
+    };
   }
 
   /**

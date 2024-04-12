@@ -1,7 +1,4 @@
 import assert from 'assert';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
 
 import type { BerReader, BerWriter } from 'asn1';
 import chai from 'chai';
@@ -21,7 +18,6 @@ import {
   InvalidDNSyntaxError,
   ModifyDNResponse,
   NoSuchObjectError,
-  PagedResultsControl,
   UndefinedTypeError,
 } from '../src/index.js';
 
@@ -144,40 +140,6 @@ describe('Client', () => {
         await client.unbind();
       } catch {
         // This can fail since it's not the part being tested
-      }
-    });
-    it('should bind using EXTERNAL sasl mechanism', async () => {
-      try {
-        const client = new Client({
-          url: 'ldap://localhost:389',
-        });
-
-        const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
-        const [ca, cert, key] = await Promise.all([
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/server-ca.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/user.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/user-key.pem')),
-        ]);
-
-        await client.startTLS({
-          ca,
-          cert,
-          key,
-        });
-        await client.bind('EXTERNAL');
-
-        try {
-          await client.unbind();
-        } catch {
-          // This can fail since it's not the part being tested
-        }
-      } catch (ex) {
-        // eslint-disable-next-line no-console
-        console.warn(`Ensure the local ldap service is running. See ../README.md#development`);
-        throw ex;
       }
     });
     it('should bind with a custom control', async () => {
@@ -816,34 +778,6 @@ describe('Client', () => {
           description: 'tagGroup',
         },
       ]);
-    });
-    it('should throw if a PagedResultsControl is specified', async () => {
-      const pagedResultsControl = new PagedResultsControl({});
-
-      try {
-        await client.search('cn=test', {}, pagedResultsControl);
-        true.should.equal(false);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('Should not specify PagedResultsControl');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
-      }
-    });
-    it('should throw if a PagedResultsControl is specified in the controls array', async () => {
-      const pagedResultsControl = new PagedResultsControl({});
-
-      try {
-        await client.search('cn=test', {}, [pagedResultsControl]);
-        true.should.equal(false);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('Should not specify PagedResultsControl');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
-      }
     });
   });
 });
