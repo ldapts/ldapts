@@ -8,7 +8,6 @@ import { v4 } from 'uuid';
 import { Attribute } from './Attribute.js';
 import type { Change } from './Change.js';
 import type { Control } from './controls/Control.js';
-import { PagedResultsControl } from './controls/PagedResultsControl.js';
 import type { DN } from './dn/DN.js';
 import type { MessageParserError } from './errors/MessageParserError.js';
 import { FilterParser } from './FilterParser.js';
@@ -535,7 +534,7 @@ export class Client {
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
+  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResponse> {
     if (!this.isConnected) {
       await this._connect();
     }
@@ -546,36 +545,8 @@ export class Client {
       } else {
         controls = [controls];
       }
-
-      // Make sure PagedResultsControl is not specified since it's handled internally
-      for (const control of controls) {
-        if (control instanceof PagedResultsControl) {
-          throw new Error('Should not specify PagedResultsControl');
-        }
-      }
     } else {
       controls = [];
-    }
-
-    let pageSize = 100;
-    if (typeof options.paged === 'object' && options.paged.pageSize) {
-      pageSize = options.paged.pageSize;
-    } else if (options.sizeLimit && options.sizeLimit > 1) {
-      // According to the RFC, servers should ignore the paging control if
-      // pageSize >= sizelimit.  Some might still send results, but it's safer
-      // to stay under that figure when assigning a default value.
-      pageSize = options.sizeLimit - 1;
-    }
-
-    let pagedResultsControl: PagedResultsControl | undefined;
-    const shouldPage = !!options.paged;
-    if (shouldPage) {
-      pagedResultsControl = new PagedResultsControl({
-        value: {
-          size: pageSize,
-        },
-      });
-      controls.push(pagedResultsControl);
     }
 
     let filter: Filter;
@@ -602,14 +573,7 @@ export class Client {
       controls,
     });
 
-    const searchResult: SearchResult = {
-      searchEntries: [],
-      searchReferences: [],
-    };
-
-    await this._sendSearch(searchRequest, searchResult, shouldPage, pageSize, pagedResultsControl);
-
-    return searchResult;
+    return this._sendSearch(searchRequest);
   }
 
   /**
@@ -639,7 +603,7 @@ export class Client {
     }
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl): Promise<void> {
+  private async _sendSearch(searchRequest: SearchRequest): Promise<SearchResponse> {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
@@ -648,33 +612,7 @@ export class Client {
       throw StatusCodeParser.parse(result);
     }
 
-    for (const searchEntry of result.searchEntries) {
-      searchResult.searchEntries.push(searchEntry.toObject(searchRequest.attributes, searchRequest.explicitBufferAttributes));
-    }
-
-    for (const searchReference of result.searchReferences) {
-      searchResult.searchReferences.push(...searchReference.uris);
-    }
-
-    // Recursively search if paging is specified
-    if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
-      let pagedResultsFromResponse: PagedResultsControl | undefined;
-      for (const control of result.controls ?? []) {
-        if (control instanceof PagedResultsControl) {
-          pagedResultsFromResponse = control;
-          break;
-        }
-      }
-
-      if (pagedResultsFromResponse?.value?.cookie?.length) {
-        // Recursively keep searching
-        pagedResultsControl.value = pagedResultsControl.value ?? {
-          size: pageSize,
-        };
-        pagedResultsControl.value.cookie = pagedResultsFromResponse.value.cookie;
-        await this._sendSearch(searchRequest, searchResult, paged, pageSize, pagedResultsControl);
-      }
-    }
+    return result;
   }
 
   private readonly socketDataHandler = (data: Buffer): void => {
