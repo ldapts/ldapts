@@ -8,7 +8,7 @@ import { v4 } from 'uuid';
 import { Attribute } from './Attribute.js';
 import type { Change } from './Change.js';
 import type { Control } from './controls/Control.js';
-import { PagedResultsControl } from './controls/PagedResultsControl.js';
+//import { PagedResultsControl } from './controls/PagedResultsControl.js';
 import type { DN } from './dn/DN.js';
 import type { MessageParserError } from './errors/MessageParserError.js';
 import { FilterParser } from './FilterParser.js';
@@ -535,7 +535,7 @@ export class Client {
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
    */
-  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
+  public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResponse> {
     if (!this.isConnected) {
       await this._connect();
     }
@@ -546,17 +546,11 @@ export class Client {
       } else {
         controls = [controls];
       }
-
-      // Make sure PagedResultsControl is not specified since it's handled internally
-      for (const control of controls) {
-        if (control instanceof PagedResultsControl) {
-          throw new Error('Should not specify PagedResultsControl');
-        }
-      }
     } else {
       controls = [];
     }
 
+    /*
     let pageSize = 100;
     if (typeof options.paged === 'object' && options.paged.pageSize) {
       pageSize = options.paged.pageSize;
@@ -577,6 +571,7 @@ export class Client {
       });
       controls.push(pagedResultsControl);
     }
+    */
 
     let filter: Filter;
     if (options.filter) {
@@ -602,14 +597,7 @@ export class Client {
       controls,
     });
 
-    const searchResult: SearchResult = {
-      searchEntries: [],
-      searchReferences: [],
-    };
-
-    await this._sendSearch(searchRequest, searchResult, shouldPage, pageSize, pagedResultsControl);
-
-    return searchResult;
+    return this._sendSearch(searchRequest);
   }
 
   /**
@@ -639,7 +627,7 @@ export class Client {
     }
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl): Promise<void> {
+  private async _sendSearch(searchRequest: SearchRequest): Promise<SearchResponse> {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
@@ -648,6 +636,8 @@ export class Client {
       throw StatusCodeParser.parse(result);
     }
 
+    return result;
+    /*
     for (const searchEntry of result.searchEntries) {
       searchResult.searchEntries.push(searchEntry.toObject(searchRequest.attributes, searchRequest.explicitBufferAttributes));
     }
@@ -675,6 +665,7 @@ export class Client {
         await this._sendSearch(searchRequest, searchResult, paged, pageSize, pagedResultsControl);
       }
     }
+    */
   }
 
   private readonly socketDataHandler = (data: Buffer): void => {
