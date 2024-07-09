@@ -7,5 +7,8 @@ export class ConfidentialityRequiredError extends ResultCodeError {
       message ??
         'The session is not protected by a protocol such as Transport Layer Security (TLS), which provides session confidentiality and the request will not be handled without confidentiality enabled.',
     );
+
+    this.name = 'ConfidentialityRequiredError';
+    Object.setPrototypeOf(this, ConfidentialityRequiredError.prototype);
   }
 }

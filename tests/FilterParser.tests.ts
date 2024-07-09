@@ -1,4 +1,4 @@
-import chai from 'chai';
+import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import {
@@ -27,16 +27,19 @@ describe('FilterParser', () => {
         FilterParser.parseString('');
       }).should.throw(Error, 'Filter cannot be empty');
     });
+
     it('should throw if parenthesis are unbalanced', () => {
       ((): void => {
         FilterParser.parseString('(cn=foo');
       }).should.throw(Error, 'Unbalanced parens');
     });
+
     it('should throw for invalid filter', () => {
       ((): void => {
         FilterParser.parseString('foo>bar');
       }).should.throw(Error, 'Invalid expression: foo>bar');
     });
+
     it('should handle non-wrapped filters', () => {
       FilterParser.parseString('cn=foo').should.deep.equal(
         new EqualityFilter({
@@ -45,16 +48,19 @@ describe('FilterParser', () => {
         }),
       );
     });
+
     it('should throw for only parenthesis', () => {
       ((): void => {
         FilterParser.parseString('()');
       }).should.throw(Error, 'Invalid attribute name:');
     });
+
     it('should throw for nested parenthesis', () => {
       ((): void => {
         FilterParser.parseString('((cn=foo))');
       }).should.throw(Error, 'Invalid attribute name: (cn=foo');
     });
+
     it('should allow xml in filter string', () => {
       const result = FilterParser.parseString('(&(CentralUIEnrollments=<mydoc>*)(objectClass=User))');
       result.should.deep.equal(
@@ -72,6 +78,7 @@ describe('FilterParser', () => {
         }),
       );
     });
+
     describe('Special characters in filter string', () => {
       it('should allow = in filter string', () => {
         const result = FilterParser.parseString('(uniquemember=uuid=930896af-bf8c-48d4-885c-6573a94b1853, ou=users, o=smartdc)');
@@ -82,6 +89,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       describe('paren in value', () => {
         it('should allow ( in filter string', () => {
           const result = FilterParser.parseString('foo=bar\\28');
@@ -92,6 +100,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow ) in filter string', () => {
           const result = FilterParser.parseString('foo=bar\\29');
           result.should.deep.equal(
@@ -101,6 +110,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow () in filter string', () => {
           const result = FilterParser.parseString('foo=bar\\28\\29');
           result.should.deep.equal(
@@ -110,6 +120,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow )( in filter string', () => {
           const result = FilterParser.parseString('foo=bar\\29\\28');
           result.should.deep.equal(
@@ -120,6 +131,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('newline in value', () => {
         it('should allow newline as attribute value', () => {
           FilterParser.parseString('(foo=\n)').should.deep.equal(
@@ -159,6 +171,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow newline after attribute value', () => {
           FilterParser.parseString('(foo=bar\n)').should.deep.equal(
             new EqualityFilter({
@@ -197,6 +210,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow newline before attribute value', () => {
           FilterParser.parseString('(foo=\nbar)').should.deep.equal(
             new EqualityFilter({
@@ -235,6 +249,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow carriage return as attribute value', () => {
           FilterParser.parseString('(foo=\r)').should.deep.equal(
             new EqualityFilter({
@@ -273,6 +288,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow carriage return after attribute value', () => {
           FilterParser.parseString('(foo=bar\r)').should.deep.equal(
             new EqualityFilter({
@@ -311,6 +327,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow carriage return before attribute value', () => {
           FilterParser.parseString('(foo=\rbar)').should.deep.equal(
             new EqualityFilter({
@@ -350,6 +367,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('tab in value', () => {
         it('should allow tab as attribute value', () => {
           FilterParser.parseString('(foo=\t)').should.deep.equal(
@@ -389,6 +407,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow tab after attribute value', () => {
           FilterParser.parseString('(foo=bar\t)').should.deep.equal(
             new EqualityFilter({
@@ -427,6 +446,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow tab before attribute value', () => {
           FilterParser.parseString('(foo=\tbar)').should.deep.equal(
             new EqualityFilter({
@@ -466,6 +486,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('space in value', () => {
         it('should allow space as attribute value', () => {
           FilterParser.parseString('(foo= )').should.deep.equal(
@@ -505,6 +526,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow space after attribute value', () => {
           FilterParser.parseString('(foo=bar )').should.deep.equal(
             new EqualityFilter({
@@ -543,6 +565,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow space before attribute value', () => {
           FilterParser.parseString('(foo= bar)').should.deep.equal(
             new EqualityFilter({
@@ -582,6 +605,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('\\ in value', () => {
         it('should allow \\ as attribute value', () => {
           FilterParser.parseString('(foo=\\5c)').should.deep.equal(
@@ -603,6 +627,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow \\ after attribute value', () => {
           FilterParser.parseString('(foo=bar\\5c)').should.deep.equal(
             new EqualityFilter({
@@ -623,6 +648,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow \\ before attribute value', () => {
           FilterParser.parseString('(foo=\\5cbar)').should.deep.equal(
             new EqualityFilter({
@@ -643,6 +669,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow \\ in attribute value', () => {
           FilterParser.parseString('(foo=\\5cbar\\5cbaz\\5c)').should.deep.equal(
             new EqualityFilter({
@@ -663,6 +690,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow null (\\00) value in attribute value', () => {
           FilterParser.parseString('(foo=bar\\00)').should.deep.equal(
             new EqualityFilter({
@@ -672,6 +700,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('* in value', () => {
         it('should allow * as attribute value', () => {
           FilterParser.parseString('(foo=\\2a)').should.deep.equal(
@@ -693,6 +722,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow * after attribute value', () => {
           FilterParser.parseString('(foo=bar\\2a)').should.deep.equal(
             new EqualityFilter({
@@ -713,6 +743,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow * before attribute value', () => {
           FilterParser.parseString('(foo=\\2abar)').should.deep.equal(
             new EqualityFilter({
@@ -733,6 +764,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow * in attribute value', () => {
           FilterParser.parseString('(foo=\\2abar\\2abaz\\2a)').should.deep.equal(
             new EqualityFilter({
@@ -754,6 +786,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('<= in value', () => {
         it('should allow <= as attribute value', () => {
           FilterParser.parseString('(foo=<=)').should.deep.equal(
@@ -775,6 +808,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow <= after attribute value', () => {
           FilterParser.parseString('(foo=bar<=)').should.deep.equal(
             new EqualityFilter({
@@ -795,6 +829,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow <= before attribute value', () => {
           FilterParser.parseString('(foo=<=bar)').should.deep.equal(
             new EqualityFilter({
@@ -815,6 +850,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow <= in attribute value', () => {
           FilterParser.parseString('(foo=bar<=baz)').should.deep.equal(
             new EqualityFilter({
@@ -836,6 +872,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('>= in value', () => {
         it('should allow >= as attribute value', () => {
           FilterParser.parseString('(foo=>=)').should.deep.equal(
@@ -857,6 +894,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow >= after attribute value', () => {
           FilterParser.parseString('(foo=bar>=)').should.deep.equal(
             new EqualityFilter({
@@ -877,6 +915,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow >= before attribute value', () => {
           FilterParser.parseString('(foo=>=bar)').should.deep.equal(
             new EqualityFilter({
@@ -897,6 +936,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow >= in attribute value', () => {
           FilterParser.parseString('(foo=bar>=baz)').should.deep.equal(
             new EqualityFilter({
@@ -918,6 +958,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('& in value', () => {
         it('should allow & as attribute value', () => {
           FilterParser.parseString('(foo=&)').should.deep.equal(
@@ -939,6 +980,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow & after attribute value', () => {
           FilterParser.parseString('(foo=bar&)').should.deep.equal(
             new EqualityFilter({
@@ -959,6 +1001,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow & before attribute value', () => {
           FilterParser.parseString('(foo=&bar)').should.deep.equal(
             new EqualityFilter({
@@ -979,6 +1022,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow & in attribute value', () => {
           FilterParser.parseString('(foo=&bar&baz&)').should.deep.equal(
             new EqualityFilter({
@@ -1000,6 +1044,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('| in value', () => {
         it('should allow | as attribute value', () => {
           FilterParser.parseString('(foo=|)').should.deep.equal(
@@ -1021,6 +1066,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow | after attribute value', () => {
           FilterParser.parseString('(foo=bar|)').should.deep.equal(
             new EqualityFilter({
@@ -1041,6 +1087,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow | before attribute value', () => {
           FilterParser.parseString('(foo=|bar)').should.deep.equal(
             new EqualityFilter({
@@ -1061,6 +1108,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow | in attribute value', () => {
           FilterParser.parseString('(foo=|bar|baz|)').should.deep.equal(
             new EqualityFilter({
@@ -1082,6 +1130,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('! in value', () => {
         it('should allow ! as attribute value', () => {
           FilterParser.parseString('(foo=!)').should.deep.equal(
@@ -1103,6 +1152,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow ! after attribute value', () => {
           FilterParser.parseString('(foo=bar!)').should.deep.equal(
             new EqualityFilter({
@@ -1123,6 +1173,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow ! before attribute value', () => {
           FilterParser.parseString('(foo=!bar)').should.deep.equal(
             new EqualityFilter({
@@ -1143,6 +1194,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow ! in attribute value', () => {
           FilterParser.parseString('(foo=!bar!baz!)').should.deep.equal(
             new EqualityFilter({
@@ -1164,6 +1216,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('unicode in value', () => {
         it('should allow ☕⛵ᄨ as attribute value', () => {
           FilterParser.parseString('(foo=☕⛵ᄨ)').should.deep.equal(
@@ -1185,6 +1238,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should allow ᎢᏣᎵᏍᎠᏁᏗ as attribute value', () => {
           FilterParser.parseString('(foo=ᎢᏣᎵᏍᎠᏁᏗ)').should.deep.equal(
             new EqualityFilter({
@@ -1206,6 +1260,7 @@ describe('FilterParser', () => {
           );
         });
       });
+
       describe('Tests from RFC examples', () => {
         it('should parse: (o=Parens R Us (for all your parenthetical needs))', () => {
           const result = FilterParser.parseString('(o=Parens R Us \\28for all your parenthetical needs\\29)');
@@ -1216,6 +1271,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should parse: (cn=***)', () => {
           const result = FilterParser.parseString('(cn=*\\2A*)');
           result.should.deep.equal(
@@ -1225,6 +1281,7 @@ describe('FilterParser', () => {
             }),
           );
         });
+
         it('should parse: (&(objectCategory=group)(displayName=My group (something)))', () => {
           const result = FilterParser.parseString('(&(objectCategory=group)(displayName=My group \\28something\\29))');
           result.should.deep.equal(
@@ -1244,6 +1301,7 @@ describe('FilterParser', () => {
         });
       });
     });
+
     describe('Github Issues', () => {
       it('should parse: (&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))', () => {
         const result = FilterParser.parseString('(&(objectCategory=person)(objectClass=user)(!(userAccountControl:1.2.840.113556.1.4.803:=2)))');
@@ -1270,6 +1328,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('SubstringFilter', () => {
       it('should support * with a prefix', () => {
         const result = FilterParser.parseString('(foo=bar*)');
@@ -1280,6 +1339,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should support * with a suffix', () => {
         const result = FilterParser.parseString('(foo=*bar)');
         result.should.deep.equal(
@@ -1289,6 +1349,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should support * with a prefix and escaped *', () => {
         const result = FilterParser.parseString('(foo=bar\\2a*)');
         result.should.deep.equal(
@@ -1298,6 +1359,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should support * with a suffix and escaped *', () => {
         const result = FilterParser.parseString('(foo=*bar\\2a)');
         result.should.deep.equal(
@@ -1308,6 +1370,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('NotFilter', () => {
       it('should parse Not filter', () => {
         const result = FilterParser.parseString('(&(objectClass=person)(!(objectClass=shadowAccount)))');
@@ -1329,6 +1392,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('PresenceFilter', () => {
       it('should parse PresenceFilter', () => {
         const result = FilterParser.parseString('(foo=*)');
@@ -1339,6 +1403,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('OrFilter', () => {
       it('should parse PresenceFilter', () => {
         const result = FilterParser.parseString('(|(foo=bar)(baz=bip))');
@@ -1358,6 +1423,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('ApproximateFilter', () => {
       it('should parse ApproximateFilter', () => {
         const result = FilterParser.parseString('(foo~=bar)');
@@ -1369,6 +1435,7 @@ describe('FilterParser', () => {
         );
       });
     });
+
     describe('ExtensibleFilter', () => {
       it('should parse: (cn:caseExactMatch:=Fred Flintstone)', () => {
         const result = FilterParser.parseString('(cn:caseExactMatch:=Fred Flintstone)');
@@ -1380,6 +1447,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should parse: (cn:=Betty Rubble)', () => {
         const result = FilterParser.parseString('(cn:=Betty Rubble)');
         result.should.deep.equal(
@@ -1389,6 +1457,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should parse: (sn:dn:2.4.6.8.10:=Barney Rubble)', () => {
         const result = FilterParser.parseString('(sn:dn:2.4.6.8.10:=Barney Rubble)');
         result.should.deep.equal(
@@ -1400,6 +1469,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should parse: (o:dn:=Ace Industry)', () => {
         const result = FilterParser.parseString('(o:dn:=Ace Industry)');
         result.should.deep.equal(
@@ -1410,6 +1480,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should parse: (:1.2.3:=Wilma Flintstone)', () => {
         const result = FilterParser.parseString('(:1.2.3:=Wilma Flintstone)');
         result.should.deep.equal(
@@ -1419,6 +1490,7 @@ describe('FilterParser', () => {
           }),
         );
       });
+
       it('should parse: (:DN:2.4.6.8.10:=Dino)', () => {
         const result = FilterParser.parseString('(:DN:2.4.6.8.10:=Dino)');
         result.should.deep.equal(

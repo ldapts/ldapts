@@ -1,6 +1,6 @@
 import type { BerWriter as BerWriterType } from 'asn1';
 import asn1 from 'asn1';
-import chai from 'chai';
+import * as chai from 'chai';
 import { anyString, mock, capture, verify, when, instance, reset } from 'ts-mockito';
 
 import { EqualityFilter } from '../../src/index.js';
@@ -13,8 +13,13 @@ describe('EqualityFilter', () => {
   });
 
   describe('#writeFilter()', () => {
-    const mockedWriter: BerWriterType = mock(BerWriter);
-    const berWriterInstance = instance(mockedWriter);
+    let mockedWriter: BerWriterType;
+    let berWriterInstance: BerWriterType;
+
+    before(() => {
+      mockedWriter = mock(BerWriter);
+      berWriterInstance = instance(mockedWriter);
+    });
 
     beforeEach(() => {
       reset(mockedWriter);
@@ -35,6 +40,7 @@ describe('EqualityFilter', () => {
       writeStringCalls.first().should.deep.equal(['o']);
       writeStringCalls.second().should.deep.equal(['Parens R Us (for all your parenthetical needs)']);
     });
+
     it('should write: (displayName=My group (something))', () => {
       const filter = new EqualityFilter({
         attribute: 'displayName',

@@ -37,7 +37,6 @@ export class AbandonRequest extends Message {
 
     assert.ok(intSize <= 4);
 
-    // eslint-disable-next-line no-plusplus
     while (intSize-- > 0) {
       writer.writeByte((i & 0xff000000) >> 24);
       i <<= 8;

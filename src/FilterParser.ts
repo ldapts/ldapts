@@ -226,7 +226,7 @@ export class FilterParser {
       attribute = '';
       remainingExpression = filterString;
     } else {
-      const matches = /^[-\w]+/.exec(filterString);
+      const matches = /^[\w-]+/.exec(filterString);
       if (matches?.length) {
         [attribute] = matches;
         remainingExpression = filterString.substr(attribute.length);
@@ -345,7 +345,7 @@ export class FilterParser {
           throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
         case '\\': {
           const value = input.substr(index + 1, 2);
-          if (/^[a-fA-F0-9]{2}$/.exec(value) === null) {
+          if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
             throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
           }
 

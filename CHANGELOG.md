@@ -1,7 +1,8 @@
 # Change Log
 
-## 7.0.13 - 2024-07-09
+## 7.1.0 - 2024-07-09
 
+- Ensure errors have name and prototype set
 - Update npms
 - Update eslint to use flat config
 

@@ -4,7 +4,7 @@ import * as path from 'path';
 import { fileURLToPath } from 'url';
 
 import type { BerReader, BerWriter } from 'asn1';
-import chai from 'chai';
+import * as chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
@@ -27,19 +27,21 @@ import {
 
 describe('Client', () => {
   let should: Chai.Should;
+  let bindDN: string;
+  const bindPassword = 'MyRedSuitKeepsMeWarm';
+
   before(() => {
     should = chai.should();
     chai.use(chaiAsPromised);
-  });
 
-  const bindDN = new DN({
-    uid: 'tony.stark',
-    ou: 'Users',
-    // eslint-disable-next-line id-length
-    o: '5be4c382c583e54de6a3ff52',
-    dc: ['jumpcloud', 'com'],
-  }).toString();
-  const bindPassword = 'MyRedSuitKeepsMeWarm';
+    bindDN = new DN({
+      uid: 'tony.stark',
+      ou: 'Users',
+      // eslint-disable-next-line id-length
+      o: '5be4c382c583e54de6a3ff52',
+      dc: ['jumpcloud', 'com'],
+    }).toString();
+  });
 
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
@@ -50,6 +52,7 @@ describe('Client', () => {
         });
       }).should.throw(Error, `${url} is an invalid LDAP URL (protocol)`);
     });
+
     it('should not throw error if url protocol is ldap://', () => {
       const url = 'ldap://127.0.0.1';
       ((): void => {
@@ -58,6 +61,7 @@ describe('Client', () => {
         });
       }).should.not.throw(Error);
     });
+
     it('should not throw error if url protocol is ldaps://', () => {
       const url = 'ldaps://127.0.0.1';
       ((): void => {
@@ -67,6 +71,7 @@ describe('Client', () => {
       }).should.not.throw(Error);
     });
   });
+
   describe('#isConnected', () => {
     it('should not be connected if a method has not been called', () => {
       const client = new Client({
@@ -75,6 +80,7 @@ describe('Client', () => {
 
       client.isConnected.should.equal(false);
     });
+
     it('should not be connected after unbind has been called', async () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -88,6 +94,7 @@ describe('Client', () => {
 
       client.isConnected.should.equal(false);
     });
+
     it('should be connected if a method has been called', async () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -104,6 +111,7 @@ describe('Client', () => {
       }
     });
   });
+
   describe('#bind()', () => {
     it('should succeed on basic bind', async () => {
       const client = new Client({
@@ -118,6 +126,7 @@ describe('Client', () => {
         // This can fail since it's not the part being tested
       }
     });
+
     it('should throw for invalid credentials', async () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -132,6 +141,7 @@ describe('Client', () => {
         await client.unbind();
       }
     });
+
     it('should succeed for non-secure bind', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "objectclass=*"
       const client = new Client({
@@ -146,6 +156,7 @@ describe('Client', () => {
         // This can fail since it's not the part being tested
       }
     });
+
     it('should bind using EXTERNAL sasl mechanism', async () => {
       try {
         const client = new Client({
@@ -180,6 +191,7 @@ describe('Client', () => {
         throw ex;
       }
     });
+
     it('should bind with a custom control', async () => {
       // Get list of supported controls and extensions:
       // ldapsearch -H ldaps://ldap.jumpcloud.com -b "" -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -s base supportedFeatures supportedControl supportedExtension
@@ -223,6 +235,7 @@ describe('Client', () => {
       hasParsed.should.equal(true, 'Did not call PasswordPolicyControl#parseControl');
     });
   });
+
   describe('#startTLS()', () => {
     it('should upgrade an existing clear-text connection to be secure', async () => {
       const client = new Client({
@@ -231,6 +244,7 @@ describe('Client', () => {
 
       await client.startTLS();
     });
+
     it('should use secure connection for subsequent operations', async () => {
       const client = new Client({
         url: 'ldap://ldap.jumpcloud.com',
@@ -241,6 +255,7 @@ describe('Client', () => {
       await client.unbind();
     });
   });
+
   describe('#unbind()', () => {
     it('should succeed on basic unbind after successful bind', async () => {
       const client = new Client({
@@ -250,6 +265,7 @@ describe('Client', () => {
       await client.bind(bindDN, bindPassword);
       await client.unbind();
     });
+
     it('should succeed on if client.bind() was not called previously', async () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -257,6 +273,7 @@ describe('Client', () => {
 
       await client.unbind();
     });
+
     it('should allow unbind to be called multiple times without error', async () => {
       const client = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -269,6 +286,7 @@ describe('Client', () => {
       await client.unbind();
     });
   });
+
   describe('#compare()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',
@@ -277,6 +295,7 @@ describe('Client', () => {
     before(async () => {
       await client.bind(bindDN, bindPassword);
     });
+
     after(async () => {
       await client.unbind();
     });
@@ -285,10 +304,12 @@ describe('Client', () => {
       const result = await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'sn', 'Banner');
       result.should.equal(true);
     });
+
     it('should return false if entry does not have the specified attribute and value', async () => {
       const result = await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'sn', 'Stark');
       result.should.equal(false);
     });
+
     it('should throw if attribute is invalid', async () => {
       try {
         await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'lorem', 'ipsum');
@@ -297,6 +318,7 @@ describe('Client', () => {
         (ex instanceof UndefinedTypeError).should.equal(true);
       }
     });
+
     it('should throw if target dn does not exist', async () => {
       try {
         await client.compare('uid=foo.bar,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'uid', 'bruce.banner');
@@ -305,6 +327,7 @@ describe('Client', () => {
         (ex instanceof NoSuchObjectError).should.equal(true);
       }
     });
+
     it('should throw on invalid DN', async () => {
       try {
         await client.compare('foo=bar', 'cn', 'bar');
@@ -345,6 +368,7 @@ describe('Client', () => {
     before(async () => {
       await client.bind(bindDN, bindPassword);
     });
+
     after(async () => {
       await client.unbind();
     });
@@ -382,6 +406,7 @@ describe('Client', () => {
       ]);
     });
   });
+
   describe('#modifyDN()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',
@@ -390,6 +415,7 @@ describe('Client', () => {
     before(async () => {
       await client.bind(bindDN, bindPassword);
     });
+
     after(async () => {
       await client.unbind();
     });
@@ -418,6 +444,7 @@ describe('Client', () => {
       args.newSuperior.should.equal(newSuperior);
       should.equal(args.controls, undefined);
     });
+
     it('should handle escaped comma in newDN. Issue #87', async () => {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-expect-error
@@ -443,6 +470,7 @@ describe('Client', () => {
       should.equal(args.controls, undefined);
     });
   });
+
   describe('#exop()', () => {
     it('should throw if fast bind is not supported', async () => {
       const client: Client = new Client({
@@ -464,6 +492,7 @@ describe('Client', () => {
       await client.unbind();
     });
   });
+
   describe('#search()', () => {
     const client: Client = new Client({
       url: 'ldaps://ldap.jumpcloud.com',
@@ -472,6 +501,7 @@ describe('Client', () => {
     before(async () => {
       await client.bind(bindDN, bindPassword);
     });
+
     after(async () => {
       await client.unbind();
     });
@@ -482,6 +512,7 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.be.greaterThan(0);
     });
+
     it('should throw error if an operation is performed after the client has closed connection', async () => {
       const testClient = new Client({
         url: 'ldaps://ldap.jumpcloud.com',
@@ -505,6 +536,7 @@ describe('Client', () => {
         await testClient.unbind();
       }
     });
+
     it('should return full search entries if filter="(mail=peter.parker@marvel.com)"', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -529,6 +561,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should return full search entries if filter="(mail=peter.park*)"', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -553,6 +586,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should return parallel search entries if filter="(mail=peter.parker@marvel.com)". Issue #83', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
       const [result1, result2, result3] = await Promise.all([
@@ -588,6 +622,7 @@ describe('Client', () => {
       result2.searchEntries.should.deep.equal(expectedResult);
       result3.searchEntries.should.deep.equal(expectedResult);
     });
+
     it('should allow arbitrary controls 1.2.840.113556.1.4.417 to be specified', async () => {
       const searchResult = await client.search(
         'ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
@@ -600,6 +635,7 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.equal(0);
     });
+
     it('should return search results for non-secure ldap server', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
       const testClient = new Client({
@@ -630,6 +666,7 @@ describe('Client', () => {
         await testClient.unbind();
       }
     });
+
     it('should restrict attributes returned if attributes are specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -645,6 +682,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should include attributes without values if attributes are specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -661,6 +699,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should not return attribute values if returnAttributeValues=false', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -687,6 +726,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should page search entries if paging is specified', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -698,6 +738,7 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.be.greaterThan(2);
     });
+
     it('should allow sizeLimit when no paging is specified - jumpcloud', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -z 6 'cn=*'
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -707,6 +748,7 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.equal(6);
     });
+
     it('should allow sizeLimit when no paging is specified - forumsys', async () => {
       // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -z 3 'cn=*'
       const testClient = new Client({
@@ -728,6 +770,7 @@ describe('Client', () => {
         await testClient.unbind();
       }
     });
+
     it('should allow sizeLimit when paging is specified - jumpcloud', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=3/noprompt -z 5 'cn=*'
       const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -740,6 +783,7 @@ describe('Client', () => {
 
       searchResult.searchEntries.length.should.equal(5);
     });
+
     it('should allow sizeLimit when paging is specified - forumsys', async () => {
       // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -E pr=3/noprompt -z 4 'cn=*'
       const testClient = new Client({
@@ -764,6 +808,7 @@ describe('Client', () => {
         await testClient.unbind();
       }
     });
+
     it('should return group contents with parenthesis in name - explicit filter controls', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
       const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -796,6 +841,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should return group contents with parenthesis in name - string filter', async () => {
       // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
       const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
@@ -817,6 +863,7 @@ describe('Client', () => {
         },
       ]);
     });
+
     it('should throw if a PagedResultsControl is specified', async () => {
       const pagedResultsControl = new PagedResultsControl({});
 
@@ -831,6 +878,7 @@ describe('Client', () => {
         }
       }
     });
+
     it('should throw if a PagedResultsControl is specified in the controls array', async () => {
       const pagedResultsControl = new PagedResultsControl({});
 

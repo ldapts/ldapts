@@ -39,6 +39,7 @@ describe('DN', () => {
       dn.toString().should.equal('oa=eu,dc=domain1,dc=domain2');
     });
   });
+
   describe('#equals()', () => {
     it('should equal two exact objects', () => {
       const dn1 = new DN({ dc: 'domain', oa: 'eu' });
@@ -52,6 +53,7 @@ describe('DN', () => {
       dn1.equals(dn2).should.not.equal(true);
     });
   });
+
   describe('#clone()', () => {
     it('should clone when RDNs have a value', () => {
       const dn = new DN({ dc: ['hello'], oa: 'aaa' });

@@ -1,4 +1,4 @@
-import chai from 'chai';
+import * as chai from 'chai';
 
 import { EqualityFilter, NotFilter } from '../../src/index.js';
 

@@ -40,7 +40,7 @@ export class ExtendedRequest extends Message {
     if (reader.peek() === 0x81) {
       try {
         this.value = reader.readString(0x81) ?? '';
-      } catch (ex) {
+      } catch {
         this.value = reader.readString(0x81, true) ?? Buffer.alloc(0);
       }
     }

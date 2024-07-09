@@ -4,6 +4,7 @@
     "module": "ES2022",
     "lib": ["ESNext"],
     "moduleResolution": "node",
+    "allowJs": false,
 
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
@@ -32,7 +33,8 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",

@@ -50,10 +50,9 @@ export class RDN {
     ourKeys.sort();
     otherKeys.sort();
 
-    for (let i = 0; i < ourKeys.length; i += 1) {
-      const key = ourKeys[i];
-
-      if (key == null || ourKeys[i] !== otherKeys[i]) {
+    for (const [i, key] of ourKeys.entries()) {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (key == null || key !== otherKeys[i]) {
         return false;
       }
 
@@ -115,8 +114,8 @@ export class RDN {
     let quoted = false;
     const len = value.length;
 
-    const escaped = /[\\"]/;
-    const special = /[,=+<>#;]/;
+    const escaped = /["\\]/;
+    const special = /[#+,;<=>]/;
 
     if (len > 0) {
       // Wrap strings with trailing or leading spaces in quotes

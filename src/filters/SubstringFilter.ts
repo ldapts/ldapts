@@ -132,6 +132,6 @@ export class SubstringFilter extends Filter {
   }
 
   private static _escapeRegExp(str: string): string {
-    return str.replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&');
+    return str.replace(/[$()*+./?[\\\]^{|}-]/g, '\\$&');
   }
 }
