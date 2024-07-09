@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.0.13 - 2024-07-09
+
+- Update npms
+- Update eslint to use flat config
+
 ## 7.0.12 - 2024-05-13
 
 - Update npms

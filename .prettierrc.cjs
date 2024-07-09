@@ -13,9 +13,9 @@ module.exports = {
 
   overrides: [
     {
-      files: '*.js',
+      files: ['*.js', '*.cjs', '*.mjs'],
       options: {
-        parser: 'babel',
+        parser: 'espree',
       },
     },
     {
