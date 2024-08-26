@@ -539,6 +539,14 @@ try {
 
 ## Development
 
+### Generate certificates
+
+Use [certyaml](https://github.com/tsaarni/certyaml) to generate certificates for tests:
+
+```sh
+(cd tests/certs && ./certyaml -d .)
+```
+
 ### Start test OpenLDAP server
 
 ```shell

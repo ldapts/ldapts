@@ -20,7 +20,7 @@ export class PresenceFilter extends Filter {
   }
 
   public override parseFilter(reader: BerReader): void {
-    this.attribute = reader.buffer.slice(0, reader.length).toString('utf8').toLowerCase();
+    this.attribute = reader.buffer.subarray(0, reader.length).toString('utf8').toLowerCase();
     reader._offset += reader.length;
   }
 

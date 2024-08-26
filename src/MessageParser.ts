@@ -6,7 +6,7 @@ import asn1 from 'asn1';
 import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
 import { MessageParserError } from './errors/MessageParserError.js';
-import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchResponse, SearchEntry, SearchReference } from './messages/index.js';
+import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchEntry, SearchReference, SearchResponse } from './messages/index.js';
 import type { Message } from './messages/Message.js';
 import type { MessageResponse } from './messages/MessageResponse.js';
 import type { ProtocolOperationValues } from './ProtocolOperation.js';
@@ -49,7 +49,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
 
     if (reader.remain > reader.length) {
       // Received too much data
-      nextMessage = this.buffer.slice(reader.offset + reader.length);
+      nextMessage = this.buffer.subarray(reader.offset + reader.length);
       reader._size = reader.offset + reader.length;
       assert.strictEqual(reader.remain, reader.length);
     }

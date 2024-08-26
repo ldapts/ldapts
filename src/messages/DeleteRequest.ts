@@ -30,7 +30,7 @@ export class DeleteRequest extends Message {
 
   public override parseMessage(reader: BerReader): void {
     const { length } = reader;
-    this.dn = reader.buffer.slice(0, length).toString('utf8');
+    this.dn = reader.buffer.subarray(0, length).toString('utf8');
     reader._offset += reader.length;
   }
 }

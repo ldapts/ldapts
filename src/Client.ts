@@ -1,9 +1,9 @@
 import * as net from 'net';
 import * as tls from 'tls';
-import { parse as parseUrl } from 'url';
 
 import debug from 'debug';
 import { v4 } from 'uuid';
+import { parseURL } from 'whatwg-url';
 
 import { Attribute } from './Attribute.js';
 import type { Change } from './Change.js';
@@ -17,23 +17,23 @@ import { PresenceFilter } from './filters/PresenceFilter.js';
 import { MessageParser } from './MessageParser.js';
 import { MessageResponseStatus } from './MessageResponseStatus.js';
 import {
-  BindRequest,
-  UnbindRequest,
   AbandonRequest,
+  AddRequest,
+  BindRequest,
   CompareRequest,
+  CompareResult,
   DeleteRequest,
   ExtendedRequest,
   ModifyDNRequest,
-  SearchRequest,
-  CompareResult,
-  SearchResponse,
-  SearchReference,
-  SearchEntry,
-  AddRequest,
   ModifyRequest,
   SASL_MECHANISMS,
+  SearchEntry,
+  SearchReference,
+  SearchRequest,
+  SearchResponse,
+  UnbindRequest,
 } from './messages/index.js';
-import type { BindResponse, CompareResponse, Entry, DeleteResponse, ExtendedResponse, ModifyDNResponse, AddResponse, ModifyResponse, SaslMechanism } from './messages/index.js';
+import type { AddResponse, BindResponse, CompareResponse, DeleteResponse, Entry, ExtendedResponse, ModifyDNResponse, ModifyResponse, SaslMechanism } from './messages/index.js';
 import type { Message } from './messages/Message.js';
 import type { MessageResponse } from './messages/MessageResponse.js';
 import { StatusCodeParser } from './StatusCodeParser.js';
@@ -169,14 +169,27 @@ export class Client {
 
     this.clientOptions.strictDN = this.clientOptions.strictDN !== false;
 
-    const parsedUrl = parseUrl(options.url);
-    if (!parsedUrl.protocol || !(parsedUrl.protocol === 'ldap:' || parsedUrl.protocol === 'ldaps:')) {
+    const parsedUrl = parseURL(options.url);
+    if (!parsedUrl?.scheme || !(parsedUrl.scheme === 'ldap' || parsedUrl.scheme === 'ldaps')) {
       throw new Error(`${options.url} is an invalid LDAP URL (protocol)`);
     }
 
-    const isSecureProtocol = parsedUrl.protocol === 'ldaps:';
+    const isSecureProtocol = parsedUrl.scheme === 'ldaps';
     this.secure = isSecureProtocol || !!this.clientOptions.tlsOptions;
-    this.host = parsedUrl.hostname ?? 'localhost';
+    let host: string | null | undefined = null;
+    if (typeof parsedUrl.host === 'string') {
+      // Host might include a port, so split to get the hostname part
+      host = parsedUrl.host.split(':')[0];
+    } else if (Array.isArray(parsedUrl.host)) {
+      // Handle IPv6Address case by joining parts
+      host = parsedUrl.host.join(':');
+    } else if (parsedUrl.host !== null) {
+      // If it's a number or any other type, convert to string
+      host = String(parsedUrl.host);
+    }
+
+    this.host = host ?? 'localhost'; // Default to 'localhost' if host is null
+
     if (parsedUrl.port) {
       this.port = Number(parsedUrl.port);
     } else if (isSecureProtocol) {

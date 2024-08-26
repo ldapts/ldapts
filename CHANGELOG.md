@@ -1,5 +1,11 @@
 # Change Log
 
+## 7.1.1 - 2024-08-26
+
+- Update npms
+- Replace deprecated `parse` from url module with `parseURL` from whatwg-url
+- Replace deprecated `string#substr` and `buffer#slice` usage
+
 ## 7.1.0 - 2024-07-09
 
 - Ensure errors have name and prototype set

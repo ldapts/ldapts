@@ -1,7 +1,7 @@
 import type { BerWriter as BerWriterType } from 'asn1';
 import asn1 from 'asn1';
 import * as chai from 'chai';
-import { anyString, mock, capture, verify, when, instance, reset } from 'ts-mockito';
+import { anyString, capture, instance, mock, reset, verify, when } from 'ts-mockito';
 
 import { EqualityFilter } from '../../src/index.js';
 

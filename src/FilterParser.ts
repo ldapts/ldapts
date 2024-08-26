@@ -3,16 +3,16 @@ import type { BerReader } from 'asn1';
 import type { ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
 import type { Filter } from './filters/Filter.js';
 import {
-  PresenceFilter,
   AndFilter,
-  GreaterThanEqualsFilter,
-  ExtensibleFilter,
-  NotFilter,
-  SubstringFilter,
-  EqualityFilter,
   ApproximateFilter,
-  OrFilter,
+  EqualityFilter,
+  ExtensibleFilter,
+  GreaterThanEqualsFilter,
   LessThanEqualsFilter,
+  NotFilter,
+  OrFilter,
+  PresenceFilter,
+  SubstringFilter,
 } from './filters/index.js';
 import { SearchFilter } from './SearchFilter.js';
 
@@ -206,7 +206,7 @@ export class FilterParser {
           throw new Error(`Unbalanced parens: ${filterString}. Full string: ${fullString}`);
         }
 
-        filter = FilterParser._parseExpressionFilterFromString(filterString.substr(cursor, end - cursor));
+        filter = FilterParser._parseExpressionFilterFromString(filterString.substring(cursor, end));
         cursor = end;
       }
     }
@@ -229,7 +229,7 @@ export class FilterParser {
       const matches = /^[\w-]+/.exec(filterString);
       if (matches?.length) {
         [attribute] = matches;
-        remainingExpression = filterString.substr(attribute.length);
+        remainingExpression = filterString.slice(attribute.length);
       } else {
         throw new Error(`Invalid attribute name: ${filterString}`);
       }
@@ -242,7 +242,7 @@ export class FilterParser {
     }
 
     if (remainingExpression.startsWith('=')) {
-      remainingExpression = remainingExpression.substr(1);
+      remainingExpression = remainingExpression.slice(1);
       if (remainingExpression.includes('*')) {
         const escapedExpression = FilterParser._unescapeSubstring(remainingExpression);
         return new SubstringFilter({
@@ -262,21 +262,21 @@ export class FilterParser {
     if (remainingExpression.startsWith('>') && remainingExpression[1] === '=') {
       return new GreaterThanEqualsFilter({
         attribute,
-        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.slice(2)),
       });
     }
 
     if (remainingExpression.startsWith('<') && remainingExpression[1] === '=') {
       return new LessThanEqualsFilter({
         attribute,
-        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.slice(2)),
       });
     }
 
     if (remainingExpression.startsWith('~') && remainingExpression[1] === '=') {
       return new ApproximateFilter({
         attribute,
-        value: FilterParser._unescapeHexValues(remainingExpression.substr(2)),
+        value: FilterParser._unescapeHexValues(remainingExpression.slice(2)),
       });
     }
 
@@ -313,7 +313,7 @@ export class FilterParser {
     }
 
     // Trim the leading = (from the :=) and reinsert any extra ':' characters
-    const remainingExpression = fields.join(':').substr(1);
+    const remainingExpression = fields.join(':').slice(1);
     const options: ExtensibleFilterOptions = {
       matchType: attribute,
       dnAttributes,
@@ -344,7 +344,7 @@ export class FilterParser {
         case '(':
           throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
         case '\\': {
-          const value = input.substr(index + 1, 2);
+          const value = input.slice(index + 1, index + 3);
           if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
             throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
           }
