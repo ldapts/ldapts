@@ -90,9 +90,9 @@ export interface SearchOptions {
    * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
    * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
    * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
-   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   * - children or subordinate - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
    */
-  scope?: 'base' | 'children' | 'one' | 'sub';
+  scope?: 'base' | 'children' | 'one' | 'sub' | 'subordinate';
   /**
    * Specifies how the server must treat references to other entries:
    * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
@@ -534,7 +534,7 @@ export class Client {
    * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
    * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
    * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
-   * - children - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
+   * - children or subordinate - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
    * @param {string} [options.derefAliases='never'] - Specifies how the server must treat references to other entries:
    * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
    * - always - Always returns the referenced entries, not the alias object.
