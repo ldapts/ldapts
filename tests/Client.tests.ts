@@ -894,4 +894,29 @@ describe('Client', () => {
       }
     });
   });
+
+  describe('#searchPaginated', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should paginate', async () => {
+      for await (const searchResult of client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: 'objectclass=*',
+        paged: {
+          pageSize: 10,
+        },
+      })) {
+        searchResult.searchEntries.length.should.be.lessThanOrEqual(10);
+      }
+    });
+  });
 });

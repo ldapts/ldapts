@@ -625,6 +625,81 @@ export class Client {
     return searchResult;
   }
 
+  public async *searchPaginated(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): AsyncGenerator<SearchResult> {
+    if (!this.isConnected) {
+      await this._connect();
+    }
+
+    if (controls) {
+      if (Array.isArray(controls)) {
+        controls = controls.slice(0);
+      } else {
+        controls = [controls];
+      }
+
+      // Make sure PagedResultsControl is not specified since it's handled internally
+      for (const control of controls) {
+        if (control instanceof PagedResultsControl) {
+          throw new Error('Should not specify PagedResultsControl');
+        }
+      }
+    } else {
+      controls = [];
+    }
+
+    let pageSize = 100;
+    if (typeof options.paged === 'object' && options.paged.pageSize) {
+      pageSize = options.paged.pageSize;
+    } else if (options.sizeLimit && options.sizeLimit > 1) {
+      // According to the RFC, servers should ignore the paging control if
+      // pageSize >= sizelimit.  Some might still send results, but it's safer
+      // to stay under that figure when assigning a default value.
+      pageSize = options.sizeLimit - 1;
+    }
+
+    let pagedResultsControl: PagedResultsControl | undefined;
+    pagedResultsControl = new PagedResultsControl({
+      value: {
+        size: pageSize,
+      },
+    });
+    controls.push(pagedResultsControl);
+
+    let filter: Filter;
+    if (options.filter) {
+      if (typeof options.filter === 'string') {
+        filter = FilterParser.parseString(options.filter);
+      } else {
+        filter = options.filter;
+      }
+    } else {
+      filter = new PresenceFilter({ attribute: 'objectclass' });
+    }
+
+    const searchRequest = new SearchRequest({
+      messageId: -1, // NOTE: This will be set from _sendRequest()
+      baseDN: typeof baseDN === 'string' ? baseDN : baseDN.toString(),
+      scope: options.scope,
+      filter,
+      attributes: options.attributes,
+      explicitBufferAttributes: options.explicitBufferAttributes,
+      returnAttributeValues: options.returnAttributeValues,
+      sizeLimit: options.sizeLimit,
+      timeLimit: options.timeLimit,
+      controls,
+    });
+
+    do {
+      const searchResult: SearchResult = {
+        searchEntries: [],
+        searchReferences: [],
+      };
+      // eslint-disable-next-line no-await-in-loop
+      pagedResultsControl = await this._sendSearch(searchRequest, searchResult, true, pageSize, pagedResultsControl, false);
+      yield searchResult;
+    } while (pagedResultsControl);
+  }
+
   /**
    * Unbinds this client from the LDAP server.
    * @returns {void|Promise} void if not connected; otherwise returns a promise to the request to disconnect
@@ -652,7 +727,14 @@ export class Client {
     }
   }
 
-  private async _sendSearch(searchRequest: SearchRequest, searchResult: SearchResult, paged: boolean, pageSize: number, pagedResultsControl?: PagedResultsControl): Promise<void> {
+  private async _sendSearch(
+    searchRequest: SearchRequest,
+    searchResult: SearchResult,
+    paged: boolean,
+    pageSize: number,
+    pagedResultsControl?: PagedResultsControl,
+    fetchAll = true,
+  ): Promise<PagedResultsControl | undefined> {
     searchRequest.messageId = this._nextMessageId();
 
     const result = await this._send<SearchResponse>(searchRequest);
@@ -685,9 +767,15 @@ export class Client {
           size: pageSize,
         };
         pagedResultsControl.value.cookie = pagedResultsFromResponse.value.cookie;
-        await this._sendSearch(searchRequest, searchResult, paged, pageSize, pagedResultsControl);
+        if (fetchAll) {
+          await this._sendSearch(searchRequest, searchResult, paged, pageSize, pagedResultsControl, true);
+        } else {
+          return pagedResultsControl;
+        }
       }
     }
+
+    return undefined;
   }
 
   private readonly socketDataHandler = (data: Buffer): void => {
