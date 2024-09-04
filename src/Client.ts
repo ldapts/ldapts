@@ -641,6 +641,11 @@ export class Client {
     await this._send(req);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  public [Symbol.asyncDispose || Symbol('Symbol.asyncDispose')](): Promise<void> {
+    return this.unbind();
+  }
+
   private async _sendBind(req: BindRequest): Promise<void> {
     if (!this.isConnected) {
       await this._connect();
