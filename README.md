@@ -385,14 +385,20 @@ The searchPagination the same `options` with [search](#search) method but return
 Example:
 
 ```ts
-for await (const searchResult of client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+const paginator = client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
   filter: 'objectclass=*',
   paged: {
     pageSize: 10,
   },
-})) {
+});
+
+let total = 0;
+for await (const searchResult of paginator) {
+  total += searchResult.searchEntries.length;
   console.log(searchResult.searchEntries);
 }
+
+console.log(`total results: ${total}`);
 ```
 
 #### Filter Strings
