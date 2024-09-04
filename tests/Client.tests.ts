@@ -909,14 +909,23 @@ describe('Client', () => {
     });
 
     it('should paginate', async () => {
-      for await (const searchResult of client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      const pageSize = 10;
+      const paginator = client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
         filter: 'objectclass=*',
         paged: {
-          pageSize: 10,
+          pageSize,
         },
-      })) {
-        searchResult.searchEntries.length.should.be.lessThanOrEqual(10);
+      });
+      let totalResults = 0;
+      let iterateCount = 0;
+      for await (const searchResult of paginator) {
+        iterateCount++;
+        totalResults += searchResult.searchEntries.length;
+        searchResult.searchEntries.length.should.be.lessThanOrEqual(pageSize);
       }
+
+      iterateCount.should.be.greaterThanOrEqual(1);
+      (totalResults / iterateCount).should.be.lessThanOrEqual(pageSize);
     });
   });
 });
