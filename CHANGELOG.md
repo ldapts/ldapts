@@ -1,5 +1,12 @@
 # Change Log
 
+## 7.2.0 - 2024-09-10
+
+- Make Client disposable. #155 Thank you @ayZagen!
+- Allow search to be paginated via searchPaginated. #156 Thank you @ayZagen!
+- Allow subordinates to be used as search scope. #157 Thank you @ayZagen!
+- Update npms
+
 ## 7.1.1 - 2024-08-26
 
 - Update npms
