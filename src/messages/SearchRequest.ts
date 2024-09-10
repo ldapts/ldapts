@@ -19,7 +19,7 @@ export class SearchRequest extends Message {
 
   public baseDN: string;
 
-  public scope: 'base' | 'children' | 'one' | 'sub';
+  public scope: 'base' | 'children' | 'one' | 'sub' | 'subordinates';
 
   public derefAliases: 'always' | 'find' | 'never' | 'search';
 
@@ -64,6 +64,7 @@ export class SearchRequest extends Message {
         writer.writeEnumeration(2);
         break;
       case 'children':
+      case 'subordinates':
         writer.writeEnumeration(3);
         break;
       default:

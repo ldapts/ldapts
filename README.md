@@ -565,6 +565,20 @@ try {
 }
 ```
 
+## `using` declaration with Typescript
+
+For more details look have a look at [using Declarations and Explicit Resource Management](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)
+
+```ts
+{
+  await using client = new Client({
+    url: 'ldap://127.0.0.1:1389',
+  });
+  await client.bind(bindDN, password);
+}
+// unbind is called
+```
+
 ## Development
 
 ### Generate certificates

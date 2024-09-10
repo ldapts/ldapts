@@ -928,4 +928,17 @@ describe('Client', () => {
       (totalResults / iterateCount).should.be.lessThanOrEqual(pageSize);
     });
   });
+
+  describe('#disposable', () => {
+    it('should unbind after disposed', async () => {
+      try {
+        await using client = new Client({
+          url: 'ldaps://ldap.jumpcloud.com',
+        });
+        await client.bind(bindDN, bindPassword);
+      } catch (e) {
+        false.should.equal(true);
+      }
+    });
+  });
 });
