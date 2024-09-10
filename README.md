@@ -23,6 +23,7 @@ Providing an API to access LDAP directory servers from Node.js programs.
   - [search](#search)
     - [Filter Strings](#filter-strings)
     - [Return buffer for specific attribute](#return-buffer-for-specific-attribute)
+  - [searchPaginated](#searchpaginated)
   - [unbind](#unbind)
 - [Usage Examples](#usage-examples)
   - [Authenticate example](#authenticate-example)
@@ -357,7 +358,7 @@ Options:
 | [returnAttributeValues=true] (boolean)         | If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | [sizeLimit=0] (number)                         | The maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | [timeLimit=10] (number)                        | The maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| [paged=false] (boolean&#124;SearchPageOptions) | Used to allow paging and specify the page size                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| [paged=false] (boolean&#124;SearchPageOptions) | Used to allow paging and specify the page size. Note that even with paged options the result will contain all of the search results. If you need to paginate over results have a look at to [searchPaginated](#searchpaginated) method.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | [attributes=] (string[])                       | A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “_” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “_” was specified to request that all user attributes be included in entries that are returned. |
 | [explicitBufferAttributes=] (string[])         | List of explicit attribute names to return as Buffer objects                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
@@ -372,6 +373,33 @@ const { searchEntries, searchReferences } = await client.search(searchDN, {
 ```
 
 Please see [Client tests](https://github.com/ldapts/ldapts/blob/master/tests/Client.tests.ts) for more search examples
+
+### searchPaginated
+
+`search(baseDN, options, [controls])`
+
+Performs a search operation against the LDAP server and retrieve results in a paginated way.
+
+The searchPagination the same `options` with [search](#search) method but returns an iterator.
+
+Example:
+
+```ts
+const paginator = client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+  filter: 'objectclass=*',
+  paged: {
+    pageSize: 10,
+  },
+});
+
+let total = 0;
+for await (const searchResult of paginator) {
+  total += searchResult.searchEntries.length;
+  console.log(searchResult.searchEntries);
+}
+
+console.log(`total results: ${total}`);
+```
 
 #### Filter Strings
 

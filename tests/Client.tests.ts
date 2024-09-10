@@ -895,6 +895,40 @@ describe('Client', () => {
     });
   });
 
+  describe('#searchPaginated', () => {
+    const client: Client = new Client({
+      url: 'ldaps://ldap.jumpcloud.com',
+    });
+
+    before(async () => {
+      await client.bind(bindDN, bindPassword);
+    });
+
+    after(async () => {
+      await client.unbind();
+    });
+
+    it('should paginate', async () => {
+      const pageSize = 10;
+      const paginator = client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+        filter: 'objectclass=*',
+        paged: {
+          pageSize,
+        },
+      });
+      let totalResults = 0;
+      let iterateCount = 0;
+      for await (const searchResult of paginator) {
+        iterateCount++;
+        totalResults += searchResult.searchEntries.length;
+        searchResult.searchEntries.length.should.be.lessThanOrEqual(pageSize);
+      }
+
+      iterateCount.should.be.greaterThanOrEqual(1);
+      (totalResults / iterateCount).should.be.lessThanOrEqual(pageSize);
+    });
+  });
+
   describe('#disposable', () => {
     it('should unbind after disposed', async () => {
       try {
