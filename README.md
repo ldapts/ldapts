@@ -592,11 +592,11 @@ Use [certyaml](https://github.com/tsaarni/certyaml) to generate certificates for
 ### Start test OpenLDAP server
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Close test OpenLDAP server
 
 ```shell
-docker-compose down
+docker compose down
 ```

@@ -8,13 +8,13 @@ The container is based on Debian.
 To build and run the container use the following command in the top directory of the repository
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 To stop the container
 
 ```bash
-docker-compose down
+docker compose down
 ```
 
 The root user inside the container (`uid=0`, `gid=0`) is the administrator, and can authenticate without password by using the SASL EXTERNAL mechanism.

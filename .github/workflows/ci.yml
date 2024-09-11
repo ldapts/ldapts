@@ -29,7 +29,7 @@ jobs:
       run: ~/go/bin/certyaml
       working-directory: ./tests/certs
     - name: Start openldap container
-      run: docker-compose up -d &
+      run: docker compose up -d &
     - name: Sleep
       run: sleep 60
 
@@ -39,4 +39,4 @@ jobs:
       env:
         CI: true
     - name: Stopping openldap container
-      run: docker-compose down
+      run: docker compose down
