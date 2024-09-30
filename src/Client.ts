@@ -136,13 +136,15 @@ export interface SearchResult {
   searchReferences: string[];
 }
 
-// polyfill for typescript < 5.2
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-Symbol.dispose ??= Symbol('Symbol.dispose');
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 Symbol.asyncDispose ??= Symbol('Symbol.asyncDispose');
+
+declare global {
+  interface SymbolConstructor {
+    readonly asyncDispose: unique symbol;
+  }
+}
 
 export class Client {
   private clientOptions: ClientOptions;
