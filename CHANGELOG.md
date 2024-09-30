@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.2.1 - 2024-09-30
+
+- Fix Property 'asyncDispose' does not exist on type 'SymbolConstructor'. #158 Thank you @ayZagen!
+- Update npms
+
 ## 7.2.0 - 2024-09-10
 
 - Make Client disposable. #155 Thank you @ayZagen!
