@@ -469,6 +469,32 @@ describe('Client', () => {
       args.newSuperior.should.equal(newSuperior);
       should.equal(args.controls, undefined);
     });
+
+    it('should handle newSuperior with the long form', async () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      const stub = sinon.stub(client, '_send').returns(
+        new ModifyDNResponse({
+          messageId: 123,
+        }),
+      );
+
+      const dn = 'uid=groot,ou=Users,dc=foo,dc=com';
+      const newRdn = 'uid=groot';
+      const newSuperior =
+        'OU=O|10006677|重新命名选择权测试部门3,OU=O|10006677|重新命名选择权测试部门2,OU=O|10006677|重新命名选择权测试部门1,OU=O|10006677|重新命名选择权测试部门,OU=O|10002220|重新命名选择权,OU=重新命名选择权中心测试,ou=Users,dc=foo,dc=com';
+      const newDN = `${newRdn},${newSuperior}`;
+      await client.modifyDN(dn, newDN);
+
+      stub.restore();
+      stub.calledOnce.should.equal(true);
+      const args = stub.getCall(0).args[0] as ModifyDNRequest;
+      args.dn.should.equal(dn);
+      args.deleteOldRdn.should.equal(true);
+      args.newRdn.should.equal(newRdn);
+      args.newSuperior.should.equal(newSuperior);
+      should.equal(args.controls, undefined);
+    });
   });
 
   describe('#exop()', () => {

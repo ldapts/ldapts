@@ -40,9 +40,8 @@ export class ModifyDNRequest extends Message {
     writer.writeBoolean(this.deleteOldRdn);
     if (this.newSuperior) {
       const length = Buffer.byteLength(this.newSuperior);
-
       writer.writeByte(0x80);
-      writer.writeByte(length);
+      writer.writeLength(length);
       writer._ensure(length);
       writer._buf.write(this.newSuperior, writer._offset);
       writer._offset += length;
