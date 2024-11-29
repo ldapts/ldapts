@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.2.2 - 2024-11-29
+
+- Fix modifyDN newSuperior not working with the long form. #162 Thank you @Oh-suki!
+- Update npms
+
 ## 7.2.1 - 2024-09-30
 
 - Fix Property 'asyncDispose' does not exist on type 'SymbolConstructor'. #158 Thank you @ayZagen!
