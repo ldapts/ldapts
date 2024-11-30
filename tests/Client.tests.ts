@@ -1,7 +1,7 @@
-import assert from 'assert';
-import { promises as fs } from 'fs';
-import * as path from 'path';
-import { fileURLToPath } from 'url';
+import assert from 'node:assert';
+import { promises as fs } from 'node:fs';
+import * as path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import type { BerReader, BerWriter } from 'asn1';
 import * as chai from 'chai';

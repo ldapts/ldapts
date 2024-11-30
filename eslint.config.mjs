@@ -5,6 +5,12 @@ export default [
     tsconfigRootDir: import.meta.dirname,
   }),
   {
+    files: ['**/*.ts'],
+    rules: {
+      'unicorn/prefer-node-protocol': 'error',
+    },
+  },
+  {
     files: ['tests/**/*.ts'],
     rules: {
       '@typescript-eslint/no-confusing-void-expression': 'off',
