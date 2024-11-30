@@ -1,5 +1,5 @@
-import * as assert from 'assert';
-import { EventEmitter } from 'events';
+import * as assert from 'node:assert';
+import { EventEmitter } from 'node:events';
 
 import type { BerReader as BerReaderType } from 'asn1';
 import asn1 from 'asn1';
