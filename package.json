@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "7.2.2",
+  "version": "7.3.0",
   "description": "LDAP client",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -70,10 +70,10 @@
   "dependencies": {
     "@types/asn1": ">=0.2.4",
     "asn1": "~0.2.6",
-    "debug": "~4.3.7",
+    "debug": "~4.4.0",
     "strict-event-emitter-types": "~2.0.0",
     "uuid": "~11.0.3",
-    "whatwg-url": "~14.0.0"
+    "whatwg-url": "~14.1.0"
   },
   "devDependencies": {
     "@types/chai": "~5.0.1",
@@ -85,19 +85,19 @@
     "@types/whatwg-url": "~13.0.0",
     "chai": "~5.1.2",
     "chai-as-promised": "~8.0.1",
-    "eslint": "~9.16.0",
-    "eslint-config-decent": "^2.2.3",
+    "eslint": "~9.17.0",
+    "eslint-config-decent": "^2.3.0",
     "husky": "~9.1.7",
-    "lint-staged": "~15.2.10",
+    "lint-staged": "~15.2.11",
     "markdownlint-cli": "~0.43.0",
-    "mocha": "~10.8.2",
+    "mocha": "~11.0.1",
     "npm-run-all": "~4.1.5",
     "pinst": "~3.0.0",
-    "prettier": "~3.4.1",
+    "prettier": "~3.4.2",
     "sinon": "~19.0.2",
     "ts-mockito": "~2.6.1",
     "tsx": "~4.19.2",
     "typescript": "~5.7.2",
-    "unbuild": "2.0.0"
+    "unbuild": "3.0.1"
   }
 }

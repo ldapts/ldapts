@@ -1,5 +1,10 @@
 # Change Log
 
+## 7.3.0 - 2024-12-17
+
+- Update npms
+- Use node protocol for built-in modules. #163 Than you @ayZagen!
+
 ## 7.2.2 - 2024-11-29
 
 - Fix modifyDN newSuperior not working with the long form. #162 Thank you @Oh-suki!
