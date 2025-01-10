@@ -29,6 +29,8 @@ Providing an API to access LDAP directory servers from Node.js programs.
   - [Authenticate example](#authenticate-example)
   - [Search example](#search-example)
   - [Delete Active Directory entry example](#delete-active-directory-entry-example)
+- [Configuring Secure Connections](#configuring-secure-connections)
+- [Common Errors](#common-errors)
 - [Development](#development)
   - [Start test OpenLDAP server](#start-test-openldap-server)
   - [Close test OpenLDAP server](#close-test-openldap-server)
@@ -578,6 +580,160 @@ For more details look have a look at [using Declarations and Explicit Resource M
 }
 // unbind is called
 ```
+
+## Configuring Secure Connections
+
+When configuring secure connections in `ldapts`, it is important to choose the appropriate TLS method (via the `Client` constructor or `client.startTLS`) based
+on your LDAP server's requirements. Prefer connecting securely from the Client constructor if the server supports LDAP over SSL. If that's not available but the
+connection can be upgraded to a secure connection, then connect insecurely and call startTLS to upgrade the connection to be secure.
+
+### Use `Client` Constructor for LDAPS
+
+If the LDAP server requires `ldaps://` (LDAP over SSL), specify `ldaps://` in the `url` and provide `tlsOptions` to the Client constructor to handle certificate validation.
+This will establish a secure connection to the LDAP server over TLS from the moment the LDAP client is instantiated.
+
+Example:
+
+```ts
+import { Client } from 'ldapts';
+import fs from 'fs';
+const client = new Client({
+  url: 'ldaps://ldap.example.com',
+  tlsOptions: {
+    ca: [fs.readFileSync('/path/to/ca-cert.pem')],
+  },
+});
+```
+
+### Use `client.startTLS` for STARTTLS
+
+If the server is unable to support LDAP over SSL but supports `STARTTLS`, the connection can be upgraded to a secure connection.
+Connect to the server using `ldap://` and call `client.startTLS()` to upgrade to a secure connection.
+
+Example:
+
+```ts
+import { Client } from 'ldapts';
+import fs from 'fs';
+const client = new Client({ url: 'ldap://ldap.example.com' });
+async function connectWithStartTLS() {
+  await client.startTLS({
+    ca: [fs.readFileSync('/path/to/ca-cert.pem')],
+  });
+}
+```
+
+## Common Errors
+
+### Client network socket disconnected before secure TLS connection was established
+
+Cause: The server expects an `ldaps://` connection, but the client uses `ldap://` without upgrading to TLS.
+
+Solution: Use `ldaps://` in the `url` or call `startTLS()` to upgrade the connection.
+
+### UNABLE_TO_VERIFY_LEAF_SIGNATURE
+
+Cause: The LDAP server's certificate is untrusted, often due to a self-signed certificate or an incomplete certificate chain.
+
+Solution(s):
+
+- Provide the CA certificate to establish trust:
+
+  ```ts
+  import fs from 'fs';
+
+  const client = new Client({
+    url: 'ldaps://ldap.example.com',
+    tlsOptions: {
+      ca: [fs.readFileSync('/path/to/ca-cert.pem')],
+    },
+  });
+  ```
+
+- Allow self-signed certificates (not recommended for production):
+
+  ```ts
+  const client = new Client({
+    url: 'ldaps://ldap.example.com',
+    tlsOptions: {
+      rejectUnauthorized: false, // Allow untrusted certificates
+    },
+  });
+  ```
+
+### ECONNREFUSED
+
+Cause: The LDAP server is not reachable at the specified host and port, or the server is not listening on the expected protocol.
+
+Solution:
+
+- Verify the server address, port, and protocol in the `url`.
+- Ensure the server is running and accessible.
+- Check firewall rules to allow connections on the required port (636 for `ldaps`, 389 for `ldap`).
+
+### Handshake inactivity timeout
+
+Cause: The server takes too long to respond to the TLS handshake due to network latency or misconfiguration.
+
+Solution:
+
+- Check the LDAP server's performance.
+- Verify TLS configuration (e.g., ciphers and protocols) on both client and server.
+- Increase the timeout if necessary:
+
+  ```ts
+  const client = new Client({
+    url: 'ldaps://ldap.example.com',
+    timeout: 30000, // 30 seconds
+  });
+  ```
+
+### Self signed certificate in certificate chain
+
+Cause: The server uses a certificate signed by an untrusted CA.
+
+Solution: Provide the CA certificate:
+
+```ts
+import fs from 'fs';
+
+const client = new Client({
+  url: 'ldaps://ldap.example.com',
+  tlsOptions: {
+    ca: [fs.readFileSync('/path/to/ca-cert.pem')],
+  },
+});
+```
+
+### DEPTH_ZERO_SELF_SIGNED_CERT
+
+Cause: The LDAP server is using a self-signed certificate without an intermediate CA.
+
+Solution(s):
+
+- Use the server's certificate as the trusted CA:
+
+  ```ts
+  import fs from 'fs';
+
+  const client = new Client({
+    url: 'ldaps://ldap.example.com',
+    tlsOptions: {
+      ca: [fs.readFileSync('/path/to/server-cert.pem')],
+    },
+  });
+  ```
+
+- Allow self-signed certificates (not recommended for production):
+
+  ```ts
+  const client = new Client({
+    url: 'ldaps://ldap.example.com',
+    tlsOptions: {
+      rejectUnauthorized: false, // Allow self-signed certificates
+    },
+  });
+  ```
 
 ## Development
 
