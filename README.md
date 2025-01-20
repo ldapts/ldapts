@@ -627,9 +627,9 @@ async function connectWithStartTLS() {
 
 ### Client network socket disconnected before secure TLS connection was established
 
-Cause: The server expects an `ldaps://` connection, but the client uses `ldap://` without upgrading to TLS.
+Cause: There is a mismatch between the LDAP protocol being used by the client and server. For example, The server expects an `ldaps://` connection, but the client uses `ldap://` without upgrading to TLS. Alternatively, the client is configured to use LDAP over SSL, but is connecting to the server using the `ldap://` protocol.
 
-Solution: Use `ldaps://` in the `url` or call `startTLS()` to upgrade the connection.
+Solution: Review the configuration options above and ensure that the client and server are configured to use the same protocol. If connecting to a `ldap://` address, call `startTLS()` to upgrade the connection. If connecting to an `ldaps://` protocol, provide the TLS options in the `Client` constructor.
 
 ### UNABLE_TO_VERIFY_LEAF_SIGNATURE
 
