@@ -121,6 +121,7 @@ export class DN {
   /**
    * Checks, if this instance of DN is equal to the other DN.
    * @param {object} other
+   * @returns true if equal; otherwise false
    */
   public equals(other: DN): boolean {
     if (this.rdns.length !== other.rdns.length) {
@@ -163,6 +164,7 @@ export class DN {
 
   /**
    * Parse the DN, escape values & return a string representation.
+   * @returns String representation of DN
    */
   public toString(): string {
     let str = '';

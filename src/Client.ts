@@ -375,6 +375,7 @@ export class Client {
    * @param {string} attribute
    * @param {string} value
    * @param {Control|Control[]} [controls]
+   * @returns true if attribute and value match; otherwise false
    */
   public async compare(dn: DN | string, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
     if (!this.isConnected) {
@@ -436,6 +437,7 @@ export class Client {
    * @param {string} oid - The object identifier (OID) of the extended operation to perform
    * @param {string|Buffer} [value]
    * @param {Control|Control[]} [controls]
+   * @returns exop result
    */
   public async exop(oid: string, value?: Buffer | string, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
     if (!this.isConnected) {
@@ -535,27 +537,27 @@ export class Client {
 
   /**
    * Performs an LDAP search against the server.
-   *
    * @param {string|DN} baseDN - This specifies the base of the subtree in which the search is to be constrained.
    * @param {SearchOptions} [options]
    * @param {string|Filter} [options.filter] - The filter of the search request. It must conform to the LDAP filter syntax specified in RFC4515. Defaults to (objectclass=*)
-   * @param {string} [options.scope='sub'] - Specifies how broad the search context is:
+   * @param {string} [options.scope] - Specifies how broad the search context is:
    * - base - Indicates that only the entry specified as the search base should be considered. None of its subordinates will be considered.
    * - one - Indicates that only the immediate children of the entry specified as the search base should be considered. The base entry itself should not be considered, nor any descendants of the immediate children of the base entry.
    * - sub - Indicates that the entry specified as the search base, and all of its subordinates to any depth, should be considered.
    * - children or subordinates - Indicates that the entry specified by the search base should not be considered, but all of its subordinates to any depth should be considered.
-   * @param {string} [options.derefAliases='never'] - Specifies how the server must treat references to other entries:
+   * @param {string} [options.derefAliases] - Specifies how the server must treat references to other entries:
    * - never - Never dereferences entries, returns alias objects instead. The alias contains the reference to the real entry.
    * - always - Always returns the referenced entries, not the alias object.
    * - search - While searching subordinates of the base object, dereferences any alias within the search scope. Dereferenced objects become the bases of further search scopes where the Search operation is also applied by the server. The server should eliminate duplicate entries that arise due to alias dereferencing while searching.
    * - find - Dereferences aliases in locating the base object of the search, but not when searching subordinates of the base object.
-   * @param {boolean} [options.returnAttributeValues=true] - If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
-   * @param {number} [options.sizeLimit=0] - This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
-   * @param {number} [options.timeLimit=10] - This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
-   * @param {boolean|SearchPageOptions} [options.paged=false] - Used to allow paging and specify the page size
+   * @param {boolean} [options.returnAttributeValues] - If true, attribute values should be included in the entries that are returned; otherwise entries that match the search criteria should be returned containing only the attribute descriptions for the attributes contained in that entry but should not include the values for those attributes.
+   * @param {number} [options.sizeLimit] - This specifies the maximum number of entries that should be returned from the search. A value of zero indicates no limit. Note that the server may also impose a size limit for the search operation, and in that case the smaller of the client-requested and server-imposed size limits will be enforced.
+   * @param {number} [options.timeLimit] - This specifies the maximum length of time, in seconds, that the server should spend processing the search. A value of zero indicates no limit. Note that the server may also impose a time limit for the search operation, and in that case the smaller of the client-requested and server-imposed time limits will be enforced.
+   * @param {boolean|SearchPageOptions} [options.paged] - Used to allow paging and specify the page size
    * @param {string[]} [options.attributes] - A set of attributes to request for inclusion in entries that match the search criteria and are returned to the client. If a specific set of attribute descriptions are listed, then only those attributes should be included in matching entries. The special value “*” indicates that all user attributes should be included in matching entries. The special value “+” indicates that all operational attributes should be included in matching entries. The special value “1.1” indicates that no attributes should be included in matching entries. Some servers may also support the ability to use the “@” symbol followed by an object class name (e.g., “@inetOrgPerson”) to request all attributes associated with that object class. If the set of attributes to request is empty, then the server should behave as if the value “*” was specified to request that all user attributes be included in entries that are returned.
    * @param {string[]} [options.explicitBufferAttributes] - List of attributes to explicitly return as buffers
    * @param {Control|Control[]} [controls]
+   * @returns {Promise<SearchResult>}
    */
   public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
     if (!this.isConnected) {
@@ -809,7 +811,7 @@ export class Client {
 
   /**
    * Open the socket connection
-   * @returns {Promise<void>}
+   * @returns {Promise<void>|void}
    * @private
    */
   private _connect(): Promise<void> | void {
@@ -976,7 +978,6 @@ export class Client {
   /**
    * Sends request message to the ldap server over the connected socket. Each message request is given a
    * unique id (messageId), used to identify the associated response when it is sent back over the socket.
-   *
    * @returns {Promise<Message>}
    * @private
    * @param {object} message
@@ -1023,6 +1024,7 @@ export class Client {
     if ((message as BindRequest).password) {
       logDebug(
         `Sending message: ${JSON.stringify({
+          // eslint-disable-next-line @typescript-eslint/no-misused-spread
           ...message,
           password: '__redacted__',
         })}`,

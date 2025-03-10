@@ -26,8 +26,8 @@ export abstract class Filter {
    * (o=Parens (R Us))       (o=Parens \28R Us\29)
    * (cn=star*)              (cn=star\2A)
    * (filename=C:\MyFile)    (filename=C:\5cMyFile)
-   *
    * @param {string|Buffer} input
+   * @returns Escaped string
    */
   public escape(input: Buffer | string): string {
     let escapedResult = '';

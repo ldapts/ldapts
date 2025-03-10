@@ -1,5 +1,9 @@
 # Change Log
 
+## 7.3.2 - 2024-03-10
+
+- Update npms
+
 ## 7.3.1 - 2024-01-08
 
 - Include Filter type definition. Fix #164. Thank you @ddequidt!

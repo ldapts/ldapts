@@ -38,6 +38,7 @@ export class RDN {
   /**
    * Checks, if this instance of RDN is equal to the other RDN.
    * @param {object} other
+   * @returns true if equal; otherwise false
    */
   public equals(other: RDN): boolean {
     const ourKeys = Object.keys(this.attrs);
@@ -104,7 +105,6 @@ export class RDN {
    * Double quote (quotation mark)  "
    * Equal sign                     =
    * Leading or trailing spaces
-   *
    * @param {string} value - RDN value to be escaped
    * @returns {string} Escaped string representation of RDN
    */
