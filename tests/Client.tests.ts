@@ -957,13 +957,46 @@ describe('Client', () => {
 
   describe('#disposable', () => {
     it('should unbind after disposed', async () => {
+      const spy = sinon.spy();
+
       try {
         await using client = new Client({
           url: 'ldaps://ldap.jumpcloud.com',
         });
+        spy(client, 'unbind');
         await client.bind(bindDN, bindPassword);
-      } catch (e) {
-        false.should.equal(true);
+      } catch {
+        /* empty */
+      } finally {
+        spy.calledOnce.should.equal(true);
+      }
+    });
+
+    it('should clear timeouts after message resolved/rejected', async () => {
+      const client = new Client({
+        timeout: 5000,
+        connectTimeout: 3000,
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+      // @ts-expect-error :  it is private
+      const messageMap = client.messageDetailsByMessageId;
+      const messageMapSetter = sinon.spy(messageMap, 'set');
+
+      try {
+        await client.bind(bindDN, bindPassword);
+      } catch {
+        /* empty */
+      } finally {
+        sinon.assert.calledOnceWithMatch(
+          messageMapSetter,
+          sinon.match.defined,
+          sinon.match((val) => {
+            return !!val.timeoutTimer;
+          }),
+        );
+
+        messageMapSetter.calledOnceWith().should.equal(true);
+        messageMap.size.should.equal(0);
       }
     });
   });
