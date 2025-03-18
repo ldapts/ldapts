@@ -17,6 +17,7 @@ import {
   InvalidSyntaxError,
   IsLeafError,
   LoopDetectError,
+  MoreResultsToReturnError,
   NamingViolationError,
   NoObjectClassModsError,
   NoResultError,
@@ -123,6 +124,8 @@ export class StatusCodeParser {
         return new ResultsTooLargeError(result.errorMessage);
       case 71:
         return new AffectsMultipleDSAsError(result.errorMessage);
+      case 95:
+        return new MoreResultsToReturnError(result.errorMessage);
       case 112:
         return new TLSNotSupportedError(result.errorMessage);
       case 248:
