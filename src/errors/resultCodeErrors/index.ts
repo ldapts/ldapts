@@ -15,6 +15,7 @@ export * from './InvalidDNSyntaxError.js';
 export * from './InvalidSyntaxError.js';
 export * from './IsLeafError.js';
 export * from './LoopDetectError.js';
+export * from './MoreResultsToReturnError.js';
 export * from './NamingViolationError.js';
 export * from './NoObjectClassModsError.js';
 export * from './NoSuchAttributeError.js';
