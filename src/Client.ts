@@ -989,6 +989,15 @@ export class Client {
 
     const messageContentBuffer = message.write();
 
+    const messageTimeoutId = this.clientOptions.timeout
+      ? setTimeout(() => {
+          const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
+          if (messageDetails) {
+            this._endSocket(messageDetails.socket);
+            messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+          }
+        }, this.clientOptions.timeout)
+      : null;
     // eslint-disable-next-line func-style
     let messageResolve: (messageResponse?: TMessageResponse) => void = () => {
       // Ignore this as a NOOP
@@ -1002,6 +1011,10 @@ export class Client {
     const sendPromise = new Promise<TMessageResponse | undefined>((resolve, reject) => {
       messageResolve = resolve;
       messageReject = reject;
+    }).finally(() => {
+      if (messageTimeoutId) {
+        clearTimeout(messageTimeoutId);
+      }
     });
 
     this.messageDetailsByMessageId.set(message.messageId.toString(), {
@@ -1009,15 +1022,7 @@ export class Client {
       // @ts-expect-error - Both parameter types extend MessageResponse but typescript sees them as different types
       resolve: messageResolve,
       reject: messageReject,
-      timeoutTimer: this.clientOptions.timeout
-        ? setTimeout(() => {
-            const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
-            if (messageDetails) {
-              this._endSocket(messageDetails.socket);
-              messageReject(new Error(`${message.constructor.name}: Operation timed out`));
-            }
-          }, this.clientOptions.timeout)
-        : null,
+      timeoutTimer: messageTimeoutId,
       socket: this.socket,
     });
 
