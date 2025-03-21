@@ -837,7 +837,7 @@ export class Client {
       this.socket.once('error', (err: Error) => {
         if (this.connectTimer) {
           clearTimeout(this.connectTimer);
-          delete this.connectTimer;
+          this.connectTimer = undefined;
         }
 
         reject(err);
@@ -851,6 +851,8 @@ export class Client {
             delete this.socket;
           }
 
+          this.connectTimer = undefined;
+
           reject(new Error('Connection timeout'));
         }, this.clientOptions.connectTimeout);
       }
@@ -860,6 +862,7 @@ export class Client {
   private _onConnect(next: () => void): void {
     if (this.connectTimer) {
       clearTimeout(this.connectTimer);
+      this.connectTimer = undefined;
     }
 
     // Clear out event listeners from _connect()
@@ -928,6 +931,12 @@ export class Client {
       if (this === clientInstance.socket) {
         clientInstance.connected = false;
         delete clientInstance.socket;
+
+        if (clientInstance.connectTimer) {
+          clearTimeout(clientInstance.connectTimer);
+          // Timeout get destroyed but also clear up reference
+          clientInstance.connectTimer = undefined;
+        }
       }
 
       // Clean up any pending messages
