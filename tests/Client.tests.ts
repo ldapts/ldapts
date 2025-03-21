@@ -285,6 +285,24 @@ describe('Client', () => {
 
       await client.unbind();
     });
+
+    it('should clear connectTimer after connection closed', async () => {
+      const client = new Client({
+        connectTimeout: 3000,
+        url: 'ldaps://ldap.jumpcloud.com',
+      });
+
+      try {
+        // @ts-expect-error : is private
+        await client._connect();
+        await client.unbind();
+      } catch (e) {
+        // ignore
+      } finally {
+        // @ts-expect-error : is private
+        should.equal(client.connectTimer, undefined);
+      }
+    });
   });
 
   describe('#compare()', () => {
