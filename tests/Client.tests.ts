@@ -27,29 +27,16 @@ import {
   UndefinedTypeError,
 } from '../src/index.js';
 
+chai.use(chaiAsPromised);
+const should = chai.should();
+
+const LDAP_DOMAIN = 'ldap.local';
+const LDAP_URI = 'ldap://localhost:389';
+const BASE_DN = 'dc=ldap,dc=local';
+const BIND_DN = `cn=admin,${BASE_DN}`;
+const BIND_PW = '1234';
+
 describe('Client', () => {
-  let should: Chai.Should;
-  const LDAP_DOMAIN = 'ldap.local';
-  const LDAP_URI = 'ldap://localhost:389';
-  const BASE_DN = 'dc=ldap,dc=local';
-  const BIND_DN = `cn=admin,${BASE_DN}`;
-  const BIND_PW = '1234';
-  // const rootDn = 'cn=admin,dc=local,dc=ldap';
-  // const rootPassword = 1234;
-
-  before(() => {
-    should = chai.should();
-    chai.use(chaiAsPromised);
-
-    // bindDN = new DN({
-    //   uid: 'tony.stark',
-    //   ou: 'Users',
-    //   // eslint-disable-next-line id-length
-    //   o: '5be4c382c583e54de6a3ff52',
-    //   dc: ['jumpcloud', 'com'],
-    // }).toString();
-  });
-
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
       const url = 'https://127.0.0.1';
@@ -165,38 +152,32 @@ describe('Client', () => {
     });
 
     it('should bind using EXTERNAL sasl mechanism', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+      });
+
+      const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
+      const [ca, cert, key] = await Promise.all([
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/server-ca.pem')),
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/user.pem')),
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/user-key.pem')),
+      ]);
+
+      await client.startTLS({
+        ca,
+        cert,
+        key,
+      });
+
+      await client.bind('EXTERNAL');
+
       try {
-        const client = new Client({
-          url: LDAP_URI,
-        });
-
-        const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
-        const [ca, cert, key] = await Promise.all([
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './data/certs/server-ca.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './data/certs/user.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './data/certs/user-key.pem')),
-        ]);
-
-        await client.startTLS({
-          ca,
-          cert,
-          key,
-        });
-
-        await client.bind('EXTERNAL');
-
-        try {
-          await client.unbind();
-        } catch {
-          // This can fail since it's not the part being tested
-        }
-      } catch (ex) {
-        // eslint-disable-next-line no-console
-        console.warn(`Ensure the local ldap service is running. See ../README.md#development`);
-        throw ex;
+        await client.unbind();
+      } catch {
+        // This can fail since it's not the part being tested
       }
     });
 
