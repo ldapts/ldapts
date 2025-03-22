@@ -3,9 +3,10 @@
 import forge from 'node-forge';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 // Get script directory
-const scriptDir = path.dirname(import.meta.filename);
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const certsDir = path.join(scriptDir, 'certs');
 
 // Create certs directory if it doesn't exist
