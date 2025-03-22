@@ -1,13 +1,28 @@
 services:
   openldap:
-    build: tests/openldap
+    image: osixia/openldap:1.5.0
     ports:
       - '389:389'
       - '636:636'
-    environment:
-      - LDAP_TLS_CERT_FILE=/certs/server.pem
-      - LDAP_TLS_KEY_FILE=/certs/server-key.pem
-      - LDAP_TLS_CA_FILE=/certs/client-ca.pem
-      - LDAP_TLS_VERIFY_CLIENTS=allow
+    command: --copy-service -l=debug
     volumes:
-      - ${LDAP_CERTS_DIR:-./tests/certs}:/certs:ro
+      - ./tests/data/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom/
+      - ./tests/data/certs/:/container/service/slapd/assets/certs
+    environment:
+      KEEP_EXISTING_CONFIG: false
+      LDAP_DOMAIN: ldap.local
+      LDAP_TLS: true
+      LDAP_TLS_ENFORCE: false
+      LDAP_ADMIN_PASSWORD: 1234
+      LDAP_CONFIG_PASSWORD: 1234
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: false
+      LDAP_TLS_CRT_FILENAME: server.pem
+      LDAP_TLS_KEY_FILENAME: server-key.pem
+      LDAP_TLS_CA_CRT_FILENAME: server-ca.pem
+      LDAP_TLS_VERIFY_CLIENT: allow
+    healthcheck:
+      test: bash -c "exec 6<> /dev/tcp/localhost/389"
+      interval: 2s
+      retries: 10
+      start_period: 10s
+      timeout: 10s

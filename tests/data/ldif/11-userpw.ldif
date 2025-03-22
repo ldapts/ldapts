@@ -1,0 +1,4 @@
+dn: uid=user4,{{ LDAP_BASE_DN }}
+changetype: modify
+add: pwdPolicySubentry
+pwdPolicySubentry: cn=passwordSpecial,ou=pwpolicies,{{ LDAP_BASE_DN }}

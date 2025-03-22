@@ -27,11 +27,9 @@ jobs:
       run: go install github.com/tsaarni/certyaml/cmd/certyaml@v0.9.2
     - name: Create certs
       run: ~/go/bin/certyaml
-      working-directory: ./tests/certs
+      working-directory: ./tests/data/certs
     - name: Start openldap container
-      run: docker compose up -d &
-    - name: Sleep
-      run: sleep 60
+      run: docker compose up -d --wait
 
     - run: npm ci
     - run: npm run build

@@ -6,6 +6,7 @@ subject: cn=server
 issuer: cn=server-ca
 sans:
 - DNS:localhost
+- DNS:ldap.local
 ---
 subject: cn=user
 issuer: cn=client-ca
