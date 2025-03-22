@@ -24,13 +24,14 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
+    - run: npm ci
+
     - name: Generate certificates
       run: node tests/data/generate-certs.js
 
     - name: Start openldap container
       run: docker compose up -d --wait
 
-    - run: npm ci
     - run: npm run build
     - run: npm test
       env:
