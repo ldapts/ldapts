@@ -23,7 +23,8 @@ services:
       LDAP_TLS_CIPHER_SUITE: "SECURE256:+SECURE128"
     healthcheck:
       test: bash -c "exec 6<> /dev/tcp/localhost/389"
-      interval: 2s
+      interval: 60s
       retries: 10
       start_period: 10s
+      start_interval: 2s
       timeout: 10s
