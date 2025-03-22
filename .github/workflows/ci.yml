@@ -24,7 +24,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Install certyaml
-      run: go install github.com/tsaarni/certyaml/cmd/certyaml@v0.9.2
+      run: go install github.com/tsaarni/certyaml/cmd/certyaml@v0.10.0
     - name: Create certs
       run: ~/go/bin/certyaml -d ./certs
       working-directory: ./tests/data
