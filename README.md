@@ -746,7 +746,7 @@ Solution(s):
 Use [certyaml](https://github.com/tsaarni/certyaml) to generate certificates for tests:
 
 ```sh
-(cd tests/certs && ./certyaml -d .)
+./certyaml -d ./tests/data/certs ./tests/data/certs.yaml
 ```
 
 ### Start test OpenLDAP server
