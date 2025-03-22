@@ -743,10 +743,10 @@ Solution(s):
 
 ### Generate certificates
 
-Use [certyaml](https://github.com/tsaarni/certyaml) to generate certificates for tests:
+Run [generate-certs.js](tests/data/generate-certs.js)
 
 ```sh
-./certyaml -d ./tests/data/certs ./tests/data/certs.yaml
+node tests/data/generate-certs.js
 ```
 
 ### Start test OpenLDAP server

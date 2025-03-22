@@ -18,16 +18,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: Install certyaml
-      run: go install github.com/tsaarni/certyaml/cmd/certyaml@v0.10.0
-    - name: Create certs
-      run: ~/go/bin/certyaml -d ./certs
-      working-directory: ./tests/data
+    - name: Generate certificates
+      run: node tests/data/generate-certs.js
+
     - name: Start openldap container
       run: docker compose up -d --wait
 

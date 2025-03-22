@@ -159,11 +159,11 @@ describe('Client', () => {
       const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
       const [ca, cert, key] = await Promise.all([
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFile(path.join(testsDirectory, './data/certs/server-ca.pem')),
+        fs.readFile(path.join(testsDirectory, './data/certs/ca.pem')),
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFile(path.join(testsDirectory, './data/certs/user.pem')),
+        fs.readFile(path.join(testsDirectory, './data/certs/client.pem')),
         // eslint-disable-next-line security/detect-non-literal-fs-filename
-        fs.readFile(path.join(testsDirectory, './data/certs/user-key.pem')),
+        fs.readFile(path.join(testsDirectory, './data/certs/client-key.pem')),
       ]);
 
       await client.startTLS({

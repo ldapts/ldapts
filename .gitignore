@@ -21,7 +21,5 @@ typings
 .eslintcache
 coverage
 
-
 tests/data/certs/*
 
-!.gitkeep

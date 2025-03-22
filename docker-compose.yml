@@ -18,8 +18,9 @@ services:
       LDAP_REMOVE_CONFIG_AFTER_SETUP: false
       LDAP_TLS_CRT_FILENAME: server.pem
       LDAP_TLS_KEY_FILENAME: server-key.pem
-      LDAP_TLS_CA_CRT_FILENAME: server-ca.pem
+      LDAP_TLS_CA_CRT_FILENAME: ca.pem
       LDAP_TLS_VERIFY_CLIENT: allow
+      LDAP_TLS_CIPHER_SUITE: "SECURE256:+SECURE128"
     healthcheck:
       test: bash -c "exec 6<> /dev/tcp/localhost/389"
       interval: 2s
