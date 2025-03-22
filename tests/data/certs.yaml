@@ -1,16 +1,16 @@
 subject: cn=server-ca
-key_type: ED25519
+key_type: RSA
 ---
 subject: cn=client-ca
-key_type: ED25519
+key_type: RSA
 ---
 subject: cn=server
 issuer: cn=server-ca
-key_type: ED25519
+key_type: RSA
 sans:
 - DNS:localhost
 - DNS:ldap.local
 ---
 subject: cn=user
 issuer: cn=client-ca
-key_type: ED25519
+key_type: RSA
