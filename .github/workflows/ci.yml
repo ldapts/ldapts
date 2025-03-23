@@ -32,9 +32,12 @@ jobs:
     - name: Start openldap container
       run: docker compose up -d --wait
 
-    - run: npm run build
     - run: npm test
       env:
         CI: true
+    - run: npm run build
     - name: Stopping openldap container
       run: docker compose down
+    - name: Show OpenLDAP logs
+      if: failure()
+      run: docker logs ldapts-openldap-1
