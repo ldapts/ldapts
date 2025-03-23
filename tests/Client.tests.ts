@@ -139,10 +139,10 @@ describe('Client', () => {
     it('should succeed for non-secure bind', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "objectclass=*"
       const client = new Client({
-        url: 'ldap://ldap.forumsys.com:389',
+        url: LDAP_URI,
       });
 
-      await client.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      await client.bind(BIND_DN, BIND_PW);
 
       try {
         await client.unbind();
@@ -677,25 +677,29 @@ describe('Client', () => {
     it('should return search results for non-secure ldap server', async () => {
       // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
       const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
+        url: LDAP_URI,
       });
 
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      await testClient.bind(BIND_DN, BIND_PW);
 
       try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: '(uid=einstein)',
+        const searchResult = await testClient.search(BASE_DN, {
+          filter: '(uid=user1)',
         });
 
         searchResult.searchEntries.should.deep.equal([
           {
-            cn: 'Albert Einstein',
-            dn: 'uid=einstein,dc=example,dc=com',
-            mail: 'einstein@ldap.forumsys.com',
-            objectClass: ['inetOrgPerson', 'organizationalPerson', 'person', 'top'],
-            sn: 'Einstein',
-            telephoneNumber: '314-159-2653',
-            uid: 'einstein',
+            cn: 'user1',
+            dn: 'uid=user1,dc=ldap,dc=local',
+            gidNumber: '14564100',
+            homeDirectory: '/home/user',
+            loginShell: '/bin/bash',
+            mail: 'user1@ldap.local',
+            objectClass: ['top', 'posixAccount', 'inetOrgPerson'],
+            sn: 'SURNAME',
+            uid: 'user1',
+            uidNumber: '14583101',
+            userPassword: '{SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=',
           },
         ]);
       } catch (ex) {
@@ -785,29 +789,7 @@ describe('Client', () => {
       searchResult.searchEntries.length.should.equal(3);
     });
 
-    it('should allow sizeLimit when no paging is specified - forumsys', async () => {
-      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -z 3 'cn=*'
-      const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
-      });
-
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
-
-      try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: 'cn=*',
-          sizeLimit: 3,
-        });
-
-        searchResult.searchEntries.length.should.equal(3);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
-    });
-
-    it('should allow sizeLimit when paging is specified - jumpcloud', async () => {
+    it('should allow sizeLimit when paging is specified', async () => {
       // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=3/noprompt -z 5 'cn=*'
       const searchResult = await client.search(BASE_DN, {
         filter: 'cn=*',
@@ -818,31 +800,6 @@ describe('Client', () => {
       });
 
       searchResult.searchEntries.length.should.equal(5);
-    });
-
-    it('should allow sizeLimit when paging is specified - forumsys', async () => {
-      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -E pr=3/noprompt -z 4 'cn=*'
-      const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
-      });
-
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
-
-      try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: 'cn=*',
-          sizeLimit: 4,
-          paged: {
-            pageSize: 3,
-          },
-        });
-
-        searchResult.searchEntries.length.should.equal(4);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
     });
 
     it('should return group contents with parenthesis in name - explicit filter controls', async () => {
