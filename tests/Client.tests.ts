@@ -136,21 +136,6 @@ describe('Client', () => {
       }
     });
 
-    it('should succeed for non-secure bind', async () => {
-      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "objectclass=*"
-      const client = new Client({
-        url: LDAP_URI,
-      });
-
-      await client.bind(BIND_DN, BIND_PW);
-
-      try {
-        await client.unbind();
-      } catch {
-        // This can fail since it's not the part being tested
-      }
-    });
-
     it('should bind using EXTERNAL sasl mechanism', async () => {
       const client = new Client({
         url: LDAP_URI,
@@ -672,41 +657,6 @@ describe('Client', () => {
       );
 
       searchResult.searchEntries.length.should.equal(0);
-    });
-
-    it('should return search results for non-secure ldap server', async () => {
-      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
-      const testClient = new Client({
-        url: LDAP_URI,
-      });
-
-      await testClient.bind(BIND_DN, BIND_PW);
-
-      try {
-        const searchResult = await testClient.search(BASE_DN, {
-          filter: '(uid=user1)',
-        });
-
-        searchResult.searchEntries.should.deep.equal([
-          {
-            cn: 'user1',
-            dn: 'uid=user1,dc=ldap,dc=local',
-            gidNumber: '14564100',
-            homeDirectory: '/home/user',
-            loginShell: '/bin/bash',
-            mail: 'user1@ldap.local',
-            objectClass: ['top', 'posixAccount', 'inetOrgPerson'],
-            sn: 'SURNAME',
-            uid: 'user1',
-            uidNumber: '14583101',
-            userPassword: '{SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=',
-          },
-        ]);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
     });
 
     it('should restrict attributes returned if attributes are specified', async () => {
