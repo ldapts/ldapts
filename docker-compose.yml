@@ -19,7 +19,7 @@ services:
       LDAP_TLS_CRT_FILENAME: server.pem
       LDAP_TLS_KEY_FILENAME: server-key.pem
       LDAP_TLS_CA_CRT_FILENAME: ca.pem
-      LDAP_TLS_VERIFY_CLIENT: never
+      LDAP_TLS_VERIFY_CLIENT: try
       LDAP_TLS_CIPHER_SUITE: "SECURE256:+SECURE128"
     healthcheck:
       test: bash -c "exec 6<> /dev/tcp/localhost/389"
