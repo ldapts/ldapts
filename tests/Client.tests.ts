@@ -32,6 +32,7 @@ const should = chai.should();
 
 const LDAP_DOMAIN = 'ldap.local';
 const LDAP_URI = 'ldap://localhost:389';
+const SECURE_LDAP_URI = 'ldaps://localhost:636';
 const BASE_DN = 'dc=ldap,dc=local';
 const BIND_DN = `cn=admin,${BASE_DN}`;
 const BIND_PW = '1234';
@@ -119,6 +120,16 @@ describe('Client', () => {
       } catch {
         // This can fail since it's not the part being tested
       }
+    });
+
+    it('should succeed with ldaps://', async () => {
+      await using client = new Client({
+        url: SECURE_LDAP_URI,
+      });
+
+      // @ts-expect-error : private field
+      client.secure.should.equal(true);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     it('should throw for invalid credentials', async () => {
