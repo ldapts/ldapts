@@ -41,3 +41,18 @@ jobs:
     - name: Show OpenLDAP logs
       if: failure()
       run: docker logs ldapts-openldap-1
+  lint:
+    name: 'Lint'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts
+
+      - run: npm ci
+
+      - name: Run lint
+        run: npm run lint
