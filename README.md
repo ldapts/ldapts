@@ -743,10 +743,10 @@ Solution(s):
 
 ### Generate certificates
 
-Run [generate-certs.js](tests/data/generate-certs.js)
+Run [generate-certs.js](tests/data/generate-certs.mjs)
 
 ```sh
-node tests/data/generate-certs.js
+node tests/data/generate-certs.mjs
 ```
 
 ### Start test OpenLDAP server

@@ -27,7 +27,7 @@ jobs:
     - run: npm ci
 
     - name: Generate certificates
-      run: node tests/data/generate-certs.js
+      run: node tests/data/generate-certs.mjs
 
     - name: Start openldap container
       run: docker compose up -d --wait
