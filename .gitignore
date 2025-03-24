@@ -21,6 +21,5 @@ typings
 .eslintcache
 coverage
 
-tests/certs/*.pem
-tests/certs/certs.state
-tests/certs/certyaml
+tests/data/certs/*
+

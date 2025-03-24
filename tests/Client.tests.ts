@@ -1,3 +1,5 @@
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+
 import assert from 'node:assert';
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
@@ -13,9 +15,9 @@ import {
   AddResponse,
   AndFilter,
   Attribute,
+  Change,
   Client,
   Control,
-  DN,
   EqualityFilter,
   InvalidCredentialsError,
   InvalidDNSyntaxError,
@@ -25,24 +27,17 @@ import {
   UndefinedTypeError,
 } from '../src/index.js';
 
+chai.use(chaiAsPromised);
+const should = chai.should();
+
+const LDAP_DOMAIN = 'ldap.local';
+const LDAP_URI = 'ldap://localhost:389';
+const SECURE_LDAP_URI = 'ldaps://localhost:636';
+const BASE_DN = 'dc=ldap,dc=local';
+const BIND_DN = `cn=admin,${BASE_DN}`;
+const BIND_PW = '1234';
+
 describe('Client', () => {
-  let should: Chai.Should;
-  let bindDN: string;
-  const bindPassword = 'MyRedSuitKeepsMeWarm';
-
-  before(() => {
-    should = chai.should();
-    chai.use(chaiAsPromised);
-
-    bindDN = new DN({
-      uid: 'tony.stark',
-      ou: 'Users',
-      // eslint-disable-next-line id-length
-      o: '5be4c382c583e54de6a3ff52',
-      dc: ['jumpcloud', 'com'],
-    }).toString();
-  });
-
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
       const url = 'https://127.0.0.1';
@@ -75,7 +70,7 @@ describe('Client', () => {
   describe('#isConnected', () => {
     it('should not be connected if a method has not been called', () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       client.isConnected.should.equal(false);
@@ -83,10 +78,10 @@ describe('Client', () => {
 
     it('should not be connected after unbind has been called', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
 
       client.isConnected.should.equal(true);
 
@@ -97,10 +92,10 @@ describe('Client', () => {
 
     it('should be connected if a method has been called', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
 
       client.isConnected.should.equal(true);
 
@@ -115,10 +110,10 @@ describe('Client', () => {
   describe('#bind()', () => {
     it('should succeed on basic bind', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
 
       try {
         await client.unbind();
@@ -127,13 +122,23 @@ describe('Client', () => {
       }
     });
 
+    it('should succeed with ldaps://', async () => {
+      await using client = new Client({
+        url: SECURE_LDAP_URI,
+      });
+
+      // @ts-expect-error : private field
+      client.secure.should.equal(true);
+      await client.bind(BIND_DN, BIND_PW);
+    });
+
     it('should throw for invalid credentials', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       try {
-        await client.bind(bindDN, 'AlsoNotAHotdog');
+        await client.bind(BIND_DN, 'AlsoNotAHotdog');
         false.should.equal(true);
       } catch (ex) {
         (ex instanceof InvalidCredentialsError).should.equal(true);
@@ -142,13 +147,28 @@ describe('Client', () => {
       }
     });
 
-    it('should succeed for non-secure bind', async () => {
-      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "objectclass=*"
+    it('should bind using EXTERNAL sasl mechanism', async () => {
       const client = new Client({
-        url: 'ldap://ldap.forumsys.com:389',
+        url: LDAP_URI,
       });
 
-      await client.bind('cn=read-only-admin,dc=example,dc=com', 'password');
+      const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
+      const [ca, cert, key] = await Promise.all([
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/ca.pem')),
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/client.pem')),
+        // eslint-disable-next-line security/detect-non-literal-fs-filename
+        fs.readFile(path.join(testsDirectory, './data/certs/client-key.pem')),
+      ]);
+
+      await client.startTLS({
+        ca,
+        cert,
+        key,
+      });
+
+      await client.bind('EXTERNAL');
 
       try {
         await client.unbind();
@@ -157,44 +177,9 @@ describe('Client', () => {
       }
     });
 
-    it('should bind using EXTERNAL sasl mechanism', async () => {
-      try {
-        const client = new Client({
-          url: 'ldap://localhost:389',
-        });
-
-        const testsDirectory = fileURLToPath(new URL('.', import.meta.url));
-        const [ca, cert, key] = await Promise.all([
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/server-ca.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/user.pem')),
-          // eslint-disable-next-line security/detect-non-literal-fs-filename
-          fs.readFile(path.join(testsDirectory, './certs/user-key.pem')),
-        ]);
-
-        await client.startTLS({
-          ca,
-          cert,
-          key,
-        });
-        await client.bind('EXTERNAL');
-
-        try {
-          await client.unbind();
-        } catch {
-          // This can fail since it's not the part being tested
-        }
-      } catch (ex) {
-        // eslint-disable-next-line no-console
-        console.warn(`Ensure the local ldap service is running. See ../README.md#development`);
-        throw ex;
-      }
-    });
-
     it('should bind with a custom control', async () => {
       // Get list of supported controls and extensions:
-      // ldapsearch -H ldaps://ldap.jumpcloud.com -b "" -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -s base supportedFeatures supportedControl supportedExtension
+      // ldapsearch -H ldaps://localhost:636 -b "" -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -s base supportedFeatures supportedControl supportedExtension
       let hasParsed = false;
       let hasWritten = false;
 
@@ -220,15 +205,26 @@ describe('Client', () => {
       const testControl = new PasswordPolicyControl();
 
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword, testControl);
+      await client.bind(`uid=user2,${BASE_DN}`, BIND_PW);
 
       try {
-        await client.unbind();
-      } catch {
-        // This can fail since it's not the part being tested
+        await client.modify(
+          `uid=user2,${BASE_DN}`,
+          new Change({
+            operation: 'replace',
+            modification: new Attribute({
+              type: 'userPassword',
+              values: ['1234'],
+            }),
+          }),
+          testControl,
+        );
+        false.should.equal(true, 'Exception expected');
+      } catch (e) {
+        // surely will happen
       }
 
       hasWritten.should.equal(true, 'Did not call PasswordPolicyControl#writeControl');
@@ -239,7 +235,7 @@ describe('Client', () => {
   describe('#startTLS()', () => {
     it('should upgrade an existing clear-text connection to be secure', async () => {
       const client = new Client({
-        url: 'ldap://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       await client.startTLS();
@@ -247,11 +243,11 @@ describe('Client', () => {
 
     it('should use secure connection for subsequent operations', async () => {
       const client = new Client({
-        url: 'ldap://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       await client.startTLS();
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
       await client.unbind();
     });
   });
@@ -259,16 +255,16 @@ describe('Client', () => {
   describe('#unbind()', () => {
     it('should succeed on basic unbind after successful bind', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
       await client.unbind();
     });
 
     it('should succeed on if client.bind() was not called previously', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       await client.unbind();
@@ -276,10 +272,10 @@ describe('Client', () => {
 
     it('should allow unbind to be called multiple times without error', async () => {
       const client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
 
       await Promise.all([client.unbind(), client.unbind()]);
 
@@ -307,11 +303,11 @@ describe('Client', () => {
 
   describe('#compare()', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     after(async () => {
@@ -319,18 +315,18 @@ describe('Client', () => {
     });
 
     it('should return true if entry has the specified attribute and value', async () => {
-      const result = await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'sn', 'Banner');
+      const result = await client.compare(`uid=user1,${BASE_DN}`, 'sn', 'SURNAME');
       result.should.equal(true);
     });
 
     it('should return false if entry does not have the specified attribute and value', async () => {
-      const result = await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'sn', 'Stark');
+      const result = await client.compare(`uid=user1,${BASE_DN}`, 'sn', 'Stark');
       result.should.equal(false);
     });
 
     it('should throw if attribute is invalid', async () => {
       try {
-        await client.compare('uid=bruce.banner,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'lorem', 'ipsum');
+        await client.compare(`uid=user1,${BASE_DN}`, 'lorem', 'ipsum');
         false.should.equal(true);
       } catch (ex) {
         (ex instanceof UndefinedTypeError).should.equal(true);
@@ -339,7 +335,7 @@ describe('Client', () => {
 
     it('should throw if target dn does not exist', async () => {
       try {
-        await client.compare('uid=foo.bar,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', 'uid', 'bruce.banner');
+        await client.compare(`uid=foo.bar,${BASE_DN}`, 'uid', 'bruce.banner');
         false.should.equal(true);
       } catch (ex) {
         (ex instanceof NoSuchObjectError).should.equal(true);
@@ -357,7 +353,7 @@ describe('Client', () => {
   });
   /*  describe('#modify()', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: ldapUri,
     });
 
     before(async () => {
@@ -380,11 +376,11 @@ describe('Client', () => {
   }); */
   describe('#add()', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     after(async () => {
@@ -400,7 +396,7 @@ describe('Client', () => {
         }),
       );
 
-      await client.add('uid=reed.richards,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      await client.add(`uid=reed.richards,${BASE_DN}`, {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-expect-error
         userPassword: null,
@@ -427,11 +423,11 @@ describe('Client', () => {
 
   describe('#modifyDN()', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     after(async () => {
@@ -518,7 +514,7 @@ describe('Client', () => {
   describe('#exop()', () => {
     it('should throw if fast bind is not supported', async () => {
       const client: Client = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       try {
@@ -532,18 +528,18 @@ describe('Client', () => {
         }
       }
 
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
       await client.unbind();
     });
   });
 
   describe('#search()', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     after(async () => {
@@ -551,22 +547,22 @@ describe('Client', () => {
     });
 
     it('should return search entries with (objectclass=*) if no filter is specified', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(objectclass=*)"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com');
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(objectclass=*)"
+      const searchResult = await client.search(BASE_DN);
 
       searchResult.searchEntries.length.should.be.greaterThan(0);
     });
 
     it('should throw error if an operation is performed after the client has closed connection', async () => {
       const testClient = new Client({
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
 
       try {
-        await testClient.bind(bindDN, bindPassword);
+        await testClient.bind(BIND_DN, BIND_PW);
 
         const unbindRequest = testClient.unbind();
-        const searchRequest = testClient.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com');
+        const searchRequest = testClient.search(BASE_DN);
         await unbindRequest;
         await searchRequest;
         false.should.equal(true);
@@ -581,84 +577,78 @@ describe('Client', () => {
       }
     });
 
-    it('should return full search entries if filter="(mail=peter.parker@marvel.com)"', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-        filter: '(mail=peter.parker@marvel.com)',
+    it('should return full search entries if filter="(mail=user1@ldap.local)"', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+      const searchResult = await client.search(BASE_DN, {
+        filter: `(mail=user1@${LDAP_DOMAIN})`,
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          gidNumber: '5004',
-          mail: 'peter.parker@marvel.com',
-          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          cn: 'Peter Parker',
-          jcLdapAdmin: 'TRUE',
-          uid: 'peter.parker',
-          uidNumber: '5004',
+          cn: 'user1',
+          dn: 'uid=user1,dc=ldap,dc=local',
+          gidNumber: '14564100',
+          homeDirectory: '/home/user',
           loginShell: '/bin/bash',
-          homeDirectory: '/home/peter.parker',
-          givenName: 'Peter',
-          sn: 'Parker',
-          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+          mail: 'user1@ldap.local',
+          objectClass: ['top', 'posixAccount', 'inetOrgPerson'],
+          sn: 'SURNAME',
+          uid: 'user1',
+          uidNumber: '14583101',
+          userPassword: '{SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=',
         },
       ]);
     });
 
-    it('should return full search entries if filter="(mail=peter.park*)"', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-        filter: '(mail=peter.park*)',
+    it('should return full search entries if filter="(mail=user1*)"', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+      const searchResult = await client.search(BASE_DN, {
+        filter: '(mail=user1*)',
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          gidNumber: '5004',
-          mail: 'peter.parker@marvel.com',
-          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          cn: 'Peter Parker',
-          jcLdapAdmin: 'TRUE',
-          uid: 'peter.parker',
-          uidNumber: '5004',
+          cn: 'user1',
+          dn: 'uid=user1,dc=ldap,dc=local',
+          gidNumber: '14564100',
+          homeDirectory: '/home/user',
           loginShell: '/bin/bash',
-          homeDirectory: '/home/peter.parker',
-          givenName: 'Peter',
-          sn: 'Parker',
-          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+          mail: 'user1@ldap.local',
+          objectClass: ['top', 'posixAccount', 'inetOrgPerson'],
+          sn: 'SURNAME',
+          uid: 'user1',
+          uidNumber: '14583101',
+          userPassword: '{SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=',
         },
       ]);
     });
 
-    it('should return parallel search entries if filter="(mail=peter.parker@marvel.com)". Issue #83', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+    it('should return parallel search entries if filter="(mail=user1@ldap.local)". Issue #83', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
       const [result1, result2, result3] = await Promise.all([
-        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-          filter: '(mail=peter.parker@marvel.com)',
+        client.search(BASE_DN, {
+          filter: `(mail=user1@${LDAP_DOMAIN})`,
         }),
-        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-          filter: '(mail=peter.parker@marvel.com)',
+        client.search(BASE_DN, {
+          filter: `(mail=user1@${LDAP_DOMAIN})`,
         }),
-        client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-          filter: '(mail=peter.parker@marvel.com)',
+        client.search(BASE_DN, {
+          filter: `(mail=user1@${LDAP_DOMAIN})`,
         }),
       ]);
       const expectedResult = [
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          gidNumber: '5004',
-          mail: 'peter.parker@marvel.com',
-          memberOf: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          cn: 'Peter Parker',
-          jcLdapAdmin: 'TRUE',
-          uid: 'peter.parker',
-          uidNumber: '5004',
+          cn: 'user1',
+          dn: 'uid=user1,dc=ldap,dc=local',
+          gidNumber: '14564100',
+          homeDirectory: '/home/user',
           loginShell: '/bin/bash',
-          homeDirectory: '/home/peter.parker',
-          givenName: 'Peter',
-          sn: 'Parker',
-          objectClass: ['top', 'person', 'organizationalPerson', 'inetOrgPerson', 'shadowAccount', 'posixAccount', 'jumpcloudUser'],
+          mail: 'user1@ldap.local',
+          objectClass: ['top', 'posixAccount', 'inetOrgPerson'],
+          sn: 'SURNAME',
+          uid: 'user1',
+          uidNumber: '14583101',
+          userPassword: '{SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=',
         },
       ];
 
@@ -669,7 +659,7 @@ describe('Client', () => {
 
     it('should allow arbitrary controls 1.2.840.113556.1.4.417 to be specified', async () => {
       const searchResult = await client.search(
-        'ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
+        BASE_DN,
         {
           scope: 'sub',
           filter: '(isDeleted=*)',
@@ -680,101 +670,68 @@ describe('Client', () => {
       searchResult.searchEntries.length.should.equal(0);
     });
 
-    it('should return search results for non-secure ldap server', async () => {
-      // ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" "uid=einstein"
-      const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
-      });
-
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
-
-      try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: '(uid=einstein)',
-        });
-
-        searchResult.searchEntries.should.deep.equal([
-          {
-            cn: 'Albert Einstein',
-            dn: 'uid=einstein,dc=example,dc=com',
-            mail: 'einstein@ldap.forumsys.com',
-            objectClass: ['inetOrgPerson', 'organizationalPerson', 'person', 'top'],
-            sn: 'Einstein',
-            telephoneNumber: '314-159-2653',
-            uid: 'einstein',
-          },
-        ]);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
-    });
-
     it('should restrict attributes returned if attributes are specified', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
+      const searchResult = await client.search(BASE_DN, {
         scope: 'sub',
-        filter: '(mail=peter.parker@marvel.com)',
+        filter: `(mail=user1@${LDAP_DOMAIN})`,
         attributes: ['cn'],
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          cn: 'Peter Parker',
+          dn: `uid=user1,${BASE_DN}`,
+          cn: 'user1',
         },
       ]);
     });
 
     it('should include attributes without values if attributes are specified', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)" "cn"
+      const searchResult = await client.search(BASE_DN, {
         scope: 'sub',
-        filter: '(mail=peter.parker@marvel.com)',
+        filter: `(mail=user1@${LDAP_DOMAIN})`,
         attributes: ['cn', 'telephoneNumber'],
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          cn: 'Peter Parker',
+          dn: `uid=user1,${BASE_DN}`,
+          cn: 'user1',
           telephoneNumber: [],
         },
       ]);
     });
 
     it('should not return attribute values if returnAttributeValues=false', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
+      const searchResult = await client.search(BASE_DN, {
         scope: 'sub',
-        filter: '(mail=peter.parker@marvel.com)',
+        filter: `(mail=user1@${LDAP_DOMAIN})`,
         returnAttributeValues: false,
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          dn: 'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          gidNumber: [],
-          mail: [],
-          memberOf: [],
           cn: [],
-          jcLdapAdmin: [],
+          dn: 'uid=user1,dc=ldap,dc=local',
+          gidNumber: [],
+          homeDirectory: [],
+          loginShell: [],
+          mail: [],
+          objectClass: [],
+          sn: [],
           uid: [],
           uidNumber: [],
-          loginShell: [],
-          homeDirectory: [],
-          givenName: [],
-          sn: [],
-          objectClass: [],
+          userPassword: [],
         },
       ]);
     });
 
     it('should page search entries if paging is specified', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-        filter: 'objectClass=jumpcloudUser',
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=2/noprompt "objectClass=jumpcloudUser"
+      const searchResult = await client.search(BASE_DN, {
+        filter: 'objectClass=*',
         paged: {
           pageSize: 2,
         },
@@ -783,41 +740,19 @@ describe('Client', () => {
       searchResult.searchEntries.length.should.be.greaterThan(2);
     });
 
-    it('should allow sizeLimit when no paging is specified - jumpcloud', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -z 6 'cn=*'
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+    it('should allow sizeLimit when no paging is specified', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -z 6 'cn=*'
+      const searchResult = await client.search(BASE_DN, {
         filter: 'cn=*',
-        sizeLimit: 6,
+        sizeLimit: 3,
       });
 
-      searchResult.searchEntries.length.should.equal(6);
+      searchResult.searchEntries.length.should.equal(3);
     });
 
-    it('should allow sizeLimit when no paging is specified - forumsys', async () => {
-      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -z 3 'cn=*'
-      const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
-      });
-
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
-
-      try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: 'cn=*',
-          sizeLimit: 3,
-        });
-
-        searchResult.searchEntries.length.should.equal(3);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
-    });
-
-    it('should allow sizeLimit when paging is specified - jumpcloud', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=3/noprompt -z 5 'cn=*'
-      const searchResult = await client.search('ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+    it('should allow sizeLimit when paging is specified', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -E pr=3/noprompt -z 5 'cn=*'
+      const searchResult = await client.search(BASE_DN, {
         filter: 'cn=*',
         sizeLimit: 5,
         paged: {
@@ -828,43 +763,18 @@ describe('Client', () => {
       searchResult.searchEntries.length.should.equal(5);
     });
 
-    it('should allow sizeLimit when paging is specified - forumsys', async () => {
-      // NOTE: ldapsearch -x -H ldap://ldap.forumsys.com:389 -D "cn=read-only-admin,dc=example,dc=com" -w password -b "dc=example,dc=com" -E pr=3/noprompt -z 4 'cn=*'
-      const testClient = new Client({
-        url: 'ldap://ldap.forumsys.com',
-      });
-
-      await testClient.bind('cn=read-only-admin,dc=example,dc=com', 'password');
-
-      try {
-        const searchResult = await testClient.search('dc=example,dc=com', {
-          filter: 'cn=*',
-          sizeLimit: 4,
-          paged: {
-            pageSize: 3,
-          },
-        });
-
-        searchResult.searchEntries.length.should.equal(4);
-      } catch (ex) {
-        assert.fail('This should not occur');
-      } finally {
-        await testClient.unbind();
-      }
-    });
-
     it('should return group contents with parenthesis in name - explicit filter controls', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
-      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search(BASE_DN, {
         filter: new AndFilter({
           filters: [
             new EqualityFilter({
               attribute: 'objectClass',
-              value: 'groupOfNames',
+              value: 'posixGroup',
             }),
             new EqualityFilter({
               attribute: 'cn',
-              value: 'Something (Special)',
+              value: 'UserGroup2 (Test)',
             }),
           ],
         }),
@@ -872,38 +782,28 @@ describe('Client', () => {
 
       searchResult.searchEntries.should.deep.equal([
         {
-          cn: 'Something (Special)',
-          ou: 'Something (Special)',
-          dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          member: [
-            'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-            'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-            'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          ],
-          objectClass: ['top', 'groupOfNames'],
-          description: 'tagGroup',
+          cn: 'UserGroup2 (Test)',
+          dn: 'cn=UserGroup2 (Test),dc=ldap,dc=local',
+          gidNumber: '2539',
+          memberUid: ['user3', 'user2'],
+          objectClass: ['posixGroup', 'top'],
         },
       ]);
     });
 
     it('should return group contents with parenthesis in name - string filter', async () => {
-      // NOTE: ldapsearch -H ldaps://ldap.jumpcloud.com -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
-      const searchResult = await client.search('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
-        filter: '(&(objectClass=groupOfNames)(cn=Something \\28Special\\29))',
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(&(objectClass=groupOfNames)(cn=Something \28Special\29))"
+      const searchResult = await client.search(BASE_DN, {
+        filter: '(&(objectClass=posixGroup)(cn=UserGroup2 \\28Test\\29))',
       });
 
       searchResult.searchEntries.should.deep.equal([
         {
-          cn: 'Something (Special)',
-          ou: 'Something (Special)',
-          dn: 'cn=Something (Special),ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          member: [
-            'uid=stan.lee,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-            'uid=tony.stark,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-            'uid=peter.parker,ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com',
-          ],
-          objectClass: ['top', 'groupOfNames'],
-          description: 'tagGroup',
+          cn: 'UserGroup2 (Test)',
+          dn: 'cn=UserGroup2 (Test),dc=ldap,dc=local',
+          gidNumber: '2539',
+          memberUid: ['user3', 'user2'],
+          objectClass: ['posixGroup', 'top'],
         },
       ]);
     });
@@ -941,11 +841,11 @@ describe('Client', () => {
 
   describe('#searchPaginated', () => {
     const client: Client = new Client({
-      url: 'ldaps://ldap.jumpcloud.com',
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
 
     after(async () => {
@@ -954,7 +854,7 @@ describe('Client', () => {
 
     it('should paginate', async () => {
       const pageSize = 10;
-      const paginator = client.searchPaginated('o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com', {
+      const paginator = client.searchPaginated(BASE_DN, {
         filter: 'objectclass=*',
         paged: {
           pageSize,
@@ -979,10 +879,10 @@ describe('Client', () => {
 
       try {
         await using client = new Client({
-          url: 'ldaps://ldap.jumpcloud.com',
+          url: LDAP_URI,
         });
         spy(client, 'unbind');
-        await client.bind(bindDN, bindPassword);
+        await client.bind(BIND_DN, BIND_PW);
       } catch {
         /* empty */
       } finally {
@@ -994,14 +894,14 @@ describe('Client', () => {
       const client = new Client({
         timeout: 5000,
         connectTimeout: 3000,
-        url: 'ldaps://ldap.jumpcloud.com',
+        url: LDAP_URI,
       });
       // @ts-expect-error :  it is private
       const messageMap = client.messageDetailsByMessageId;
       const messageMapSetter = sinon.spy(messageMap, 'set');
 
       try {
-        await client.bind(bindDN, bindPassword);
+        await client.bind(BIND_DN, BIND_PW);
       } catch {
         /* empty */
       } finally {
