@@ -1,5 +1,3 @@
-/* eslint-disable */
-
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -7,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import forge from 'node-forge';
 
 // Get script directory (ESM equivalent of __dirname)
+// eslint-disable-next-line no-redeclare
 const __filename = fileURLToPath(import.meta.url);
 const scriptDir = path.dirname(__filename);
 const certsDir = path.join(scriptDir, 'certs');
@@ -19,11 +18,15 @@ function generateKeyPair() {
 }
 
 async function writePem(filename, pem) {
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   await fs.writeFile(path.join(certsDir, filename), pem.replace(/\r\n/g, '\n')); // Force LF
   if (filename.endsWith('-key.pem')) {
     try {
+      // eslint-disable-next-line security/detect-non-literal-fs-filename
       await fs.chmod(path.join(certsDir, filename), '600');
-    } catch (e) {} // Ignore on Windows
+    } catch {
+      // Ignore on Windows
+    }
   }
 }
 
@@ -87,5 +90,5 @@ await Promise.all([
   writePem('client.pem', forge.pki.certificateToPem(clientCert)),
   writePem('client-key.pem', forge.pki.privateKeyToPem(clientKeys.privateKey)),
 ]);
-
+// eslint-disable-next-line no-console
 console.log(`Generated ca.pem, server.pem, server-key.pem, client.pem, and client-key.pem in ${certsDir}`);
