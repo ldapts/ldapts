@@ -30,7 +30,7 @@
     "lint:code": "eslint --fix",
     "lint": "run-p lint:*",
     "lint-staged": "lint-staged",
-    "docker:up": "docker compose up -d",
+    "docker:up": "docker compose up -d --wait",
     "docker:down": "docker compose down",
     "beta": "npm publish --tag beta",
     "prepublishOnly": "npm run lint && npm run build && npm run test && pinst --disable",

@@ -20,11 +20,13 @@ services:
       LDAP_TLS_KEY_FILENAME: server-key.pem
       LDAP_TLS_CA_CRT_FILENAME: ca.pem
       LDAP_TLS_VERIFY_CLIENT: allow
-      LDAP_TLS_CIPHER_SUITE: "NORMAL:!VERS-TLS1.3"
+      LDAP_TLS_CIPHER_SUITE: "NORMAL"
     healthcheck:
-      test: bash -c "exec 6<> /dev/tcp/localhost/636"
-      interval: 60s
-      retries: 10
-      start_period: 10s
-      start_interval: 2s
-      timeout: 10s
+      test: ldapsearch -x -H ldaps://localhost:636 -b dc=ldap,dc=local -D "cn=admin,dc=ldap,dc=local" -w 1234 -s base objectclass=* || exit 1
+      interval: 2s
+      retries: 60
+      start_period: 5s
+      start_interval: 1s
+      timeout: 3s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
