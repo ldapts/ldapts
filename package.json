@@ -42,10 +42,7 @@
       "prettier --write",
       "markdownlint --config=.github/linters/.markdown-lint.yml --fix"
     ],
-    "*.cjs": [
-      "eslint --fix"
-    ],
-    "*.ts": [
+    "*.{cjs,mjs,ts}": [
       "eslint --fix"
     ]
   },

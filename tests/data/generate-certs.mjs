@@ -11,7 +11,7 @@ const scriptDir = path.dirname(__filename);
 const certsDir = path.join(scriptDir, 'certs');
 
 // Create certs directory if it doesn't exist
-await fs.mkdir(certsDir, { recursive: true })
+await fs.mkdir(certsDir, { recursive: true });
 
 function generateKeyPair() {
   return forge.pki.rsa.generateKeyPair({ bits: 2048 });
@@ -57,8 +57,8 @@ serverCert.setExtensions([
     name: 'subjectAltName',
     altNames: [
       { type: 2, value: 'ldap.local' }, // type 2 is DNSName
-      { type: 2, value: 'localhost' }
-    ]
+      { type: 2, value: 'localhost' },
+    ],
   },
   { name: 'keyUsage', digitalSignature: true, keyEncipherment: true, critical: true },
   { name: 'extKeyUsage', serverAuth: true, critical: true },
