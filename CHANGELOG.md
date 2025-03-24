@@ -1,5 +1,13 @@
 # Change Log
 
+## 7.3.3 - 2024-03-24
+
+- feat: MoreResultsToReturn error, useful for informing end-users by @ayZagen in <https://github.com/ldapts/ldapts/pull/173>
+- fix: message timers are not cleared by @ayZagen in <https://github.com/ldapts/ldapts/pull/172>
+- fix: ensure connectTimer is cleared by @ayZagen in <https://github.com/ldapts/ldapts/pull/174>
+- Replace JumpCloud with local openldap image. Thank you @ayZagen!
+- Update npms
+
 ## 7.3.2 - 2024-03-10
 
 - Update npms

@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "7.3.2",
+  "version": "7.3.3",
   "description": "LDAP client",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -73,7 +73,7 @@
     "whatwg-url": "~14.2.0"
   },
   "devDependencies": {
-    "@types/chai": "~5.2.0",
+    "@types/chai": "~5.2.1",
     "@types/chai-as-promised": "~8.0.2",
     "@types/debug": "~4.1.12",
     "@types/mocha": "~10.0.10",
