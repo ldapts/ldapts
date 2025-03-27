@@ -716,19 +716,24 @@ export class Client {
    * @returns {void|Promise} void if not connected; otherwise returns a promise to the request to disconnect
    */
   public async unbind(): Promise<void> {
-    if (!this.connected || !this.socket) {
-      return;
+    try {
+      if (!this.connected || !this.socket) {
+        return;
+      }
+
+      const req = new UnbindRequest({
+        messageId: this._nextMessageId(),
+      });
+
+      await this._send(req);
+    } finally {
+      this._destroySocket(this.socket);
     }
-
-    const req = new UnbindRequest({
-      messageId: this._nextMessageId(),
-    });
-
-    await this._send(req);
   }
 
-  public [Symbol.asyncDispose](): Promise<void> {
-    return this.unbind();
+  public async [Symbol.asyncDispose](): Promise<void> {
+    await this.unbind().catch();
+    this._destroySocket(this.socket);
   }
 
   private async _sendBind(req: BindRequest): Promise<void> {
@@ -835,23 +840,13 @@ export class Client {
       }
 
       this.socket.once('error', (err: Error) => {
-        if (this.connectTimer) {
-          clearTimeout(this.connectTimer);
-          this.connectTimer = undefined;
-        }
-
+        this._destroySocket(this.socket);
         reject(err);
       });
 
       if (this.clientOptions.connectTimeout) {
         this.connectTimer = setTimeout(() => {
-          if (this.socket && (!this.socket.readable || !this.socket.writable)) {
-            this.connected = false;
-            this.socket.destroy();
-            delete this.socket;
-          }
-
-          this.connectTimer = undefined;
+          this._destroySocket(this.socket);
 
           reject(new Error('Connection timeout'));
         }, this.clientOptions.connectTimeout);
@@ -971,17 +966,27 @@ export class Client {
     next();
   }
 
-  private _endSocket(socket: SocketWithId): void {
-    if (socket === this.socket) {
-      this.connected = false;
-    }
+  private _destroySocket(socket?: SocketWithId): void {
+    if (socket) {
+      if (this.connectTimer) {
+        clearTimeout(this.connectTimer);
+        this.connectTimer = undefined;
+      }
 
-    // Ignore any error since the connection is being closed
-    socket.removeAllListeners('error');
-    socket.on('error', () => {
-      // Ignore NOOP
-    });
-    socket.end();
+      // Ignore any error since the connection is being closed
+      socket.removeAllListeners('error');
+      socket.on('error', () => {
+        // Ignore NOOP
+      });
+      // send FIN packet first for the sake of ldap servers
+      socket.end();
+      socket.destroy();
+
+      if (socket === this.socket) {
+        this.connected = false;
+        this.socket = undefined;
+      }
+    }
   }
 
   /**
@@ -1002,7 +1007,7 @@ export class Client {
       ? setTimeout(() => {
           const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
           if (messageDetails) {
-            this._endSocket(messageDetails.socket);
+            this._destroySocket(messageDetails.socket);
             messageReject(new Error(`${message.constructor.name}: Operation timed out`));
           }
         }, this.clientOptions.timeout)
@@ -1056,7 +1061,7 @@ export class Client {
       } else if (message instanceof UnbindRequest) {
         logDebug('Unbind success. Ending socket');
         if (this.socket) {
-          this._endSocket(this.socket);
+          this._destroySocket(this.socket);
         }
       } else {
         // NOTE: messageResolve will be called as 'data' events come from the socket
