@@ -1,0 +1,13 @@
+dn: cn=module{0},cn=config
+changeType: modify
+add: olcModuleLoad
+olcModuleLoad: {0}sssvlv
+
+
+dn: olcOverlay={0}sssvlv,olcDatabase={1}{{ LDAP_BACKEND }},cn=config
+changeType: add
+objectClass: olcOverlayConfig
+objectClass: olcSssVlvConfig
+olcOverlay: {0}sssvlv
+olcSssVlvMax: 8
+olcSssVlvMaxKeys: 5
