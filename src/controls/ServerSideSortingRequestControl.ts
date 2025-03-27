@@ -17,7 +17,7 @@ export interface ServerSideSortingRequestControlOptions extends ControlOptions {
 }
 
 export class ServerSideSortingRequestControl extends Control {
-  public static type = '2.16.840.1.113730.3.4.3';
+  public static type = '1.2.840.113556.1.4.473';
 
   public values: ServerSideSortingRequestValue[];
 

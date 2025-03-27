@@ -23,7 +23,7 @@ services:
       LDAP_TLS_CIPHER_SUITE: "NORMAL"
     healthcheck:
       test: ldapsearch -x -H ldaps://localhost:636 -b dc=ldap,dc=local -D "cn=admin,dc=ldap,dc=local" -w 1234 -s base objectclass=* || exit 1
-      interval: 2s
+      interval: 60s
       retries: 60
       start_period: 5s
       start_interval: 1s
