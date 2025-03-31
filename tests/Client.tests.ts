@@ -921,7 +921,6 @@ describe('Client', () => {
       try {
         // @ts-expect-error : is private
         await client._connect();
-        await client.bind(BIND_DN, BIND_PW);
       } catch (e) {
         // ignore
       } finally {
