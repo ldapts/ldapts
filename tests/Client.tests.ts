@@ -902,7 +902,6 @@ describe('Client', () => {
       try {
         // @ts-expect-error : is private
         await client._connect();
-        await client.unbind();
       } catch (e) {
         // ignore
       } finally {
