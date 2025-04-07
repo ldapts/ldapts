@@ -6,6 +6,9 @@ on:
       - 'main'
       - 'issue-**'
 
+permissions:
+  contents: read
+
 jobs:
   build_and_test:
     name: 'Build & Test'
@@ -17,30 +20,30 @@ jobs:
         node-version: ['18', '20', '22']
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-    - run: npm ci
+      - run: npm ci
 
-    - name: Generate certificates
-      run: node tests/data/generate-certs.mjs
+      - name: Generate certificates
+        run: node tests/data/generate-certs.mjs
 
-    - name: Start openldap container
-      run: docker compose up -d --wait
+      - name: Start openldap container
+        run: docker compose up -d --wait
 
-    - run: npm test
-      env:
-        CI: true
-    - run: npm run build
-    - name: Stopping openldap container
-      run: docker compose down
-    - name: Show OpenLDAP logs
-      if: failure()
-      run: docker logs ldapts-openldap-1
+      - run: npm test
+        env:
+          CI: true
+      - run: npm run build
+      - name: Stopping openldap container
+        run: docker compose down
+      - name: Show OpenLDAP logs
+        if: failure()
+        run: docker logs ldapts-openldap-1
   lint:
     name: 'Lint'
     runs-on: ubuntu-latest
