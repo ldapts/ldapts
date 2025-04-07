@@ -44,6 +44,9 @@
     ],
     "*.{cjs,mjs,ts}": [
       "eslint --fix"
+    ],
+    "*.{json5,yml}": [
+      "prettier --write"
     ]
   },
   "repository": {
@@ -66,36 +69,36 @@
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
     "@types/asn1": ">=0.2.4",
-    "asn1": "~0.2.6",
-    "debug": "~4.4.0",
-    "strict-event-emitter-types": "~2.0.0",
-    "uuid": "~11.1.0",
-    "whatwg-url": "~14.2.0"
+    "asn1": "0.2.6",
+    "debug": "4.4.0",
+    "strict-event-emitter-types": "2.0.0",
+    "uuid": "11.1.0",
+    "whatwg-url": "14.2.0"
   },
   "devDependencies": {
-    "@types/chai": "~5.2.1",
-    "@types/chai-as-promised": "~8.0.2",
-    "@types/debug": "~4.1.12",
-    "@types/mocha": "~10.0.10",
+    "@types/chai": "5.2.1",
+    "@types/chai-as-promised": "8.0.2",
+    "@types/debug": "4.1.12",
+    "@types/mocha": "10.0.10",
     "@types/node": ">=22",
-    "@types/sinon": "~17.0.4",
-    "@types/whatwg-url": "~13.0.0",
-    "chai": "~5.2.0",
-    "chai-as-promised": "~8.0.1",
-    "eslint": "~9.23.0",
-    "eslint-config-decent": "^2.6.2",
-    "husky": "~9.1.7",
-    "lint-staged": "~15.5.0",
-    "markdownlint-cli": "~0.44.0",
-    "mocha": "~11.1.0",
-    "node-forge": "^1.3.1",
-    "npm-run-all": "~4.1.5",
-    "pinst": "~3.0.0",
-    "prettier": "~3.5.3",
-    "sinon": "~19.0.4",
-    "ts-mockito": "~2.6.1",
-    "tsx": "~4.19.3",
-    "typescript": "~5.8.2",
+    "@types/sinon": "17.0.4",
+    "@types/whatwg-url": "13.0.0",
+    "chai": "5.2.0",
+    "chai-as-promised": "8.0.1",
+    "eslint": "9.24.0",
+    "eslint-config-decent": "2.6.4",
+    "husky": "9.1.7",
+    "lint-staged": "15.5.0",
+    "markdownlint-cli": "0.44.0",
+    "mocha": "11.1.0",
+    "node-forge": "1.3.1",
+    "npm-run-all2": "7.0.2",
+    "pinst": "3.0.0",
+    "prettier": "3.5.3",
+    "sinon": "20.0.0",
+    "ts-mockito": "2.6.1",
+    "tsx": "4.19.3",
+    "typescript": "5.8.3",
     "unbuild": "3.5.0"
   }
 }
