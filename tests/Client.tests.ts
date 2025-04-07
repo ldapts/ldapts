@@ -282,21 +282,24 @@ describe('Client', () => {
       await client.unbind();
     });
 
-    it('should clear connectTimer after connection closed', async () => {
+    it('should destroy socket after unbind', async () => {
       const client = new Client({
-        connectTimeout: 3000,
-        url: 'ldaps://ldap.jumpcloud.com',
+        connectTimeout: 5000,
+        url: 'ldaps://localhost:389',
       });
 
       try {
         // @ts-expect-error : is private
         await client._connect();
+        await client.bind(BIND_DN, BIND_PW);
         await client.unbind();
       } catch (e) {
         // ignore
       } finally {
         // @ts-expect-error : is private
         should.equal(client.connectTimer, undefined);
+        // @ts-expect-error : is private
+        should.equal(client.socket, undefined);
       }
     });
   });
@@ -887,6 +890,44 @@ describe('Client', () => {
         /* empty */
       } finally {
         spy.calledOnce.should.equal(true);
+      }
+    });
+
+    it('should destroy socket after connection failure', async () => {
+      const client = new Client({
+        connectTimeout: 300,
+        url: 'ldap://localhost:9999',
+      });
+
+      try {
+        // @ts-expect-error : is private
+        await client._connect();
+      } catch (e) {
+        // ignore
+      } finally {
+        // @ts-expect-error : is private
+        should.equal(client.connectTimer, undefined);
+        // @ts-expect-error : is private
+        should.equal(client.socket, undefined);
+      }
+    });
+
+    it('should destroy socket after tls connection failure', async () => {
+      const client = new Client({
+        connectTimeout: 5000,
+        url: 'ldaps://localhost:389',
+      });
+
+      try {
+        // @ts-expect-error : is private
+        await client._connect();
+      } catch (e) {
+        // ignore
+      } finally {
+        // @ts-expect-error : is private
+        should.equal(client.connectTimer, undefined);
+        // @ts-expect-error : is private
+        should.equal(client.socket, undefined);
       }
     });
 
