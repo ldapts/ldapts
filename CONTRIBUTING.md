@@ -1,22 +1,25 @@
-# Contributors
+# Contributing Guidelines
 
-## Checkin
+## Pull Request Format
 
-- Do checkin source (src)
-- Do not checkin build output (dist)
-- Do not checkin node_modules
+The title of your PR should match the following format:
 
-## Development
-
-In order to handle code style and static analysis, we run [Husky](https://github.com/typicode/husky) before each commit.
-This step ensures that formatting and checkin rules are followed. To make sure Husky runs correctly, please use the
-following workflow:
-
-```sh
-npm install                                 # installs all devDependencies including Husky
-git add abc.ext                             # Add the files you've changed. This should include files in src, lib, and node_modules (see above)
-git commit -m "Informative commit message"  # Commit. This will run Husky
+```text
+<type>: <short description>
 ```
 
-During the commit step, Husky will take care of formatting all files with [Prettier](https://github.com/prettier/prettier).
-It will also make sure these changes are appropriately included in your commit (no further work is needed)
+### Types
+
+- **docs** - Documentation changes only
+- **feat** - Any new functionality additions
+- **fix** - Bugfixes that don't add new functionality
+- **test** - Test changes only
+- **chore** - Anything else
+
+Within the body of your PR, make sure you reference the issue that you have worked on, as well as pointing out anything
+of note you wish us to look at during our review.
+
+### Commits
+
+We do not care about the number, or style of commits in your history, because we squash merge every PR into main.
+Feel free to commit in whatever style you feel comfortable with.
