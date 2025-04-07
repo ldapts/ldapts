@@ -1,3 +1,9 @@
+# [7.4.0](https://github.com/ldapts/ldapts/compare/v7.3.3...v7.4.0) (2025-04-07)
+
+### Features
+
+- ensure socket is destroyed after unbind and connection errors ([#180](https://github.com/ldapts/ldapts/issues/180)) ([bcf433c](https://github.com/ldapts/ldapts/commit/bcf433c884b192a0e1af6032dfe34dc09c3c8493))
+
 # 7.3.3 - 2024-03-24
 
 - feat: MoreResultsToReturn error, useful for informing end-users by @ayZagen in <https://github.com/ldapts/ldapts/pull/173>
