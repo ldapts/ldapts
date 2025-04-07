@@ -34,6 +34,9 @@ jobs:
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
 
+      - name: Lint
+        run: npm run lint
+
       - name: Build
         run: npm run build
 
@@ -42,6 +45,9 @@ jobs:
 
       - name: Start openldap container
         run: docker compose up -d --wait
+
+      - name: Test
+        run: npm test
 
       - name: Release
         run: npx semantic-release
