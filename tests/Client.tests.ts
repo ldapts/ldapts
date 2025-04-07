@@ -105,6 +105,23 @@ describe('Client', () => {
         // This can fail since it's not the part being tested
       }
     });
+
+    it('should allow bind/unbind to be called multiple times without error', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+      });
+
+      client.isConnected.should.equal(false);
+      await client.bind(BIND_DN, BIND_PW);
+      client.isConnected.should.equal(true);
+      await client.unbind();
+      client.isConnected.should.equal(false);
+
+      await client.bind(BIND_DN, BIND_PW);
+      client.isConnected.should.equal(true);
+      await client.unbind();
+      client.isConnected.should.equal(false);
+    });
   });
 
   describe('#bind()', () => {
@@ -127,7 +144,7 @@ describe('Client', () => {
         url: SECURE_LDAP_URI,
       });
 
-      // @ts-expect-error : private field
+      // @ts-expect-error - private field
       client.secure.should.equal(true);
       await client.bind(BIND_DN, BIND_PW);
     });
@@ -262,7 +279,7 @@ describe('Client', () => {
       await client.unbind();
     });
 
-    it('should succeed on if client.bind() was not called previously', async () => {
+    it('should succeed if client.bind() was not called previously', async () => {
       const client = new Client({
         url: LDAP_URI,
       });
@@ -289,16 +306,16 @@ describe('Client', () => {
       });
 
       try {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         await client._connect();
         await client.bind(BIND_DN, BIND_PW);
         await client.unbind();
       } catch (e) {
         // ignore
       } finally {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.connectTimer, undefined);
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.socket, undefined);
       }
     });
@@ -391,8 +408,7 @@ describe('Client', () => {
     });
 
     it('should allow adding entry with null or undefined attribute value. Issue #88', async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
+      // @ts-expect-error - Private method
       const stub = sinon.stub(client, '_send').returns(
         new AddResponse({
           messageId: 123,
@@ -400,11 +416,9 @@ describe('Client', () => {
       );
 
       await client.add(`uid=reed.richards,${BASE_DN}`, {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
+        // @ts-expect-error - Test data
         userPassword: null,
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
+        // @ts-expect-error - Test data
         foo: undefined,
       });
 
@@ -438,8 +452,7 @@ describe('Client', () => {
     });
 
     it('should set newSuperior when newDN is a string and contains a comma', async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
+      // @ts-expect-error - Private method
       const stub = sinon.stub(client, '_send').returns(
         new ModifyDNResponse({
           messageId: 123,
@@ -463,8 +476,7 @@ describe('Client', () => {
     });
 
     it('should handle escaped comma in newDN. Issue #87', async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
+      // @ts-expect-error - Private method
       const stub = sinon.stub(client, '_send').returns(
         new ModifyDNResponse({
           messageId: 123,
@@ -488,8 +500,7 @@ describe('Client', () => {
     });
 
     it('should handle newSuperior with the long form', async () => {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-expect-error
+      // @ts-expect-error - Private method
       const stub = sinon.stub(client, '_send').returns(
         new ModifyDNResponse({
           messageId: 123,
@@ -893,6 +904,18 @@ describe('Client', () => {
       }
     });
 
+    it('should destroy socket after disposed', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+      await client[Symbol.asyncDispose]();
+
+      // @ts-expect-error - is private
+      should.equal(client.socket, undefined);
+    });
+
     it('should destroy socket after connection failure', async () => {
       const client = new Client({
         connectTimeout: 300,
@@ -900,14 +923,14 @@ describe('Client', () => {
       });
 
       try {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         await client._connect();
       } catch (e) {
         // ignore
       } finally {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.connectTimer, undefined);
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.socket, undefined);
       }
     });
@@ -919,14 +942,14 @@ describe('Client', () => {
       });
 
       try {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         await client._connect();
       } catch (e) {
         // ignore
       } finally {
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.connectTimer, undefined);
-        // @ts-expect-error : is private
+        // @ts-expect-error - is private
         should.equal(client.socket, undefined);
       }
     });
@@ -937,7 +960,7 @@ describe('Client', () => {
         connectTimeout: 3000,
         url: LDAP_URI,
       });
-      // @ts-expect-error :  it is private
+      // @ts-expect-error - it is private
       const messageMap = client.messageDetailsByMessageId;
       const messageMapSetter = sinon.spy(messageMap, 'set');
 

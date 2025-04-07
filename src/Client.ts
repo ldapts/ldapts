@@ -168,13 +168,8 @@ export class Client {
 
   public constructor(options: ClientOptions) {
     this.clientOptions = options;
-    if (!this.clientOptions.timeout) {
-      this.clientOptions.timeout = 0;
-    }
-
-    if (!this.clientOptions.connectTimeout) {
-      this.clientOptions.connectTimeout = 0;
-    }
+    this.clientOptions.timeout ??= 0;
+    this.clientOptions.connectTimeout ??= 0;
 
     this.clientOptions.strictDN = this.clientOptions.strictDN !== false;
 
@@ -731,9 +726,8 @@ export class Client {
     }
   }
 
-  public async [Symbol.asyncDispose](): Promise<void> {
-    await this.unbind().catch();
-    this._destroySocket(this.socket);
+  public [Symbol.asyncDispose](): Promise<void> {
+    return this.unbind();
   }
 
   private async _sendBind(req: BindRequest): Promise<void> {
