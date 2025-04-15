@@ -13,7 +13,8 @@ export default {
           { type: 'chore', release: 'patch' },
         ],
         parserOpts: {
-          headerPattern: /^(\w*): (.*)$/,
+          // eslint-disable-next-line security/detect-unsafe-regex
+          headerPattern: /^(\w+)(?:\([^)]+\))?: (.+)$/,
           headerCorrespondence: ['type', 'subject'],
         },
       },
