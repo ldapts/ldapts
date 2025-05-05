@@ -6,6 +6,9 @@ on:
       - 'main'
       - 'issue-**'
 
+  pull_request:
+    branches: ['main']
+
 permissions:
   contents: read
 
