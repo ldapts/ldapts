@@ -6,6 +6,9 @@ on:
       - 'main'
       - 'issue-**'
 
+  pull_request:
+    branches: ['main']
+
 permissions:
   contents: read
 
@@ -17,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: ['18', '20', '22']
+        node-version: ['20', '22']
 
     steps:
       - uses: actions/checkout@v4

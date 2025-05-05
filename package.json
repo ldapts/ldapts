@@ -54,7 +54,7 @@
     "url": "git+https://github.com/ldapts/ldapts.git"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "keywords": [
     "ldap",
@@ -86,7 +86,7 @@
     "@types/chai-as-promised": "8.0.2",
     "@types/debug": "4.1.12",
     "@types/mocha": "10.0.10",
-    "@types/node": ">=22",
+    "@types/node": ">=20",
     "@types/sinon": "17.0.4",
     "@types/whatwg-url": "13.0.0",
     "chai": "5.2.0",
