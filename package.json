@@ -92,7 +92,7 @@
     "chai": "5.2.0",
     "chai-as-promised": "8.0.1",
     "eslint": "9.26.0",
-    "eslint-config-decent": "2.6.7",
+    "eslint-config-decent": "2.7.1",
     "husky": "9.1.7",
     "lint-staged": "15.5.1",
     "markdownlint-cli": "0.44.0",
