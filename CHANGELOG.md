@@ -1,3 +1,20 @@
+# [8.0.0](https://github.com/ldapts/ldapts/compare/v7.4.0...v8.0.0) (2025-05-05)
+
+- feat!: remove Node.js v18 support ([#203](https://github.com/ldapts/ldapts/issues/203)) ([da031c0](https://github.com/ldapts/ldapts/commit/da031c078d7bd12ad7c348086fa214bc673a3fc2))
+
+### Bug Fixes
+
+- optional scope for semantic release ([#189](https://github.com/ldapts/ldapts/issues/189)) ([6e36018](https://github.com/ldapts/ldapts/commit/6e360182f5f42fa69120aa0829cecf665b9f8744))
+
+### BREAKING CHANGES
+
+- Drop support for Node.js v18. Minimum required version is now Node.js v20.
+
+* Updated engines field in package.json
+* Updated CI configuration to test on supported versions only
+
+- Run CI jobs for PRs targeting main
+
 # [7.4.0](https://github.com/ldapts/ldapts/compare/v7.3.3...v7.4.0) (2025-04-07)
 
 ### Features
