@@ -72,7 +72,7 @@ interface MessageDetails {
   searchReferences?: SearchReference[];
   resolve: (message?: MessageResponse) => void;
   reject: (err: Error) => void;
-  timeoutTimer: NodeJS.Timer | null;
+  timeoutTimer: NodeJS.Timeout | null;
   socket: SocketWithId;
 }
 
