@@ -1,6 +1,7 @@
 import type { BerWriter as BerWriterType } from 'asn1';
 import asn1 from 'asn1';
 import * as chai from 'chai';
+import 'chai/register-should.js';
 import { anyString, anything, capture, instance, mock, reset, verify, when } from 'ts-mockito';
 
 import { ExtensibleFilter } from '../../src/index.js';

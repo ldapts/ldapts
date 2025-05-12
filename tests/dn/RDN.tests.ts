@@ -1,3 +1,5 @@
+import 'chai/register-should.js';
+
 import { RDN } from '../../src/dn/RDN.js';
 
 describe('RDN', () => {

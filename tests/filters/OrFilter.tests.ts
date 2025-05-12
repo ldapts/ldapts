@@ -1,4 +1,5 @@
 import * as chai from 'chai';
+import 'chai/register-should.js';
 
 import { EqualityFilter, OrFilter } from '../../src/index.js';
 

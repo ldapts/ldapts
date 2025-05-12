@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import type { BerReader, BerWriter } from 'asn1';
 import * as chai from 'chai';
+import 'chai/register-should.js';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
