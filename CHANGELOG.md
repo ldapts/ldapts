@@ -1,3 +1,9 @@
+## [8.0.1](https://github.com/ldapts/ldapts/compare/v8.0.0...v8.0.1) (2025-05-29)
+
+### Bug Fixes
+
+- **deps:** update all dependencies ([#211](https://github.com/ldapts/ldapts/issues/211)) ([02c585f](https://github.com/ldapts/ldapts/commit/02c585f63ff19c6a476197e7ad4e833be01ceec5))
+
 # [8.0.0](https://github.com/ldapts/ldapts/compare/v7.4.0...v8.0.0) (2025-05-05)
 
 - feat!: remove Node.js v18 support ([#203](https://github.com/ldapts/ldapts/issues/203)) ([da031c0](https://github.com/ldapts/ldapts/commit/da031c078d7bd12ad7c348086fa214bc673a3fc2))
