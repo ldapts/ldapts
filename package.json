@@ -91,7 +91,7 @@
     "@types/whatwg-url": "13.0.0",
     "chai": "5.2.0",
     "chai-as-promised": "8.0.1",
-    "eslint": "9.27.0",
+    "eslint": "9.28.0",
     "eslint-config-decent": "2.8.1",
     "husky": "9.1.7",
     "lint-staged": "16.1.0",
