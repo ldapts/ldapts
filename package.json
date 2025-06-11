@@ -104,7 +104,7 @@
     "semantic-release": "24.2.5",
     "sinon": "20.0.0",
     "ts-mockito": "2.6.1",
-    "tsx": "4.19.4",
+    "tsx": "4.20.1",
     "typescript": "5.8.3",
     "unbuild": "3.5.0"
   }
