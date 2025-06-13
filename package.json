@@ -91,8 +91,8 @@
     "@types/whatwg-url": "13.0.0",
     "chai": "5.2.0",
     "chai-as-promised": "8.0.1",
-    "eslint": "9.28.0",
-    "eslint-config-decent": "2.8.2",
+    "eslint": "9.29.0",
+    "eslint-config-decent": "2.8.5",
     "husky": "9.1.7",
     "lint-staged": "16.1.0",
     "markdownlint-cli": "0.45.0",
@@ -102,9 +102,9 @@
     "pinst": "3.0.0",
     "prettier": "3.5.3",
     "semantic-release": "24.2.5",
-    "sinon": "20.0.0",
+    "sinon": "21.0.0",
     "ts-mockito": "2.6.1",
-    "tsx": "4.20.1",
+    "tsx": "4.20.3",
     "typescript": "5.8.3",
     "unbuild": "3.5.0"
   }
