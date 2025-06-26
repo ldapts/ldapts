@@ -1,6 +1,6 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['config:recommended', 'group:all', ':semanticCommits'],
+  extends: ['config:recommended', 'group:all', ':semanticCommits', ':maintainLockFilesWeekly'],
   timezone: 'America/Chicago',
   labels: ['dependencies'],
   rangeStrategy: 'pin',
