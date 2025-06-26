@@ -29,7 +29,7 @@
 
 # 7.3.3 - 2024-03-24
 
-- feat: MoreResultsToReturn error, useful for informing end-users by @ayZagen in <https://github.com/ldapts/ldapts/pull/173>
+- feat: MoreResultsToReturn error, useful for informing end users by @ayZagen in <https://github.com/ldapts/ldapts/pull/173>
 - fix: message timers are not cleared by @ayZagen in <https://github.com/ldapts/ldapts/pull/172>
 - fix: ensure connectTimer is cleared by @ayZagen in <https://github.com/ldapts/ldapts/pull/174>
 - Replace JumpCloud with local openldap image. Thank you @ayZagen!
@@ -140,7 +140,7 @@
 # 6.0.0 - 2023-07-24
 
 - Update npms
-- Fix lots of lint issues
+- Fix lots of linting issues
 - Change `Client.messageDetailsByMessageId` to be a map
 - Fix `Client._send` signature to return `undefined`
 - Change `MessageResponseStatus`, `ProtocolOperation`, and `SearchFilter` from enum to a const
@@ -210,7 +210,7 @@
 # 3.2.2 - 2022-02-22
 
 - Update npms
-- Update husky to support Apple silicon homebrew package links
+- Update husky to support Apple silicon Homebrew package links
 
 # 3.2.1 - 2021-12-30
 
@@ -263,7 +263,7 @@
 # 3.0.1
 
 - Fix "Unhandled promise rejection" when calling modify without password. Fix #88. Thanks @ctaschereau!
-- Enable typescript lint checks: [`noPropertyAccessFromIndexSignature`](https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature) and [`noImplicitOverride`](https://www.typescriptlang.org/tsconfig#noImplicitOverride)
+- Enable TypeScript lint checks: [`noPropertyAccessFromIndexSignature`](https://www.typescriptlang.org/tsconfig#noPropertyAccessFromIndexSignature) and [`noImplicitOverride`](https://www.typescriptlang.org/tsconfig#noImplicitOverride)
 - Update npms
 
 # 3.0.0
@@ -370,7 +370,7 @@
 # 2.0.3
 
 - Update npms
-- Make typescript lint rules more strict
+- Make typescript linter rules more strict
 
 # 2.0.2
 
@@ -382,7 +382,7 @@
 
 # 2.0.0
 
-- Drop support for nodejs v8
+- Drop support for Node.js v8
 - Update to Typescript 3.7
 - Fix exop response overwriting status and error message. Fixes #52
 - Update npms
