@@ -19,5 +19,9 @@
       matchPackageNames: ['@types/node', '@types/asn1'],
       rangeStrategy: 'replace',
     },
+    {
+      matchDepTypes: ['devDependencies'],
+      schedule: ['* 13-14 * * 1'],
+    },
   ],
 }
