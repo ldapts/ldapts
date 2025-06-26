@@ -1,3 +1,8 @@
+filters:
+  allowlist:
+    allow:
+      - "/CHANGELOG\\.md$/"
+
 rules:
   filters:
     - comments
