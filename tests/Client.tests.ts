@@ -372,29 +372,118 @@ describe('Client', () => {
       }
     });
   });
-  /*  describe('#modify()', () => {
+
+  describe('#modify()', () => {
     const client: Client = new Client({
-      url: ldapUri,
+      url: LDAP_URI,
     });
 
     before(async () => {
-      await client.bind(bindDN, bindPassword);
+      await client.bind(BIND_DN, BIND_PW);
     });
+
     after(async () => {
       await client.unbind();
     });
 
-    it('should allow updating binary attributes', async () => {
-      const thumbnailPhotoBuffer = await fs.readFile(path.join(__dirname, './groot_100.jpg'));
-      await client.modify('uid=groot,ou=Users,dc=foo,dc=com', new Change({
-        operation: 'replace',
-        modification: new Attribute({
-          type: 'thumbnailPhoto;binary',
-          values: [thumbnailPhotoBuffer]
+    it('should allow replacing an attribute', async () => {
+      await client.modify(
+        `uid=user4,${BASE_DN}`,
+        new Change({
+          operation: 'replace',
+          modification: new Attribute({
+            type: 'mail',
+            values: [`four@${LDAP_DOMAIN}`],
+          }),
         }),
-      }));
+      );
+      const { searchEntries } = await client.search(BASE_DN, {
+        filter: `uid=user4`,
+        attributes: ['mail'],
+      });
+      searchEntries.should.have.length(1);
+      searchEntries[0]?.should.have.property('mail').that.equals(`four@${LDAP_DOMAIN}`);
+      // change it back to user4@LDAP_DOMAIN
+      await client.modify(
+        `uid=user4,${BASE_DN}`,
+        new Change({
+          operation: 'replace',
+          modification: new Attribute({
+            type: 'mail',
+            values: [`user4@${LDAP_DOMAIN}`],
+          }),
+        }),
+      );
+      const { searchEntries: searchEntries2 } = await client.search(BASE_DN, {
+        filter: `uid=user4`,
+        attributes: ['mail'],
+      });
+      searchEntries2.should.have.length(1);
+      searchEntries2[0]?.should.have.property('mail').that.equals(`user4@${LDAP_DOMAIN}`);
     });
-  }); */
+
+    it('should allow pushing onto attributes', async () => {
+      await client.modify(
+        `uid=user4,${BASE_DN}`,
+        new Change({
+          operation: 'add',
+          modification: new Attribute({
+            type: 'mail',
+            values: [`four@${LDAP_DOMAIN}`],
+          }),
+        }),
+      );
+      const { searchEntries } = await client.search(BASE_DN, {
+        filter: `uid=user4`,
+        attributes: ['mail'],
+      });
+
+      searchEntries.should.have.length(1);
+      searchEntries[0]?.should.have.property('mail').that.includes(`four@${LDAP_DOMAIN}`);
+    });
+
+    it('should allow removing an attribute', async () => {
+      await client.modify(
+        `uid=user4,${BASE_DN}`,
+        new Change({
+          operation: 'delete',
+          modification: new Attribute({
+            type: 'mail',
+            values: [`four@${LDAP_DOMAIN}`],
+          }),
+        }),
+      );
+      const { searchEntries } = await client.search(BASE_DN, {
+        filter: `uid=user4`,
+        attributes: ['mail'],
+      });
+      searchEntries.should.have.length(1);
+      searchEntries[0]?.should.have.property('mail').that.equals(`user4@${LDAP_DOMAIN}`);
+    });
+
+    it('should allow updating binary attributes', async () => {
+      // this should be a 10x10 green square PNG
+      // we're putting it in an attribute called jpegPhoto but that doesn't matter for the test
+      const jpegPhotoBuffer = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFUlEQVR42mNk+M9Qz0AEYBxVSF+FAAhKDveksOjmAAAAAElFTkSuQmCC', 'base64');
+      await client.modify(
+        `uid=user4,${BASE_DN}`,
+        new Change({
+          operation: 'replace',
+          modification: new Attribute({
+            type: 'jpegPhoto',
+            values: [jpegPhotoBuffer],
+          }),
+        }),
+      );
+      const { searchEntries: searchEntries2 } = await client.search(BASE_DN, {
+        filter: `uid=user4`,
+        attributes: ['jpegPhoto'],
+      });
+      searchEntries2.should.have.length(1);
+      searchEntries2[0]?.should.have.property('jpegPhoto').that.eqls(jpegPhotoBuffer);
+    });
+  });
+
   describe('#add()', () => {
     const client: Client = new Client({
       url: LDAP_URI,

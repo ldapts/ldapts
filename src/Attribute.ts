@@ -1,8 +1,11 @@
+import { TextDecoder } from 'node:util';
+
 import type { BerReader, BerWriter } from 'asn1';
 import asn1 from 'asn1';
 
 import { ProtocolOperation } from './ProtocolOperation.js';
 
+const utfDecoder = new TextDecoder('utf8', { fatal: true });
 const { Ber } = asn1;
 
 export interface AttributeOptions {
@@ -64,7 +67,13 @@ export class Attribute {
           if (isBinaryType) {
             (this.values as Buffer[]).push(buffer);
           } else {
-            (this.values as string[]).push(buffer.toString('utf8'));
+            try {
+              const decoded = utfDecoder.decode(buffer);
+              (this.values as string[]).push(decoded);
+            } catch {
+              // If the buffer cannot be decoded as UTF-8, treat it as binary data
+              (this.values as Buffer[]).push(buffer);
+            }
           }
         }
       }
