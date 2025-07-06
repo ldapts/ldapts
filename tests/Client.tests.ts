@@ -718,6 +718,22 @@ describe('Client', () => {
       ]);
     });
 
+    it('should return clean list of attributes even if the requested attribute is in the wrong case', async () => {
+      // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(mail=peter.parker@marvel.com)"
+      const searchResult = await client.search(BASE_DN, {
+        scope: 'sub',
+        filter: `(mail=user1@${LDAP_DOMAIN})`,
+        attributes: ['homedirectory'],
+      });
+
+      searchResult.searchEntries.should.deep.equal([
+        {
+          dn: `uid=user1,${BASE_DN}`,
+          homeDirectory: '/home/user',
+        },
+      ]);
+    });
+
     it('should not return attribute values if returnAttributeValues=false', async () => {
       // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm -A "(mail=peter.parker@marvel.com)"
       const searchResult = await client.search(BASE_DN, {
