@@ -47,10 +47,9 @@ export class SearchEntry extends MessageResponse {
       dn: this.name,
     };
 
-    const hasExplicitBufferAttributes = explicitBufferAttributes.length;
     for (const attribute of this.attributes) {
       let { values } = attribute;
-      if (hasExplicitBufferAttributes && explicitBufferAttributes.includes(attribute.type)) {
+      if (explicitBufferAttributes.includes(attribute.type) || values.some((value) => Buffer.isBuffer(value))) {
         values = attribute.parsedBuffers;
       }
 
