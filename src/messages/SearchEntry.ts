@@ -48,7 +48,9 @@ export class SearchEntry extends MessageResponse {
     };
 
     const hasExplicitBufferAttributes = explicitBufferAttributes.length;
+    const resultLCAttributes = new Set<string>();
     for (const attribute of this.attributes) {
+      resultLCAttributes.add(attribute.type.toLocaleLowerCase());
       let { values } = attribute;
       if (hasExplicitBufferAttributes && explicitBufferAttributes.includes(attribute.type)) {
         values = attribute.parsedBuffers;
@@ -67,7 +69,7 @@ export class SearchEntry extends MessageResponse {
 
     // Fill in any missing attributes that were requested
     for (const attribute of requestAttributes) {
-      if (typeof result[attribute] === 'undefined') {
+      if (typeof result[attribute] === 'undefined' && !resultLCAttributes.has(attribute.toLocaleLowerCase())) {
         result[attribute] = [];
       }
     }
