@@ -493,7 +493,7 @@ const bindDN = 'cn=read-only-admin,dc=example,dc=com';
 const password = 'password';
 
 const client = new Client({
-  url,
+  url: url,
 });
 
 let isAuthenticated;
@@ -518,7 +518,7 @@ const password = 'MyRedSuitKeepsMeWarm';
 const searchDN = 'ou=Users,o=5be4c382c583e54de6a3ff52,dc=jumpcloud,dc=com';
 
 const client = new Client({
-  url,
+  url: url,
   tlsOptions: {
     rejectUnauthorized: args.rejectUnauthorized,
   },
@@ -549,7 +549,7 @@ const password = 'bar';
 const dnToDelete = 'uid=foobar,dc=example,dc=com';
 
 const client = new Client({
-  url,
+  url: url,
 });
 
 try {
