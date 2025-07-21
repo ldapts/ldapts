@@ -1,3 +1,9 @@
+## [8.0.8](https://github.com/ldapts/ldapts/compare/v8.0.7...v8.0.8) (2025-07-21)
+
+### Bug Fixes
+
+- avoid extra properties on Entry objects for case mis-match ([#247](https://github.com/ldapts/ldapts/issues/247)) ([d56e2f6](https://github.com/ldapts/ldapts/commit/d56e2f619a34c3fc8caaf623442fd212c55cb5dc))
+
 ## [8.0.7](https://github.com/ldapts/ldapts/compare/v8.0.6...v8.0.7) (2025-07-21)
 
 ## [8.0.6](https://github.com/ldapts/ldapts/compare/v8.0.5...v8.0.6) (2025-07-14)
