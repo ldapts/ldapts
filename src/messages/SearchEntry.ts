@@ -47,12 +47,11 @@ export class SearchEntry extends MessageResponse {
       dn: this.name,
     };
 
-    const hasExplicitBufferAttributes = explicitBufferAttributes.length;
     const resultLCAttributes = new Set<string>();
     for (const attribute of this.attributes) {
       resultLCAttributes.add(attribute.type.toLocaleLowerCase());
       let { values } = attribute;
-      if (hasExplicitBufferAttributes && explicitBufferAttributes.includes(attribute.type)) {
+      if (explicitBufferAttributes.includes(attribute.type) || values.some((value) => Buffer.isBuffer(value))) {
         values = attribute.parsedBuffers;
       }
 
