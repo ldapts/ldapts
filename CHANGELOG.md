@@ -1,3 +1,5 @@
+## [8.0.9](https://github.com/ldapts/ldapts/compare/v8.0.8...v8.0.9) (2025-07-28)
+
 ## [8.0.8](https://github.com/ldapts/ldapts/compare/v8.0.7...v8.0.8) (2025-07-21)
 
 ### Bug Fixes
