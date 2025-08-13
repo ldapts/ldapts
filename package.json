@@ -92,7 +92,7 @@
     "chai": "5.2.1",
     "chai-as-promised": "8.0.1",
     "eslint": "9.33.0",
-    "eslint-config-decent": "2.8.58",
+    "eslint-config-decent": "2.8.59",
     "husky": "9.1.7",
     "lint-staged": "16.1.5",
     "markdownlint-cli": "0.45.0",
@@ -104,7 +104,7 @@
     "semantic-release": "24.2.7",
     "sinon": "21.0.0",
     "ts-mockito": "2.6.1",
-    "tsx": "4.20.3",
+    "tsx": "4.20.4",
     "typescript": "5.9.2",
     "unbuild": "3.6.0"
   }
