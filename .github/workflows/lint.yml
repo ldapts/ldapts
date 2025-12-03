@@ -34,6 +34,8 @@ jobs:
           FIX_CSS_PRETTIER: false
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_ANSIBLE: false
+          VALIDATE_BIOME_FORMAT: false
+          VALIDATE_BIOME_LINT: false
           VALIDATE_CLOUDFORMATION: false
           VALIDATE_CSS: false
           VALIDATE_CSS_PRETTIER: false

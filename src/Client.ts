@@ -331,7 +331,7 @@ export class Client {
     } else {
       attributesToAdd = [];
       for (const [key, value] of Object.entries(attributes)) {
-        let values;
+        let values: string[];
         if (Array.isArray(value)) {
           values = value;
           // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

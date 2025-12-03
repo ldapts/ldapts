@@ -25,7 +25,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
   private buffer?: Buffer;
 
   public read(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): void {
-    let nextMessage;
+    let nextMessage: Buffer | undefined;
 
     if (this.buffer) {
       this.buffer = Buffer.concat([this.buffer, data]);

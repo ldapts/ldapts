@@ -30,7 +30,7 @@ export class EntryChangeNotificationControl extends Control {
   public override parseControl(reader: BerReader): void {
     if (reader.readSequence()) {
       const changeType = reader.readInt() ?? 0;
-      let previousDN;
+      let previousDN: string | null | undefined;
 
       if (changeType === 8) {
         previousDN = reader.readString();

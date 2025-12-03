@@ -241,7 +241,7 @@ describe('Client', () => {
           testControl,
         );
         false.should.equal(true, 'Exception expected');
-      } catch (e) {
+      } catch {
         // surely will happen
       }
 
@@ -311,7 +311,7 @@ describe('Client', () => {
         await client._connect();
         await client.bind(BIND_DN, BIND_PW);
         await client.unbind();
-      } catch (e) {
+      } catch {
         // ignore
       } finally {
         // @ts-expect-error - is private
@@ -1030,7 +1030,7 @@ describe('Client', () => {
       try {
         // @ts-expect-error - is private
         await client._connect();
-      } catch (e) {
+      } catch {
         // ignore
       } finally {
         // @ts-expect-error - is private
@@ -1049,7 +1049,7 @@ describe('Client', () => {
       try {
         // @ts-expect-error - is private
         await client._connect();
-      } catch (e) {
+      } catch {
         // ignore
       } finally {
         // @ts-expect-error - is private

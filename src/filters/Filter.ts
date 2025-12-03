@@ -80,7 +80,7 @@ export abstract class Filter {
   }
 
   protected getObjectValue(objectToCheck: Record<string, string>, key: string, strictAttributeCase?: boolean): string | undefined {
-    let objectKey;
+    let objectKey: string | undefined;
     if (typeof objectToCheck[key] !== 'undefined') {
       objectKey = key;
     } else if (!strictAttributeCase && key.toLowerCase() === 'objectclass') {
