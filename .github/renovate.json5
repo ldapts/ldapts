@@ -1,6 +1,6 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['config:recommended', 'group:all', ':semanticCommits', ':maintainLockFilesWeekly'],
+  extends: ['config:recommended', ':semanticCommits', ':maintainLockFilesWeekly'],
   timezone: 'America/Chicago',
   labels: ['dependencies'],
   rangeStrategy: 'pin',
@@ -21,7 +21,12 @@
     },
     {
       matchDepTypes: ['devDependencies'],
-      schedule: ['* 13-14 * * 1'],
+      schedule: ['* 0-4,22-23 * * 1-5', '* * * * 0,6'],
+      groupName: 'dev dependencies',
+    },
+    {
+      matchDepTypes: ['dependencies'],
+      groupName: 'all dependencies',
     },
   ],
 }
