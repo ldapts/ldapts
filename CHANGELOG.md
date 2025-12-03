@@ -1,3 +1,9 @@
+## [8.0.10](https://github.com/ldapts/ldapts/compare/v8.0.9...v8.0.10) (2025-12-03)
+
+### Bug Fixes
+
+- **deps:** update all dependencies ([#268](https://github.com/ldapts/ldapts/issues/268)) ([223b403](https://github.com/ldapts/ldapts/commit/223b403b47b36b3342da35e797acfeb13887a4ce))
+
 ## [8.0.9](https://github.com/ldapts/ldapts/compare/v8.0.8...v8.0.9) (2025-07-28)
 
 ## [8.0.8](https://github.com/ldapts/ldapts/compare/v8.0.7...v8.0.8) (2025-07-21)
