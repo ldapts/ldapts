@@ -195,7 +195,7 @@ export class Client {
     this.host = host ?? 'localhost'; // Default to 'localhost' if host is null
 
     if (parsedUrl.port) {
-      this.port = Number(parsedUrl.port);
+      this.port = parsedUrl.port;
     } else if (isSecureProtocol) {
       this.port = 636;
     } else {
