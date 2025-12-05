@@ -42,6 +42,7 @@ jobs:
         env:
           CI: true
       - run: npm run build
+      - run: npm run test:imports
       - name: Stopping openldap container
         run: docker compose down
       - name: Show OpenLDAP logs
