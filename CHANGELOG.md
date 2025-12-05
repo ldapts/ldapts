@@ -1,3 +1,9 @@
+## [8.0.13](https://github.com/ldapts/ldapts/compare/v8.0.12...v8.0.13) (2025-12-05)
+
+### Bug Fixes
+
+- Remove uuid package to fix cjs imports ([6914379](https://github.com/ldapts/ldapts/commit/6914379c7ebe1c652f4b644846ede3da58f4e9c4)), closes [#277](https://github.com/ldapts/ldapts/issues/277)
+
 ## [8.0.12](https://github.com/ldapts/ldapts/compare/v8.0.11...v8.0.12) (2025-12-04)
 
 ## [8.0.11](https://github.com/ldapts/ldapts/compare/v8.0.10...v8.0.11) (2025-12-03)
