@@ -26,6 +26,7 @@
     "build": "unbuild",
     "test": "npm run test:types && mocha \"tests/**/*.tests.ts\"",
     "test:types": "tsc --noEmit --skipLibCheck",
+    "test:imports": "node --no-experimental-require-module tests/import.tests.cjs && node tests/import.tests.mjs",
     "lint:markdown": "prettier --write '*.md' '!(node_modules|dist)/**/*.md' && markdownlint '*.md' '!(node_modules|dist)/**/*.md' --config=.github/linters/.markdown-lint.yml --fix",
     "lint:code": "eslint --fix",
     "lint": "run-p lint:*",
@@ -72,7 +73,6 @@
     "asn1": "0.2.6",
     "debug": "4.4.3",
     "strict-event-emitter-types": "2.0.0",
-    "uuid": "13.0.0",
     "whatwg-url": "15.1.0"
   },
   "devDependencies": {

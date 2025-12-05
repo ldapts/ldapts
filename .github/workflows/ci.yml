@@ -24,6 +24,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v6
@@ -42,6 +44,7 @@ jobs:
         env:
           CI: true
       - run: npm run build
+      - run: npm run test:imports
       - name: Stopping openldap container
         run: docker compose down
       - name: Show OpenLDAP logs
@@ -52,6 +55,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
 
       - name: Use Node.js
         uses: actions/setup-node@v6

@@ -1,8 +1,8 @@
+import * as crypto from 'node:crypto';
 import * as net from 'node:net';
 import * as tls from 'node:tls';
 
 import debug from 'debug';
-import { v4 } from 'uuid';
 import { parseURL } from 'whatwg-url';
 
 import { Attribute } from './Attribute.js';
@@ -821,13 +821,13 @@ export class Client {
     return new Promise((resolve, reject) => {
       if (this.secure) {
         this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
-        this.socket.id = v4();
+        this.socket.id = crypto.randomUUID();
         this.socket.once('secureConnect', () => {
           this._onConnect(resolve);
         });
       } else {
         this.socket = net.connect(this.port, this.host);
-        this.socket.id = v4();
+        this.socket.id = crypto.randomUUID();
         this.socket.once('connect', () => {
           this._onConnect(resolve);
         });
