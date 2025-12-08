@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "8.0.14",
+  "version": "8.0.15",
   "description": "LDAP client",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
