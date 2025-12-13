@@ -16,6 +16,7 @@ export default {
           { type: 'feat', release: 'minor' },
           { type: 'fix', release: 'patch' },
           { type: 'test', release: 'patch' },
+          { type: 'chore', scope: 'deps', release: false },
           { type: 'chore', release: 'patch' },
         ],
         parserOpts: {
