@@ -21,8 +21,8 @@ export default {
         ],
         parserOpts: {
           // eslint-disable-next-line security/detect-unsafe-regex
-          headerPattern: /^(\w+)(?:\([^)]+\))?: (.+)$/,
-          headerCorrespondence: ['type', 'subject'],
+          headerPattern: /^(\w+)(?:\(([^)]+)\))?: (.+)$/,
+          headerCorrespondence: ['type', 'scope', 'subject'],
         },
       },
     ],
