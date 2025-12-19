@@ -1,3 +1,5 @@
+## [8.0.28](https://github.com/ldapts/ldapts/compare/v8.0.27...v8.0.28) (2025-12-19)
+
 ## [8.0.27](https://github.com/ldapts/ldapts/compare/v8.0.26...v8.0.27) (2025-12-18)
 
 ## [8.0.26](https://github.com/ldapts/ldapts/compare/v8.0.25...v8.0.26) (2025-12-18)
