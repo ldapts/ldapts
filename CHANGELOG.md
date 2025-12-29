@@ -1,3 +1,9 @@
+## [8.0.36](https://github.com/ldapts/ldapts/compare/v8.0.35...v8.0.36) (2025-12-29)
+
+### Bug Fixes
+
+- treat empty tlsOptions as no TLS configuration ([#304](https://github.com/ldapts/ldapts/issues/304)) ([d0a894b](https://github.com/ldapts/ldapts/commit/d0a894bc75560e096def4217d2a49629882df6c5)), closes [#262](https://github.com/ldapts/ldapts/issues/262)
+
 ## [8.0.35](https://github.com/ldapts/ldapts/compare/v8.0.34...v8.0.35) (2025-12-25)
 
 ## [8.0.34](https://github.com/ldapts/ldapts/compare/v8.0.33...v8.0.34) (2025-12-24)
