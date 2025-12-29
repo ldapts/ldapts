@@ -179,7 +179,9 @@ export class Client {
     }
 
     const isSecureProtocol = parsedUrl.scheme === 'ldaps';
-    this.secure = isSecureProtocol || !!this.clientOptions.tlsOptions;
+    // Check if tlsOptions has at least one defined property (not just an empty object or object with all undefined values)
+    const hasTlsOptions = !!this.clientOptions.tlsOptions && Object.values(this.clientOptions.tlsOptions).some((value) => value !== undefined);
+    this.secure = isSecureProtocol || hasTlsOptions;
     let host: string | null | undefined = null;
     if (typeof parsedUrl.host === 'string') {
       // Host might include a port, so split to get the hostname part

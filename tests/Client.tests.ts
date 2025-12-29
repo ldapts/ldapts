@@ -66,6 +66,51 @@ describe('Client', () => {
         });
       }).should.not.throw(Error);
     });
+
+    it('should not enable secure mode with empty tlsOptions object', () => {
+      const client = new Client({
+        url: 'ldap://127.0.0.1',
+        tlsOptions: {},
+      });
+
+      // @ts-expect-error - private field
+      client.secure.should.equal(false);
+    });
+
+    it('should not enable secure mode with tlsOptions containing only undefined values', () => {
+      const client = new Client({
+        url: 'ldap://127.0.0.1',
+        tlsOptions: {
+          rejectUnauthorized: undefined,
+          ca: undefined,
+        },
+      });
+
+      // @ts-expect-error - private field
+      client.secure.should.equal(false);
+    });
+
+    it('should enable secure mode with tlsOptions containing defined values', () => {
+      const client = new Client({
+        url: 'ldap://127.0.0.1',
+        tlsOptions: {
+          rejectUnauthorized: false,
+        },
+      });
+
+      // @ts-expect-error - private field
+      client.secure.should.equal(true);
+    });
+
+    it('should enable secure mode with ldaps:// even with empty tlsOptions', () => {
+      const client = new Client({
+        url: 'ldaps://127.0.0.1',
+        tlsOptions: {},
+      });
+
+      // @ts-expect-error - private field
+      client.secure.should.equal(true);
+    });
   });
 
   describe('#isConnected', () => {
