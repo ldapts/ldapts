@@ -1,8 +1,8 @@
 import * as crypto from 'node:crypto';
 import * as net from 'node:net';
 import * as tls from 'node:tls';
+import { debuglog } from 'node:util';
 
-import debug from 'debug';
 import { parseURL } from 'whatwg-url';
 
 import { Attribute } from './Attribute.js';
@@ -39,7 +39,7 @@ import type { MessageResponse } from './messages/MessageResponse.js';
 import { StatusCodeParser } from './StatusCodeParser.js';
 
 const MAX_MESSAGE_ID = 2 ** 31 - 1;
-const logDebug = debug('ldapts');
+const logDebug = debuglog('ldapts');
 
 type SocketWithId = { id?: string } & (net.Socket | tls.TLSSocket);
 
@@ -214,7 +214,9 @@ export class Client {
         }
       }
 
-      logDebug(err.stack);
+      if (err.stack) {
+        logDebug(err.stack);
+      }
     });
 
     this.messageParser.on('message', this._handleSendResponse.bind(this));

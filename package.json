@@ -69,7 +69,6 @@
   },
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
-    "debug": "4.4.3",
     "strict-event-emitter-types": "2.0.0",
     "whatwg-url": "15.1.0"
   },
@@ -82,7 +81,6 @@
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/chai": "5.2.3",
     "@types/chai-as-promised": "8.0.2",
-    "@types/debug": "4.1.12",
     "@types/mocha": "10.0.10",
     "@types/node": ">=20",
     "@types/sinon": "21.0.0",
