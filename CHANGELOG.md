@@ -1,3 +1,9 @@
+# [8.1.0](https://github.com/ldapts/ldapts/compare/v8.0.36...v8.1.0) (2025-12-31)
+
+### Features
+
+- add RFC 4517 postal address encoding/decoding utilities ([#308](https://github.com/ldapts/ldapts/issues/308)) ([cd8d4f6](https://github.com/ldapts/ldapts/commit/cd8d4f6a7ead941ca500033a358a82f9988953e0)), closes [#267](https://github.com/ldapts/ldapts/issues/267)
+
 ## [8.0.36](https://github.com/ldapts/ldapts/compare/v8.0.35...v8.0.36) (2025-12-29)
 
 ### Bug Fixes
