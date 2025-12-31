@@ -11,6 +11,7 @@ export * from './ControlParser.js';
 export * from './FilterParser.js';
 export * from './MessageParser.js';
 export * from './MessageResponseStatus.js';
+export * from './PostalAddress.js';
 export * from './ProtocolOperation.js';
 export * from './SearchFilter.js';
 export * from './StatusCodeParser.js';
