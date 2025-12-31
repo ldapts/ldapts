@@ -1,12 +1,9 @@
-import type { BerReader, BerWriter } from 'asn1';
-import asn1 from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
+import { Ber } from '../ber/index.js';
 import type { SearchFilterValues } from '../SearchFilter.js';
 import { SearchFilter } from '../SearchFilter.js';
 
 import { Filter } from './Filter.js';
-
-const { Ber } = asn1;
 
 export interface EqualityFilterOptions {
   attribute?: string;

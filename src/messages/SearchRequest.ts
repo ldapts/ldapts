@@ -1,5 +1,4 @@
-import type { BerReader, BerWriter } from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
 import type { SearchOptions } from '../Client.js';
 import { FilterParser } from '../FilterParser.js';
 import type { Filter } from '../filters/Filter.js';

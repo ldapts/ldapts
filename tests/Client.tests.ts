@@ -1,16 +1,14 @@
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-
 import assert from 'node:assert';
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import type { BerReader, BerWriter } from 'asn1';
 import * as chai from 'chai';
 import 'chai/register-should.js';
 import chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 
+import type { BerReader, BerWriter } from '../src/ber/index.js';
 import type { AddRequest, ModifyDNRequest } from '../src/index.js';
 import {
   AddResponse,
@@ -27,6 +25,8 @@ import {
   PagedResultsControl,
   UndefinedTypeError,
 } from '../src/index.js';
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 chai.use(chaiAsPromised);
 const should = chai.should();

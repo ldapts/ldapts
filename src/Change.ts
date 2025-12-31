@@ -1,6 +1,5 @@
-import type { BerReader, BerWriter } from 'asn1';
-
 import { Attribute } from './Attribute.js';
+import type { BerReader, BerWriter } from './ber/index.js';
 
 export interface ChangeOptions {
   operation?: 'add' | 'delete' | 'replace';

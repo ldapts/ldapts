@@ -1,5 +1,4 @@
-import type { BerReader } from 'asn1';
-
+import type { BerReader } from '../ber/index.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 

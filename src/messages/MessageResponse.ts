@@ -1,4 +1,4 @@
-import type { BerReader } from 'asn1';
+import type { BerReader } from '../ber/index.js';
 
 import type { MessageOptions } from './Message.js';
 import { Message } from './Message.js';

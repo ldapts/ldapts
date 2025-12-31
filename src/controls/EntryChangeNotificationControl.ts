@@ -1,10 +1,8 @@
-import type { BerReader, BerWriter as BerWriterType } from 'asn1';
-import asn1 from 'asn1';
+import type { BerReader } from '../ber/index.js';
+import { BerWriter } from '../ber/index.js';
 
 import type { ControlOptions } from './Control.js';
 import { Control } from './Control.js';
-
-const { BerWriter } = asn1;
 
 export interface EntryChangeNotificationControlValue {
   changeType: number;
@@ -46,7 +44,7 @@ export class EntryChangeNotificationControl extends Control {
     }
   }
 
-  public override writeControl(writer: BerWriterType): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.value) {
       return;
     }

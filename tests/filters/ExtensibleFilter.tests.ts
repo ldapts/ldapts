@@ -1,12 +1,9 @@
-import type { BerWriter as BerWriterType } from 'asn1';
-import asn1 from 'asn1';
 import * as chai from 'chai';
 import 'chai/register-should.js';
 import { anyString, anything, capture, instance, mock, reset, verify, when } from 'ts-mockito';
 
+import { BerWriter } from '../../src/ber/index.js';
 import { ExtensibleFilter } from '../../src/index.js';
-
-const { BerWriter } = asn1;
 
 describe('ExtensibleFilter', () => {
   before(() => {
@@ -14,8 +11,8 @@ describe('ExtensibleFilter', () => {
   });
 
   describe('#writeFilter()', () => {
-    let mockedWriter: BerWriterType;
-    let berWriterInstance: BerWriterType;
+    let mockedWriter: BerWriter;
+    let berWriterInstance: BerWriter;
 
     before(() => {
       mockedWriter = mock(BerWriter);

@@ -1,7 +1,6 @@
 import * as assert from 'node:assert';
 
-import type { BerReader, BerWriter } from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
@@ -63,7 +62,7 @@ export class AbandonRequest extends Message {
         value = -value;
       }
 
-      reader._offset += length;
+      reader.offset += length;
 
       this.abandonId = value;
     } else {
