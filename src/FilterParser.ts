@@ -1,5 +1,4 @@
-import type { BerReader } from 'asn1';
-
+import type { BerReader } from './ber/index.js';
 import type { ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
 import type { Filter } from './filters/Filter.js';
 import {

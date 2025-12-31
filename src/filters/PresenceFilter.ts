@@ -1,5 +1,4 @@
-import type { BerReader, BerWriter } from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
 import type { SearchFilterValues } from '../SearchFilter.js';
 import { SearchFilter } from '../SearchFilter.js';
 
@@ -21,7 +20,7 @@ export class PresenceFilter extends Filter {
 
   public override parseFilter(reader: BerReader): void {
     this.attribute = reader.buffer.subarray(0, reader.length).toString('utf8').toLowerCase();
-    reader._offset += reader.length;
+    reader.offset += reader.length;
   }
 
   public override writeFilter(writer: BerWriter): void {

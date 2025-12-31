@@ -1,10 +1,8 @@
-import * as assert from 'node:assert';
 import { EventEmitter } from 'node:events';
 
-import type { BerReader as BerReaderType } from 'asn1';
-import asn1 from 'asn1';
 import type { StrictEventEmitter } from 'strict-event-emitter-types';
 
+import { BerReader } from './ber/index.js';
 import { MessageParserError } from './errors/MessageParserError.js';
 import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchEntry, SearchReference, SearchResponse } from './messages/index.js';
 import type { Message } from './messages/Message.js';
@@ -18,8 +16,6 @@ interface MessageParserEvents {
 }
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
-
-const { BerReader } = asn1;
 
 export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
   private buffer?: Buffer;
@@ -48,10 +44,9 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
     }
 
     if (reader.remain > reader.length) {
-      // Received too much data
+      // Received too much data - extract next message and limit current reader
       nextMessage = this.buffer.subarray(reader.offset + reader.length);
-      reader._size = reader.offset + reader.length;
-      assert.strictEqual(reader.remain, reader.length);
+      reader.setBufferSize(reader.offset + reader.length);
     }
 
     // Free up space since `ber` holds the current message and `nextMessage` is temporarily pointing
@@ -103,7 +98,7 @@ export class MessageParser extends (EventEmitter as new () => MessageParserEmitt
   }
 
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
-  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperationValues | number, reader: BerReaderType, messageDetails?: Message): MessageResponse {
+  private _getMessageFromProtocolOperation(messageId: number, protocolOperation: ProtocolOperationValues | number, reader: BerReader, messageDetails?: Message): MessageResponse {
     let message: MessageResponse;
 
     switch (protocolOperation) {

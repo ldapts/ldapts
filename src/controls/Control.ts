@@ -1,4 +1,4 @@
-import type { BerReader, BerWriter } from 'asn1';
+import type { BerReader, BerWriter } from '../ber/index.js';
 
 export interface ControlOptions {
   critical?: boolean;

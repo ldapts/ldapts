@@ -1,12 +1,10 @@
 import { TextDecoder } from 'node:util';
 
-import type { BerReader, BerWriter } from 'asn1';
-import asn1 from 'asn1';
-
+import type { BerReader, BerWriter } from './ber/index.js';
+import { Ber } from './ber/index.js';
 import { ProtocolOperation } from './ProtocolOperation.js';
 
 const utfDecoder = new TextDecoder('utf8', { fatal: true });
-const { Ber } = asn1;
 
 export interface AttributeOptions {
   type?: string;

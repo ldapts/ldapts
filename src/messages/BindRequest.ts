@@ -1,13 +1,10 @@
-import type { BerReader, BerWriter } from 'asn1';
-import asn1 from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
+import { Ber } from '../ber/index.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
 import type { MessageOptions } from './Message.js';
 import { Message } from './Message.js';
-
-const { Ber } = asn1;
 
 export const SASL_MECHANISMS = ['EXTERNAL', 'PLAIN', 'DIGEST-MD5', 'SCRAM-SHA-1'] as const;
 export type SaslMechanism = (typeof SASL_MECHANISMS)[number];

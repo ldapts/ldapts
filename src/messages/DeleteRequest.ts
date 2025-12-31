@@ -1,5 +1,4 @@
-import type { BerReader, BerWriter } from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
@@ -31,6 +30,6 @@ export class DeleteRequest extends Message {
   public override parseMessage(reader: BerReader): void {
     const { length } = reader;
     this.dn = reader.buffer.subarray(0, length).toString('utf8');
-    reader._offset += reader.length;
+    reader.offset += reader.length;
   }
 }

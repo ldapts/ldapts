@@ -1,11 +1,10 @@
-process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-
 import * as chai from 'chai';
 import 'chai/register-should.js';
 import chaiAsPromised from 'chai-as-promised';
 
-import { ServerSideSortingRequestControl } from '../src/index.js';
-import { Client } from '../src/index.js';
+import { Client, ServerSideSortingRequestControl } from '../src/index.js';
+
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 chai.use(chaiAsPromised);
 

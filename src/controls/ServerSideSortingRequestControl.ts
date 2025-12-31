@@ -1,10 +1,8 @@
-import type { BerReader, BerWriter as BerWriterType } from 'asn1';
-import asn1 from 'asn1';
+import type { BerReader } from '../ber/index.js';
+import { Ber, BerWriter } from '../ber/index.js';
 
 import type { ControlOptions } from './Control.js';
 import { Control } from './Control.js';
-
-const { Ber, BerWriter } = asn1;
 
 export interface ServerSideSortingRequestValue {
   attributeType: string;
@@ -44,7 +42,7 @@ export class ServerSideSortingRequestControl extends Control {
         }
 
         if (reader.peek() === 0x81) {
-          reverseOrder = reader._readTag(0x81) !== 0;
+          reverseOrder = reader.readTag(0x81) !== 0;
         }
 
         this.values.push({
@@ -56,7 +54,7 @@ export class ServerSideSortingRequestControl extends Control {
     }
   }
 
-  public override writeControl(writer: BerWriterType): void {
+  public override writeControl(writer: BerWriter): void {
     if (!this.values.length) {
       return;
     }

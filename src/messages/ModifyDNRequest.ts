@@ -1,5 +1,4 @@
-import type { BerReader, BerWriter } from 'asn1';
-
+import type { BerReader, BerWriter } from '../ber/index.js';
 import type { ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
@@ -39,12 +38,7 @@ export class ModifyDNRequest extends Message {
     writer.writeString(this.newRdn);
     writer.writeBoolean(this.deleteOldRdn);
     if (this.newSuperior) {
-      const length = Buffer.byteLength(this.newSuperior);
-      writer.writeByte(0x80);
-      writer.writeLength(length);
-      writer._ensure(length);
-      writer._buf.write(this.newSuperior, writer._offset);
-      writer._offset += length;
+      writer.writeString(this.newSuperior, 0x80);
     }
   }
 
