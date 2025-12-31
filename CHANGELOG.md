@@ -1,3 +1,9 @@
+## [8.1.1](https://github.com/ldapts/ldapts/compare/v8.1.0...v8.1.1) (2025-12-31)
+
+### Bug Fixes
+
+- replace external asn1 package with internal BER module ([#309](https://github.com/ldapts/ldapts/issues/309)) ([8d50fbc](https://github.com/ldapts/ldapts/commit/8d50fbcb44e02db736112c1285a2e421d055d949)), closes [#151](https://github.com/ldapts/ldapts/issues/151) [#151](https://github.com/ldapts/ldapts/issues/151)
+
 # [8.1.0](https://github.com/ldapts/ldapts/compare/v8.0.36...v8.1.0) (2025-12-31)
 
 ### Features
