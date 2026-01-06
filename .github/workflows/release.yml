@@ -19,6 +19,7 @@ jobs:
       pull-requests: write # To be able to comment on released pull requests
       id-token: write # To enable use of OIDC for npm provenance
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Checkout
@@ -33,7 +34,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: npm clean-install
+        run: npm ci
 
       - name: Verify the integrity of provenance attestations and registry signatures for installed dependencies
         run: npm audit signatures
@@ -57,4 +58,3 @@ jobs:
         run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
