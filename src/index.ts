@@ -1,3 +1,4 @@
+export * from './ber/index.js';
 export * from './controls/index.js';
 export * from './dn/DN.js';
 export * from './errors/index.js';
