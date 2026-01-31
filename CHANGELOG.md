@@ -1,3 +1,9 @@
+## [8.1.4](https://github.com/ldapts/ldapts/compare/v8.1.3...v8.1.4) (2026-01-31)
+
+### Bug Fixes
+
+- export BerReader, BerWriter, and InvalidAsn1Error from main entry point ([#339](https://github.com/ldapts/ldapts/issues/339)) ([16bec3c](https://github.com/ldapts/ldapts/commit/16bec3c6fdf322cbe86bb0e37cf6afc6fefa906a)), closes [#318](https://github.com/ldapts/ldapts/issues/318)
+
 ## [8.1.3](https://github.com/ldapts/ldapts/compare/v8.1.2...v8.1.3) (2026-01-07)
 
 ## [8.1.2](https://github.com/ldapts/ldapts/compare/v8.1.1...v8.1.2) (2025-12-31)
