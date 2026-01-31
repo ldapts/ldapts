@@ -136,14 +136,8 @@ export interface SearchResult {
   searchReferences: string[];
 }
 
-// @ts-expect-error - Polyfill Symbol.asyncDispose
+// @ts-expect-error - Polyfill Symbol.asyncDispose for Node < 22
 Symbol.asyncDispose ??= Symbol('Symbol.asyncDispose');
-
-declare global {
-  interface SymbolConstructor {
-    readonly asyncDispose: unique symbol;
-  }
-}
 
 export class Client {
   private clientOptions: ClientOptions;
