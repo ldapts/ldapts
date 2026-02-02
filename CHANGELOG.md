@@ -1,3 +1,9 @@
+## [8.1.5](https://github.com/ldapts/ldapts/compare/v8.1.4...v8.1.5) (2026-02-02)
+
+### Bug Fixes
+
+- **deps:** update dependency whatwg-url to v16 ([#341](https://github.com/ldapts/ldapts/issues/341)) ([fd05995](https://github.com/ldapts/ldapts/commit/fd059958f5ac63f2afafa8315d7a348fa3582721))
+
 ## [8.1.4](https://github.com/ldapts/ldapts/compare/v8.1.3...v8.1.4) (2026-01-31)
 
 ### Bug Fixes
