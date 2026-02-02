@@ -70,7 +70,7 @@
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
     "strict-event-emitter-types": "2.0.0",
-    "whatwg-url": "15.1.0"
+    "whatwg-url": "16.0.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
