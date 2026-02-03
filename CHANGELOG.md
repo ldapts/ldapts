@@ -1,3 +1,9 @@
+## [8.1.6](https://github.com/ldapts/ldapts/compare/v8.1.5...v8.1.6) (2026-02-03)
+
+### Bug Fixes
+
+- replace whatwg-url with native URL class ([#345](https://github.com/ldapts/ldapts/issues/345)) ([f61da30](https://github.com/ldapts/ldapts/commit/f61da30b430ff1f8e21b223fde0f965ae0f8e8ae)), closes [#344](https://github.com/ldapts/ldapts/issues/344)
+
 ## [8.1.5](https://github.com/ldapts/ldapts/compare/v8.1.4...v8.1.5) (2026-02-02)
 
 ### Bug Fixes
