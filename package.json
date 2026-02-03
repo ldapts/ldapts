@@ -69,8 +69,7 @@
   },
   "homepage": "https://github.com/ldapts/ldapts#readme",
   "dependencies": {
-    "strict-event-emitter-types": "2.0.0",
-    "whatwg-url": "16.0.0"
+    "strict-event-emitter-types": "2.0.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
@@ -84,7 +83,6 @@
     "@types/mocha": "10.0.10",
     "@types/node": ">=20",
     "@types/sinon": "21.0.0",
-    "@types/whatwg-url": "13.0.0",
     "chai": "6.2.2",
     "chai-as-promised": "8.0.2",
     "eslint": "9.39.2",
