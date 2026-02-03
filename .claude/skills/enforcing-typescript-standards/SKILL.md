@@ -61,9 +61,9 @@ if (isUser(data)) {
 
 ### Import Organization
 
-- **Import order**: builtin → external → internal → parent → sibling → index (alphabetized within groups)
+- **Import order**: built-in → external → internal → parent → sibling → index (alphabetized within groups)
 - **No duplicate imports**: Consolidate imports from the same module
-- **Newline after imports**: Blank line required after import block
+- **Newline after imports**: Empty line required after import block
 
 ### Class Member Ordering
 
@@ -123,7 +123,7 @@ if (isUser(data)) {
 
 ## Negative Knowledge
 
-Avoid these anti-patterns:
+Avoid these antipatterns:
 
 - `console.log()` statements in production code
 - `eval()` or `Function()` constructor
@@ -137,7 +137,7 @@ Avoid these anti-patterns:
 - Comments that duplicate type information: `// returns a string` when return type is `: string`
 - Commented-out code (delete it; use version control)
 - Verbose boolean comparisons: `arr.length > 0`, `str !== ''`, `obj !== null && obj !== undefined`
-- Disabling lint rules via comments (fix the code instead)
+- Disabling linter rules via comments (fix the code instead)
 - Overuse of `any` type or `as` type assertions
 - Over-mocking in tests instead of using real implementations or data generators
 - Empty catch blocks that silently swallow errors
