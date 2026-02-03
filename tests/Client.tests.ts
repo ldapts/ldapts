@@ -111,6 +111,172 @@ describe('Client', () => {
       // @ts-expect-error - private field
       client.secure.should.equal(true);
     });
+
+    // URL parsing tests to ensure native URL class handles all cases correctly
+    describe('URL parsing', () => {
+      it('should parse ldap URL with explicit port', () => {
+        const client = new Client({
+          url: 'ldap://localhost:389',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.equal('localhost');
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+        // @ts-expect-error - private field
+        client.secure.should.equal(false);
+      });
+
+      it('should parse ldaps URL with explicit port', () => {
+        const client = new Client({
+          url: 'ldaps://localhost:636',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.equal('localhost');
+        // @ts-expect-error - private field
+        client.port.should.equal(636);
+        // @ts-expect-error - private field
+        client.secure.should.equal(true);
+      });
+
+      it('should use default port 389 for ldap URL without port', () => {
+        const client = new Client({
+          url: 'ldap://localhost',
+        });
+
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+
+      it('should use default port 636 for ldaps URL without port', () => {
+        const client = new Client({
+          url: 'ldaps://localhost',
+        });
+
+        // @ts-expect-error - private field
+        client.port.should.equal(636);
+      });
+
+      it('should parse IPv4 address', () => {
+        const client = new Client({
+          url: 'ldap://192.168.1.1:389',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.equal('192.168.1.1');
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+
+      it('should parse IPv6 address with brackets', () => {
+        const client = new Client({
+          url: 'ldap://[::1]:389',
+        });
+
+        // @ts-expect-error - private field
+        // IPv6 can be represented as '::1' or '0:0:0:0:0:0:0:1' - both are valid
+        client.host.should.match(/^(:{2}1|(?:0:){7}1)$/);
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+
+      it('should parse full IPv6 address', () => {
+        const client = new Client({
+          url: 'ldap://[2001:db8:85a3::8a2e:370:7334]:389',
+        });
+
+        // @ts-expect-error - private field
+        // The host should be a valid representation of the IPv6 address (compressed or expanded)
+        client.host.should.be.a('string');
+        // @ts-expect-error - private field
+        client.host.length.should.be.greaterThan(0);
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+
+      it('should parse IPv6 address without port', () => {
+        const client = new Client({
+          url: 'ldap://[::1]',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.match(/^(:{2}1|(?:0:){7}1)$/);
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+
+      it('should parse hostname with subdomain', () => {
+        const client = new Client({
+          url: 'ldap://ldap.example.com:389',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.equal('ldap.example.com');
+      });
+
+      it('should use custom port when specified', () => {
+        const client = new Client({
+          url: 'ldap://localhost:1389',
+        });
+
+        // @ts-expect-error - private field
+        client.port.should.equal(1389);
+      });
+
+      it('should throw error for http:// protocol', () => {
+        ((): void => {
+          new Client({
+            url: 'http://localhost:389',
+          });
+        }).should.throw(Error, 'http://localhost:389 is an invalid LDAP URL (protocol)');
+      });
+
+      it('should throw error for https:// protocol', () => {
+        ((): void => {
+          new Client({
+            url: 'https://localhost:389',
+          });
+        }).should.throw(Error, 'https://localhost:389 is an invalid LDAP URL (protocol)');
+      });
+
+      it('should throw error for ftp:// protocol', () => {
+        ((): void => {
+          new Client({
+            url: 'ftp://localhost:389',
+          });
+        }).should.throw(Error, 'ftp://localhost:389 is an invalid LDAP URL (protocol)');
+      });
+
+      it('should throw error for malformed URL', () => {
+        ((): void => {
+          new Client({
+            url: 'not-a-valid-url',
+          });
+        }).should.throw(Error, 'not-a-valid-url is an invalid LDAP URL (protocol)');
+      });
+
+      it('should throw error for empty URL', () => {
+        ((): void => {
+          new Client({
+            url: '',
+          });
+        }).should.throw(Error, ' is an invalid LDAP URL (protocol)');
+      });
+
+      it('should handle URL with empty host', () => {
+        // ldap:/// is a valid URL format - behavior may vary
+        // The client should not throw and should have a valid host
+        const client = new Client({
+          url: 'ldap:///',
+        });
+
+        // @ts-expect-error - private field
+        client.host.should.be.a('string');
+        // @ts-expect-error - private field
+        client.port.should.equal(389);
+      });
+    });
   });
 
   describe('#isConnected', () => {

@@ -3,8 +3,6 @@ import * as net from 'node:net';
 import * as tls from 'node:tls';
 import { debuglog } from 'node:util';
 
-import { parseURL } from 'whatwg-url';
-
 import { Attribute } from './Attribute.js';
 import type { Change } from './Change.js';
 import type { Control } from './controls/Control.js';
@@ -167,31 +165,36 @@ export class Client {
 
     this.clientOptions.strictDN = this.clientOptions.strictDN !== false;
 
-    const parsedUrl = parseURL(options.url);
-    if (!parsedUrl?.scheme || !(parsedUrl.scheme === 'ldap' || parsedUrl.scheme === 'ldaps')) {
+    let parsedUrl: URL;
+
+    try {
+      parsedUrl = new URL(options.url);
+    } catch {
       throw new Error(`${options.url} is an invalid LDAP URL (protocol)`);
     }
 
-    const isSecureProtocol = parsedUrl.scheme === 'ldaps';
+    // protocol includes trailing colon (e.g., 'ldap:')
+    const scheme = parsedUrl.protocol.replace(/:$/, '');
+    if (scheme !== 'ldap' && scheme !== 'ldaps') {
+      throw new Error(`${options.url} is an invalid LDAP URL (protocol)`);
+    }
+
+    const isSecureProtocol = scheme === 'ldaps';
     // Check if tlsOptions has at least one defined property (not just an empty object or object with all undefined values)
     const hasTlsOptions = !!this.clientOptions.tlsOptions && Object.values(this.clientOptions.tlsOptions).some((value) => value !== undefined);
     this.secure = isSecureProtocol || hasTlsOptions;
-    let host: string | null | undefined = null;
-    if (typeof parsedUrl.host === 'string') {
-      // Host might include a port, so split to get the hostname part
-      host = parsedUrl.host.split(':')[0];
-    } else if (Array.isArray(parsedUrl.host)) {
-      // Handle IPv6Address case by joining parts
-      host = parsedUrl.host.join(':');
-    } else if (parsedUrl.host !== null) {
-      // If it's a number or any other type, convert to string
-      host = String(parsedUrl.host);
+
+    // hostname excludes port; for IPv6, it includes brackets (e.g., '[::1]')
+    let host = parsedUrl.hostname;
+    // Remove IPv6 brackets if present
+    if (host.startsWith('[') && host.endsWith(']')) {
+      host = host.slice(1, -1);
     }
 
-    this.host = host ?? 'localhost'; // Default to 'localhost' if host is null
+    this.host = host || 'localhost'; // Default to 'localhost' if host is empty
 
     if (parsedUrl.port) {
-      this.port = parsedUrl.port;
+      this.port = Number(parsedUrl.port);
     } else if (isSecureProtocol) {
       this.port = 636;
     } else {
