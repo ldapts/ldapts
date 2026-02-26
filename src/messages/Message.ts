@@ -1,8 +1,8 @@
-import type { BerReader } from '../ber/index.js';
+import { type BerReader } from '../ber/index.js';
 import { BerWriter } from '../ber/index.js';
 import { ControlParser } from '../ControlParser.js';
-import type { Control } from '../controls/Control.js';
-import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { type Control } from '../controls/Control.js';
+import { type ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
 export interface MessageOptions {

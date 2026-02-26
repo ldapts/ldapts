@@ -1,5 +1,5 @@
 import { Ber, BerReader } from './ber/index.js';
-import type { Control } from './controls/Control.js';
+import { type Control } from './controls/Control.js';
 import { EntryChangeNotificationControl, PagedResultsControl, PersistentSearchControl, ServerSideSortingRequestControl } from './controls/index.js';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class

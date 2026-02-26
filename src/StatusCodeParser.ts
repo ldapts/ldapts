@@ -1,4 +1,4 @@
-import type { ResultCodeError } from './errors/index.js';
+import { type ResultCodeError } from './errors/index.js';
 import {
   AdminLimitExceededError,
   AffectsMultipleDSAsError,
@@ -41,8 +41,8 @@ import {
   UnknownStatusCodeError,
   UnwillingToPerformError,
 } from './errors/index.js';
-import type { BindResponse } from './messages/BindResponse.js';
-import type { MessageResponse } from './messages/MessageResponse.js';
+import { type BindResponse } from './messages/BindResponse.js';
+import { type MessageResponse } from './messages/MessageResponse.js';
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class StatusCodeParser {

@@ -1,5 +1,5 @@
-import type { BerReader, BerWriter } from '../ber/index.js';
-import type { SearchFilterValues } from '../SearchFilter.js';
+import { type BerReader, type BerWriter } from '../ber/index.js';
+import { type SearchFilterValues } from '../SearchFilter.js';
 
 export abstract class Filter {
   public abstract type: SearchFilterValues;

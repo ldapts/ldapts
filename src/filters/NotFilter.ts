@@ -1,5 +1,5 @@
-import type { BerWriter } from '../ber/index.js';
-import type { SearchFilterValues } from '../SearchFilter.js';
+import { type BerWriter } from '../ber/index.js';
+import { type SearchFilterValues } from '../SearchFilter.js';
 import { SearchFilter } from '../SearchFilter.js';
 
 import { Filter } from './Filter.js';
