@@ -40,6 +40,7 @@ jobs:
           VALIDATE_CLOUDFORMATION: false
           VALIDATE_CSS: false
           VALIDATE_CSS_PRETTIER: false
+          VALIDATE_GITHUB_ACTIONS_ZIZMOR: false
           VALIDATE_HTML: false
           VALIDATE_HTML_PRETTIER: false
           VALIDATE_JSCPD: false
@@ -49,6 +50,7 @@ jobs:
           VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JAVASCRIPT_PRETTIER: false
           VALIDATE_JAVASCRIPT_STANDARD: false
+          VALIDATE_SPELL_CODESPELL: false
           VALIDATE_TSX: false
           VALIDATE_TYPESCRIPT_ES: false
           VALIDATE_TYPESCRIPT_PRETTIER: false

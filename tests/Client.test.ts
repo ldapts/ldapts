@@ -1,15 +1,11 @@
-import assert from 'node:assert';
 import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import * as chai from 'chai';
-import 'chai/register-should.js';
-import chaiAsPromised from 'chai-as-promised';
-import * as sinon from 'sinon';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import type { BerReader, BerWriter } from '../src/ber/index.js';
-import type { AddRequest, ModifyDNRequest } from '../src/index.js';
+import { type BerReader, type BerWriter } from '../src/ber/index.js';
+import { type AddRequest, type ModifyDNRequest } from '../src/index.js';
 import {
   AddResponse,
   AndFilter,
@@ -28,9 +24,6 @@ import {
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
-chai.use(chaiAsPromised);
-const should = chai.should();
-
 const LDAP_DOMAIN = 'ldap.local';
 const LDAP_URI = 'ldap://localhost:389';
 const SECURE_LDAP_URI = 'ldaps://localhost:636';
@@ -42,29 +35,29 @@ describe('Client', () => {
   describe('#constructor()', () => {
     it('should throw error if url protocol is not ldap:// or ldaps://', () => {
       const url = 'https://127.0.0.1';
-      ((): void => {
+      expect((): void => {
         new Client({
           url,
         });
-      }).should.throw(Error, `${url} is an invalid LDAP URL (protocol)`);
+      }).toThrow(`${url} is an invalid LDAP URL (protocol)`);
     });
 
     it('should not throw error if url protocol is ldap://', () => {
       const url = 'ldap://127.0.0.1';
-      ((): void => {
+      expect((): void => {
         new Client({
           url,
         });
-      }).should.not.throw(Error);
+      }).not.toThrow();
     });
 
     it('should not throw error if url protocol is ldaps://', () => {
       const url = 'ldaps://127.0.0.1';
-      ((): void => {
+      expect((): void => {
         new Client({
           url,
         });
-      }).should.not.throw(Error);
+      }).not.toThrow();
     });
 
     it('should not enable secure mode with empty tlsOptions object', () => {
@@ -74,7 +67,7 @@ describe('Client', () => {
       });
 
       // @ts-expect-error - private field
-      client.secure.should.equal(false);
+      expect(client.secure).toBe(false);
     });
 
     it('should not enable secure mode with tlsOptions containing only undefined values', () => {
@@ -87,7 +80,7 @@ describe('Client', () => {
       });
 
       // @ts-expect-error - private field
-      client.secure.should.equal(false);
+      expect(client.secure).toBe(false);
     });
 
     it('should enable secure mode with tlsOptions containing defined values', () => {
@@ -99,7 +92,7 @@ describe('Client', () => {
       });
 
       // @ts-expect-error - private field
-      client.secure.should.equal(true);
+      expect(client.secure).toBe(true);
     });
 
     it('should enable secure mode with ldaps:// even with empty tlsOptions', () => {
@@ -109,7 +102,7 @@ describe('Client', () => {
       });
 
       // @ts-expect-error - private field
-      client.secure.should.equal(true);
+      expect(client.secure).toBe(true);
     });
 
     // URL parsing tests to ensure native URL class handles all cases correctly
@@ -120,11 +113,11 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.equal('localhost');
+        expect(client.host).toBe('localhost');
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
         // @ts-expect-error - private field
-        client.secure.should.equal(false);
+        expect(client.secure).toBe(false);
       });
 
       it('should parse ldaps URL with explicit port', () => {
@@ -133,11 +126,11 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.equal('localhost');
+        expect(client.host).toBe('localhost');
         // @ts-expect-error - private field
-        client.port.should.equal(636);
+        expect(client.port).toBe(636);
         // @ts-expect-error - private field
-        client.secure.should.equal(true);
+        expect(client.secure).toBe(true);
       });
 
       it('should use default port 389 for ldap URL without port', () => {
@@ -146,7 +139,7 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
 
       it('should use default port 636 for ldaps URL without port', () => {
@@ -155,7 +148,7 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.port.should.equal(636);
+        expect(client.port).toBe(636);
       });
 
       it('should parse IPv4 address', () => {
@@ -164,9 +157,9 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.equal('192.168.1.1');
+        expect(client.host).toBe('192.168.1.1');
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
 
       it('should parse IPv6 address with brackets', () => {
@@ -176,9 +169,9 @@ describe('Client', () => {
 
         // @ts-expect-error - private field
         // IPv6 can be represented as '::1' or '0:0:0:0:0:0:0:1' - both are valid
-        client.host.should.match(/^(:{2}1|(?:0:){7}1)$/);
+        expect(client.host).toMatch(/^(:{2}1|(?:0:){7}1)$/);
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
 
       it('should parse full IPv6 address', () => {
@@ -188,11 +181,11 @@ describe('Client', () => {
 
         // @ts-expect-error - private field
         // The host should be a valid representation of the IPv6 address (compressed or expanded)
-        client.host.should.be.a('string');
+        expect(typeof client.host).toBe('string');
         // @ts-expect-error - private field
-        client.host.length.should.be.greaterThan(0);
+        expect(client.host.length).toBeGreaterThan(0);
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
 
       it('should parse IPv6 address without port', () => {
@@ -201,9 +194,9 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.match(/^(:{2}1|(?:0:){7}1)$/);
+        expect(client.host).toMatch(/^(:{2}1|(?:0:){7}1)$/);
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
 
       it('should parse hostname with subdomain', () => {
@@ -212,7 +205,7 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.equal('ldap.example.com');
+        expect(client.host).toBe('ldap.example.com');
       });
 
       it('should use custom port when specified', () => {
@@ -221,47 +214,47 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.port.should.equal(1389);
+        expect(client.port).toBe(1389);
       });
 
       it('should throw error for http:// protocol', () => {
-        ((): void => {
+        expect((): void => {
           new Client({
             url: 'http://localhost:389',
           });
-        }).should.throw(Error, 'http://localhost:389 is an invalid LDAP URL (protocol)');
+        }).toThrow('http://localhost:389 is an invalid LDAP URL (protocol)');
       });
 
       it('should throw error for https:// protocol', () => {
-        ((): void => {
+        expect((): void => {
           new Client({
             url: 'https://localhost:389',
           });
-        }).should.throw(Error, 'https://localhost:389 is an invalid LDAP URL (protocol)');
+        }).toThrow('https://localhost:389 is an invalid LDAP URL (protocol)');
       });
 
       it('should throw error for ftp:// protocol', () => {
-        ((): void => {
+        expect((): void => {
           new Client({
             url: 'ftp://localhost:389',
           });
-        }).should.throw(Error, 'ftp://localhost:389 is an invalid LDAP URL (protocol)');
+        }).toThrow('ftp://localhost:389 is an invalid LDAP URL (protocol)');
       });
 
       it('should throw error for malformed URL', () => {
-        ((): void => {
+        expect((): void => {
           new Client({
             url: 'not-a-valid-url',
           });
-        }).should.throw(Error, 'not-a-valid-url is an invalid LDAP URL (protocol)');
+        }).toThrow('not-a-valid-url is an invalid LDAP URL (protocol)');
       });
 
       it('should throw error for empty URL', () => {
-        ((): void => {
+        expect((): void => {
           new Client({
             url: '',
           });
-        }).should.throw(Error, ' is an invalid LDAP URL (protocol)');
+        }).toThrow(' is an invalid LDAP URL (protocol)');
       });
 
       it('should handle URL with empty host', () => {
@@ -272,9 +265,9 @@ describe('Client', () => {
         });
 
         // @ts-expect-error - private field
-        client.host.should.be.a('string');
+        expect(typeof client.host).toBe('string');
         // @ts-expect-error - private field
-        client.port.should.equal(389);
+        expect(client.port).toBe(389);
       });
     });
   });
@@ -285,7 +278,7 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      client.isConnected.should.equal(false);
+      expect(client.isConnected).toBe(false);
     });
 
     it('should not be connected after unbind has been called', async () => {
@@ -295,11 +288,11 @@ describe('Client', () => {
 
       await client.bind(BIND_DN, BIND_PW);
 
-      client.isConnected.should.equal(true);
+      expect(client.isConnected).toBe(true);
 
       await client.unbind();
 
-      client.isConnected.should.equal(false);
+      expect(client.isConnected).toBe(false);
     });
 
     it('should be connected if a method has been called', async () => {
@@ -309,7 +302,7 @@ describe('Client', () => {
 
       await client.bind(BIND_DN, BIND_PW);
 
-      client.isConnected.should.equal(true);
+      expect(client.isConnected).toBe(true);
 
       try {
         await client.unbind();
@@ -323,16 +316,16 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      client.isConnected.should.equal(false);
+      expect(client.isConnected).toBe(false);
       await client.bind(BIND_DN, BIND_PW);
-      client.isConnected.should.equal(true);
+      expect(client.isConnected).toBe(true);
       await client.unbind();
-      client.isConnected.should.equal(false);
+      expect(client.isConnected).toBe(false);
 
       await client.bind(BIND_DN, BIND_PW);
-      client.isConnected.should.equal(true);
+      expect(client.isConnected).toBe(true);
       await client.unbind();
-      client.isConnected.should.equal(false);
+      expect(client.isConnected).toBe(false);
     });
   });
 
@@ -342,7 +335,7 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      await client.bind(BIND_DN, BIND_PW);
+      await expect(client.bind(BIND_DN, BIND_PW)).resolves.toBeUndefined();
 
       try {
         await client.unbind();
@@ -357,7 +350,7 @@ describe('Client', () => {
       });
 
       // @ts-expect-error - private field
-      client.secure.should.equal(true);
+      expect(client.secure).toBe(true);
       await client.bind(BIND_DN, BIND_PW);
     });
 
@@ -366,14 +359,8 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      try {
-        await client.bind(BIND_DN, 'AlsoNotAHotdog');
-        false.should.equal(true);
-      } catch (ex) {
-        (ex instanceof InvalidCredentialsError).should.equal(true);
-      } finally {
-        await client.unbind();
-      }
+      await expect(client.bind(BIND_DN, 'AlsoNotAHotdog')).rejects.toBeInstanceOf(InvalidCredentialsError);
+      await client.unbind();
     });
 
     it('should bind using EXTERNAL sasl mechanism', async () => {
@@ -397,7 +384,7 @@ describe('Client', () => {
         key,
       });
 
-      await client.bind('EXTERNAL');
+      await expect(client.bind('EXTERNAL')).resolves.toBeUndefined();
 
       try {
         await client.unbind();
@@ -451,13 +438,13 @@ describe('Client', () => {
           }),
           testControl,
         );
-        false.should.equal(true, 'Exception expected');
+        expect.unreachable('Exception expected');
       } catch {
         // surely will happen
       }
 
-      hasWritten.should.equal(true, 'Did not call PasswordPolicyControl#writeControl');
-      hasParsed.should.equal(true, 'Did not call PasswordPolicyControl#parseControl');
+      expect(hasWritten).toBe(true);
+      expect(hasParsed).toBe(true);
     });
   });
 
@@ -467,7 +454,7 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      await client.startTLS();
+      await expect(client.startTLS()).resolves.toBeUndefined();
     });
 
     it('should use secure connection for subsequent operations', async () => {
@@ -477,7 +464,7 @@ describe('Client', () => {
 
       await client.startTLS();
       await client.bind(BIND_DN, BIND_PW);
-      await client.unbind();
+      await expect(client.unbind()).resolves.toBeUndefined();
     });
   });
 
@@ -488,7 +475,7 @@ describe('Client', () => {
       });
 
       await client.bind(BIND_DN, BIND_PW);
-      await client.unbind();
+      await expect(client.unbind()).resolves.toBeUndefined();
     });
 
     it('should succeed if client.bind() was not called previously', async () => {
@@ -496,7 +483,7 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      await client.unbind();
+      await expect(client.unbind()).resolves.toBeUndefined();
     });
 
     it('should allow unbind to be called multiple times without error', async () => {
@@ -508,7 +495,7 @@ describe('Client', () => {
 
       await Promise.all([client.unbind(), client.unbind()]);
 
-      await client.unbind();
+      await expect(client.unbind()).resolves.toBeUndefined();
     });
 
     it('should destroy socket after unbind', async () => {
@@ -526,9 +513,9 @@ describe('Client', () => {
         // ignore
       } finally {
         // @ts-expect-error - is private
-        should.equal(client.connectTimer, undefined);
+        expect(client.connectTimer).toBeUndefined();
         // @ts-expect-error - is private
-        should.equal(client.socket, undefined);
+        expect(client.socket).toBeUndefined();
       }
     });
   });
@@ -538,49 +525,34 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
     it('should return true if entry has the specified attribute and value', async () => {
       const result = await client.compare(`uid=user1,${BASE_DN}`, 'sn', 'SURNAME');
-      result.should.equal(true);
+      expect(result).toBe(true);
     });
 
     it('should return false if entry does not have the specified attribute and value', async () => {
       const result = await client.compare(`uid=user1,${BASE_DN}`, 'sn', 'Stark');
-      result.should.equal(false);
+      expect(result).toBe(false);
     });
 
     it('should throw if attribute is invalid', async () => {
-      try {
-        await client.compare(`uid=user1,${BASE_DN}`, 'lorem', 'ipsum');
-        false.should.equal(true);
-      } catch (ex) {
-        (ex instanceof UndefinedTypeError).should.equal(true);
-      }
+      await expect(client.compare(`uid=user1,${BASE_DN}`, 'lorem', 'ipsum')).rejects.toBeInstanceOf(UndefinedTypeError);
     });
 
     it('should throw if target dn does not exist', async () => {
-      try {
-        await client.compare(`uid=foo.bar,${BASE_DN}`, 'uid', 'bruce.banner');
-        false.should.equal(true);
-      } catch (ex) {
-        (ex instanceof NoSuchObjectError).should.equal(true);
-      }
+      await expect(client.compare(`uid=foo.bar,${BASE_DN}`, 'uid', 'bruce.banner')).rejects.toBeInstanceOf(NoSuchObjectError);
     });
 
     it('should throw on invalid DN', async () => {
-      try {
-        await client.compare('foo=bar', 'cn', 'bar');
-        false.should.equal(true);
-      } catch (ex) {
-        (ex instanceof InvalidDNSyntaxError).should.equal(true);
-      }
+      await expect(client.compare('foo=bar', 'cn', 'bar')).rejects.toBeInstanceOf(InvalidDNSyntaxError);
     });
   });
 
@@ -589,11 +561,11 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
@@ -612,8 +584,8 @@ describe('Client', () => {
         filter: `uid=user4`,
         attributes: ['mail'],
       });
-      searchEntries.should.have.length(1);
-      searchEntries[0]?.should.have.property('mail').that.equals(`four@${LDAP_DOMAIN}`);
+      expect(searchEntries).toHaveLength(1);
+      expect(searchEntries[0]).toHaveProperty('mail', `four@${LDAP_DOMAIN}`);
       // change it back to user4@LDAP_DOMAIN
       await client.modify(
         `uid=user4,${BASE_DN}`,
@@ -629,8 +601,8 @@ describe('Client', () => {
         filter: `uid=user4`,
         attributes: ['mail'],
       });
-      searchEntries2.should.have.length(1);
-      searchEntries2[0]?.should.have.property('mail').that.equals(`user4@${LDAP_DOMAIN}`);
+      expect(searchEntries2).toHaveLength(1);
+      expect(searchEntries2[0]).toHaveProperty('mail', `user4@${LDAP_DOMAIN}`);
     });
 
     it('should allow pushing onto attributes', async () => {
@@ -649,8 +621,8 @@ describe('Client', () => {
         attributes: ['mail'],
       });
 
-      searchEntries.should.have.length(1);
-      searchEntries[0]?.should.have.property('mail').that.includes(`four@${LDAP_DOMAIN}`);
+      expect(searchEntries).toHaveLength(1);
+      expect(searchEntries[0]?.['mail']).toContain(`four@${LDAP_DOMAIN}`);
     });
 
     it('should allow removing an attribute', async () => {
@@ -668,8 +640,8 @@ describe('Client', () => {
         filter: `uid=user4`,
         attributes: ['mail'],
       });
-      searchEntries.should.have.length(1);
-      searchEntries[0]?.should.have.property('mail').that.equals(`user4@${LDAP_DOMAIN}`);
+      expect(searchEntries).toHaveLength(1);
+      expect(searchEntries[0]).toHaveProperty('mail', `user4@${LDAP_DOMAIN}`);
     });
 
     it('should allow updating binary attributes', async () => {
@@ -690,8 +662,8 @@ describe('Client', () => {
         filter: `uid=user4`,
         attributes: ['jpegPhoto'],
       });
-      searchEntries2.should.have.length(1);
-      searchEntries2[0]?.should.have.property('jpegPhoto').that.eqls(jpegPhotoBuffer);
+      expect(searchEntries2).toHaveLength(1);
+      expect(searchEntries2[0]?.['jpegPhoto']).toStrictEqual(jpegPhotoBuffer);
     });
   });
 
@@ -700,17 +672,17 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
     it('should allow adding entry with null or undefined attribute value. Issue #88', async () => {
-      // @ts-expect-error - Private method
-      const stub = sinon.stub(client, '_send').returns(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
         new AddResponse({
           messageId: 123,
         }),
@@ -723,10 +695,9 @@ describe('Client', () => {
         foo: undefined,
       });
 
-      stub.restore();
-      stub.calledOnce.should.equal(true);
-      const args = stub.getCall(0).args[0] as AddRequest;
-      args.attributes.should.deep.equal([
+      expect(stub).toHaveBeenCalledOnce();
+      const args = stub.mock.calls[0]![0] as AddRequest;
+      expect(args.attributes).toStrictEqual([
         new Attribute({
           type: 'userPassword',
           values: [],
@@ -736,6 +707,7 @@ describe('Client', () => {
           values: [],
         }),
       ]);
+      stub.mockRestore();
     });
   });
 
@@ -744,17 +716,17 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
     it('should set newSuperior when newDN is a string and contains a comma', async () => {
-      // @ts-expect-error - Private method
-      const stub = sinon.stub(client, '_send').returns(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
         new ModifyDNResponse({
           messageId: 123,
         }),
@@ -766,19 +738,19 @@ describe('Client', () => {
       const newDN = `${newRdn},${newSuperior}`;
       await client.modifyDN(dn, newDN);
 
-      stub.restore();
-      stub.calledOnce.should.equal(true);
-      const args = stub.getCall(0).args[0] as ModifyDNRequest;
-      args.dn.should.equal(dn);
-      args.deleteOldRdn.should.equal(true);
-      args.newRdn.should.equal(newRdn);
-      args.newSuperior.should.equal(newSuperior);
-      should.equal(args.controls, undefined);
+      expect(stub).toHaveBeenCalledOnce();
+      const args = stub.mock.calls[0]![0] as ModifyDNRequest;
+      expect(args.dn).toBe(dn);
+      expect(args.deleteOldRdn).toBe(true);
+      expect(args.newRdn).toBe(newRdn);
+      expect(args.newSuperior).toBe(newSuperior);
+      expect(args.controls).toBeUndefined();
+      stub.mockRestore();
     });
 
     it('should handle escaped comma in newDN. Issue #87', async () => {
-      // @ts-expect-error - Private method
-      const stub = sinon.stub(client, '_send').returns(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
         new ModifyDNResponse({
           messageId: 123,
         }),
@@ -790,19 +762,19 @@ describe('Client', () => {
       const newDN = `${newRdn},${newSuperior}`;
       await client.modifyDN(dn, newDN);
 
-      stub.restore();
-      stub.calledOnce.should.equal(true);
-      const args = stub.getCall(0).args[0] as ModifyDNRequest;
-      args.dn.should.equal(dn);
-      args.deleteOldRdn.should.equal(true);
-      args.newRdn.should.equal(newRdn);
-      args.newSuperior.should.equal(newSuperior);
-      should.equal(args.controls, undefined);
+      expect(stub).toHaveBeenCalledOnce();
+      const args = stub.mock.calls[0]![0] as ModifyDNRequest;
+      expect(args.dn).toBe(dn);
+      expect(args.deleteOldRdn).toBe(true);
+      expect(args.newRdn).toBe(newRdn);
+      expect(args.newSuperior).toBe(newSuperior);
+      expect(args.controls).toBeUndefined();
+      stub.mockRestore();
     });
 
     it('should handle newSuperior with the long form', async () => {
-      // @ts-expect-error - Private method
-      const stub = sinon.stub(client, '_send').returns(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
         new ModifyDNResponse({
           messageId: 123,
         }),
@@ -815,14 +787,14 @@ describe('Client', () => {
       const newDN = `${newRdn},${newSuperior}`;
       await client.modifyDN(dn, newDN);
 
-      stub.restore();
-      stub.calledOnce.should.equal(true);
-      const args = stub.getCall(0).args[0] as ModifyDNRequest;
-      args.dn.should.equal(dn);
-      args.deleteOldRdn.should.equal(true);
-      args.newRdn.should.equal(newRdn);
-      args.newSuperior.should.equal(newSuperior);
-      should.equal(args.controls, undefined);
+      expect(stub).toHaveBeenCalledOnce();
+      const args = stub.mock.calls[0]![0] as ModifyDNRequest;
+      expect(args.dn).toBe(dn);
+      expect(args.deleteOldRdn).toBe(true);
+      expect(args.newRdn).toBe(newRdn);
+      expect(args.newSuperior).toBe(newSuperior);
+      expect(args.controls).toBeUndefined();
+      stub.mockRestore();
     });
   });
 
@@ -832,16 +804,7 @@ describe('Client', () => {
         url: LDAP_URI,
       });
 
-      try {
-        await client.exop('1.2.840.113556.1.4.1781');
-        false.should.equal(true);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('unsupported extended operation Code: 0x2');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
-      }
+      await expect(client.exop('1.2.840.113556.1.4.1781')).rejects.toThrow('unsupported extended operation Code: 0x2');
 
       await client.bind(BIND_DN, BIND_PW);
       await client.unbind();
@@ -853,11 +816,11 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
@@ -865,7 +828,7 @@ describe('Client', () => {
       // NOTE: ldapsearch -H ldaps://localhost:636 -b dc=jumpcloud,dc=com -x -D uid=tony.stark,dc=jumpcloud,dc=com -w MyRedSuitKeepsMeWarm "(objectclass=*)"
       const searchResult = await client.search(BASE_DN);
 
-      searchResult.searchEntries.length.should.be.greaterThan(0);
+      expect(searchResult.searchEntries.length).toBeGreaterThan(0);
     });
 
     it('should throw error if an operation is performed after the client has closed connection', async () => {
@@ -879,14 +842,7 @@ describe('Client', () => {
         const unbindRequest = testClient.unbind();
         const searchRequest = testClient.search(BASE_DN);
         await unbindRequest;
-        await searchRequest;
-        false.should.equal(true);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('Connection closed before message response was received. Message type: SearchRequest (0x63)');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
+        await expect(searchRequest).rejects.toThrow('Connection closed before message response was received. Message type: SearchRequest (0x63)');
       } finally {
         await testClient.unbind();
       }
@@ -898,7 +854,7 @@ describe('Client', () => {
         filter: `(mail=user1@${LDAP_DOMAIN})`,
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           cn: 'user1',
           dn: 'uid=user1,dc=ldap,dc=local',
@@ -921,7 +877,7 @@ describe('Client', () => {
         filter: '(mail=user1*)',
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           cn: 'user1',
           dn: 'uid=user1,dc=ldap,dc=local',
@@ -967,9 +923,9 @@ describe('Client', () => {
         },
       ];
 
-      result1.searchEntries.should.deep.equal(expectedResult);
-      result2.searchEntries.should.deep.equal(expectedResult);
-      result3.searchEntries.should.deep.equal(expectedResult);
+      expect(result1.searchEntries).toStrictEqual(expectedResult);
+      expect(result2.searchEntries).toStrictEqual(expectedResult);
+      expect(result3.searchEntries).toStrictEqual(expectedResult);
     });
 
     it('should allow arbitrary controls 1.2.840.113556.1.4.417 to be specified', async () => {
@@ -982,7 +938,7 @@ describe('Client', () => {
         new Control('1.2.840.113556.1.4.417'),
       );
 
-      searchResult.searchEntries.length.should.equal(0);
+      expect(searchResult.searchEntries.length).toBe(0);
     });
 
     it('should restrict attributes returned if attributes are specified', async () => {
@@ -993,7 +949,7 @@ describe('Client', () => {
         attributes: ['cn'],
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           dn: `uid=user1,${BASE_DN}`,
           cn: 'user1',
@@ -1009,7 +965,7 @@ describe('Client', () => {
         attributes: ['cn', 'telephoneNumber'],
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           dn: `uid=user1,${BASE_DN}`,
           cn: 'user1',
@@ -1025,7 +981,7 @@ describe('Client', () => {
         attributes: ['homedirectory'],
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           dn: `uid=user1,${BASE_DN}`,
           homeDirectory: '/home/user',
@@ -1041,7 +997,7 @@ describe('Client', () => {
         returnAttributeValues: false,
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           cn: [],
           dn: 'uid=user1,dc=ldap,dc=local',
@@ -1067,7 +1023,7 @@ describe('Client', () => {
         },
       });
 
-      searchResult.searchEntries.length.should.be.greaterThan(2);
+      expect(searchResult.searchEntries.length).toBeGreaterThan(2);
     });
 
     it('should allow sizeLimit when no paging is specified', async () => {
@@ -1077,7 +1033,7 @@ describe('Client', () => {
         sizeLimit: 3,
       });
 
-      searchResult.searchEntries.length.should.equal(3);
+      expect(searchResult.searchEntries.length).toBe(3);
     });
 
     it('should allow sizeLimit when paging is specified', async () => {
@@ -1090,7 +1046,7 @@ describe('Client', () => {
         },
       });
 
-      searchResult.searchEntries.length.should.equal(5);
+      expect(searchResult.searchEntries.length).toBe(5);
     });
 
     it('should return group contents with parenthesis in name - explicit filter controls', async () => {
@@ -1110,7 +1066,7 @@ describe('Client', () => {
         }),
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           cn: 'UserGroup2 (Test)',
           dn: 'cn=UserGroup2 (Test),dc=ldap,dc=local',
@@ -1127,7 +1083,7 @@ describe('Client', () => {
         filter: '(&(objectClass=posixGroup)(cn=UserGroup2 \\28Test\\29))',
       });
 
-      searchResult.searchEntries.should.deep.equal([
+      expect(searchResult.searchEntries).toStrictEqual([
         {
           cn: 'UserGroup2 (Test)',
           dn: 'cn=UserGroup2 (Test),dc=ldap,dc=local',
@@ -1140,32 +1096,12 @@ describe('Client', () => {
 
     it('should throw if a PagedResultsControl is specified', async () => {
       const pagedResultsControl = new PagedResultsControl({});
-
-      try {
-        await client.search('cn=test', {}, pagedResultsControl);
-        true.should.equal(false);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('Should not specify PagedResultsControl');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
-      }
+      await expect(client.search('cn=test', {}, pagedResultsControl)).rejects.toThrow('Should not specify PagedResultsControl');
     });
 
     it('should throw if a PagedResultsControl is specified in the controls array', async () => {
       const pagedResultsControl = new PagedResultsControl({});
-
-      try {
-        await client.search('cn=test', {}, [pagedResultsControl]);
-        true.should.equal(false);
-      } catch (ex) {
-        if (ex instanceof Error) {
-          ex.message.should.equal('Should not specify PagedResultsControl');
-        } else {
-          assert.fail('Exception was not of type Error');
-        }
-      }
+      await expect(client.search('cn=test', {}, [pagedResultsControl])).rejects.toThrow('Should not specify PagedResultsControl');
     });
   });
 
@@ -1174,11 +1110,11 @@ describe('Client', () => {
       url: LDAP_URI,
     });
 
-    before(async () => {
+    beforeAll(async () => {
       await client.bind(BIND_DN, BIND_PW);
     });
 
-    after(async () => {
+    afterAll(async () => {
       await client.unbind();
     });
 
@@ -1195,17 +1131,17 @@ describe('Client', () => {
       for await (const searchResult of paginator) {
         iterateCount++;
         totalResults += searchResult.searchEntries.length;
-        searchResult.searchEntries.length.should.be.lessThanOrEqual(pageSize);
+        expect(searchResult.searchEntries.length).toBeLessThanOrEqual(pageSize);
       }
 
-      iterateCount.should.be.greaterThanOrEqual(1);
-      (totalResults / iterateCount).should.be.lessThanOrEqual(pageSize);
+      expect(iterateCount).toBeGreaterThanOrEqual(1);
+      expect(totalResults / iterateCount).toBeLessThanOrEqual(pageSize);
     });
   });
 
   describe('#disposable', () => {
     it('should unbind after disposed', async () => {
-      const spy = sinon.spy();
+      const spy = vi.fn();
 
       try {
         await using client = new Client({
@@ -1216,7 +1152,7 @@ describe('Client', () => {
       } catch {
         /* empty */
       } finally {
-        spy.calledOnce.should.equal(true);
+        expect(spy).toHaveBeenCalledOnce();
       }
     });
 
@@ -1229,7 +1165,7 @@ describe('Client', () => {
       await client[Symbol.asyncDispose]();
 
       // @ts-expect-error - is private
-      should.equal(client.socket, undefined);
+      expect(client.socket).toBeUndefined();
     });
 
     it('should destroy socket after connection failure', async () => {
@@ -1245,9 +1181,9 @@ describe('Client', () => {
         // ignore
       } finally {
         // @ts-expect-error - is private
-        should.equal(client.connectTimer, undefined);
+        expect(client.connectTimer).toBeUndefined();
         // @ts-expect-error - is private
-        should.equal(client.socket, undefined);
+        expect(client.socket).toBeUndefined();
       }
     });
 
@@ -1264,9 +1200,9 @@ describe('Client', () => {
         // ignore
       } finally {
         // @ts-expect-error - is private
-        should.equal(client.connectTimer, undefined);
+        expect(client.connectTimer).toBeUndefined();
         // @ts-expect-error - is private
-        should.equal(client.socket, undefined);
+        expect(client.socket).toBeUndefined();
       }
     });
 
@@ -1278,23 +1214,20 @@ describe('Client', () => {
       });
       // @ts-expect-error - it is private
       const messageMap = client.messageDetailsByMessageId;
-      const messageMapSetter = sinon.spy(messageMap, 'set');
+      const messageMapSetter = vi.spyOn(messageMap, 'set');
 
       try {
         await client.bind(BIND_DN, BIND_PW);
       } catch {
         /* empty */
       } finally {
-        sinon.assert.calledOnceWithMatch(
-          messageMapSetter,
-          sinon.match.defined,
-          sinon.match((val) => {
-            return !!val.timeoutTimer;
-          }),
-        );
+        expect(messageMapSetter).toHaveBeenCalledOnce();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const setCalls = messageMapSetter.mock.calls as any[];
+        expect(setCalls[0][0]).toBeDefined();
+        expect(setCalls[0][1].timeoutTimer).toBeTruthy();
 
-        messageMapSetter.calledOnceWith().should.equal(true);
-        messageMap.size.should.equal(0);
+        expect(messageMap.size).toBe(0);
       }
     });
   });

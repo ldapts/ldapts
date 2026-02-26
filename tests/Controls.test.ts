@@ -1,12 +1,8 @@
-import * as chai from 'chai';
-import 'chai/register-should.js';
-import chaiAsPromised from 'chai-as-promised';
+import { describe, expect, it } from 'vitest';
 
 import { Client, ServerSideSortingRequestControl } from '../src/index.js';
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-
-chai.use(chaiAsPromised);
 
 const LDAP_URI = 'ldap://localhost:389';
 const BASE_DN = 'dc=ldap,dc=local';
@@ -33,7 +29,7 @@ describe('Controls', () => {
       );
       const results = res.searchEntries.map((entry) => entry['uid']) as [string, ...string[]];
 
-      results[0].should.equal(results.sort()[0]);
+      expect(results[0]).toBe(results.sort()[0]);
     });
 
     it('should sort values (descending)', async () => {
@@ -54,7 +50,7 @@ describe('Controls', () => {
       );
       const results = res.searchEntries.map((entry) => entry['uid']) as [string, ...string[]];
 
-      results[0].should.equal(results.sort().reverse()[0]);
+      expect(results[0]).toBe(results.sort().reverse()[0]);
     });
   });
 });
