@@ -1,16 +1,13 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ES2022",
+    "module": "nodenext",
     "lib": ["ESNext"],
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "allowJs": false,
 
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-
     "outDir": "dist",
-    "baseUrl": ".",
+    "rootDir": ".",
 
     "declaration": true,
     "sourceMap": true,
@@ -26,11 +23,7 @@
     "noPropertyAccessFromIndexSignature": true,
     "noUncheckedIndexedAccess": true,
 
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    }
+    "types": ["node"]
   },
   "include": [
     "src/**/*",
