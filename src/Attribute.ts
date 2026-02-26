@@ -1,6 +1,6 @@
 import { TextDecoder } from 'node:util';
 
-import type { BerReader, BerWriter } from './ber/index.js';
+import { type BerReader, type BerWriter } from './ber/index.js';
 import { Ber } from './ber/index.js';
 import { ProtocolOperation } from './ProtocolOperation.js';
 

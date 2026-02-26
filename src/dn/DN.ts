@@ -1,4 +1,4 @@
-import type { RDNAttributes } from './RDN.js';
+import { type RDNAttributes } from './RDN.js';
 import { RDN } from './RDN.js';
 
 /**

@@ -1,6 +1,6 @@
-import type { BerReader } from '../ber/index.js';
+import { type BerReader } from '../ber/index.js';
 
-import type { MessageOptions } from './Message.js';
+import { type MessageOptions } from './Message.js';
 import { Message } from './Message.js';
 
 export interface MessageResponseOptions extends MessageOptions {

@@ -4,13 +4,13 @@ import * as tls from 'node:tls';
 import { debuglog } from 'node:util';
 
 import { Attribute } from './Attribute.js';
-import type { Change } from './Change.js';
-import type { Control } from './controls/Control.js';
+import { type Change } from './Change.js';
+import { type Control } from './controls/Control.js';
 import { PagedResultsControl } from './controls/PagedResultsControl.js';
-import type { DN } from './dn/DN.js';
-import type { MessageParserError } from './errors/MessageParserError.js';
+import { type DN } from './dn/DN.js';
+import { type MessageParserError } from './errors/MessageParserError.js';
 import { FilterParser } from './FilterParser.js';
-import type { Filter } from './filters/Filter.js';
+import { type Filter } from './filters/Filter.js';
 import { PresenceFilter } from './filters/PresenceFilter.js';
 import { MessageParser } from './MessageParser.js';
 import { MessageResponseStatus } from './MessageResponseStatus.js';
@@ -31,9 +31,19 @@ import {
   SearchResponse,
   UnbindRequest,
 } from './messages/index.js';
-import type { AddResponse, BindResponse, CompareResponse, DeleteResponse, Entry, ExtendedResponse, ModifyDNResponse, ModifyResponse, SaslMechanism } from './messages/index.js';
-import type { Message } from './messages/Message.js';
-import type { MessageResponse } from './messages/MessageResponse.js';
+import {
+  type AddResponse,
+  type BindResponse,
+  type CompareResponse,
+  type DeleteResponse,
+  type Entry,
+  type ExtendedResponse,
+  type ModifyDNResponse,
+  type ModifyResponse,
+  type SaslMechanism,
+} from './messages/index.js';
+import { type Message } from './messages/Message.js';
+import { type MessageResponse } from './messages/MessageResponse.js';
 import { StatusCodeParser } from './StatusCodeParser.js';
 
 const MAX_MESSAGE_ID = 2 ** 31 - 1;

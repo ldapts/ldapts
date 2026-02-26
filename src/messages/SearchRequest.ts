@@ -1,11 +1,11 @@
-import type { BerReader, BerWriter } from '../ber/index.js';
-import type { SearchOptions } from '../Client.js';
+import { type BerReader, type BerWriter } from '../ber/index.js';
+import { type SearchOptions } from '../Client.js';
 import { FilterParser } from '../FilterParser.js';
-import type { Filter } from '../filters/Filter.js';
-import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { type Filter } from '../filters/Filter.js';
+import { type ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
-import type { MessageOptions } from './Message.js';
+import { type MessageOptions } from './Message.js';
 import { Message } from './Message.js';
 
 export interface SearchRequestMessageOptions extends MessageOptions, SearchOptions {

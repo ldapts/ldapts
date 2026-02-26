@@ -1,13 +1,13 @@
 import { EventEmitter } from 'node:events';
 
-import type { StrictEventEmitter } from 'strict-event-emitter-types';
+import { type StrictEventEmitter } from 'strict-event-emitter-types';
 
 import { BerReader } from './ber/index.js';
 import { MessageParserError } from './errors/MessageParserError.js';
 import { AddResponse, BindResponse, CompareResponse, DeleteResponse, ExtendedResponse, ModifyDNResponse, ModifyResponse, SearchEntry, SearchReference, SearchResponse } from './messages/index.js';
-import type { Message } from './messages/Message.js';
-import type { MessageResponse } from './messages/MessageResponse.js';
-import type { ProtocolOperationValues } from './ProtocolOperation.js';
+import { type Message } from './messages/Message.js';
+import { type MessageResponse } from './messages/MessageResponse.js';
+import { type ProtocolOperationValues } from './ProtocolOperation.js';
 import { ProtocolOperation } from './ProtocolOperation.js';
 
 interface MessageParserEvents {

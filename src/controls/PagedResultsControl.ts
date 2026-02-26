@@ -1,7 +1,7 @@
-import type { BerReader } from '../ber/index.js';
+import { type BerReader } from '../ber/index.js';
 import { Ber, BerWriter } from '../ber/index.js';
 
-import type { ControlOptions } from './Control.js';
+import { type ControlOptions } from './Control.js';
 import { Control } from './Control.js';
 
 export interface PagedResultsValue {

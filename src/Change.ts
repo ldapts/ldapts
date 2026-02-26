@@ -1,5 +1,5 @@
 import { Attribute } from './Attribute.js';
-import type { BerReader, BerWriter } from './ber/index.js';
+import { type BerReader, type BerWriter } from './ber/index.js';
 
 export interface ChangeOptions {
   operation?: 'add' | 'delete' | 'replace';

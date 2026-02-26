@@ -1,8 +1,8 @@
-import type { BerReader } from '../ber/index.js';
-import type { ProtocolOperationValues } from '../ProtocolOperation.js';
+import { type BerReader } from '../ber/index.js';
+import { type ProtocolOperationValues } from '../ProtocolOperation.js';
 import { ProtocolOperation } from '../ProtocolOperation.js';
 
-import type { MessageResponseOptions } from './MessageResponse.js';
+import { type MessageResponseOptions } from './MessageResponse.js';
 import { MessageResponse } from './MessageResponse.js';
 
 export interface ExtendedResponseOptions extends MessageResponseOptions {

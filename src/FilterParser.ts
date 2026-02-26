@@ -1,6 +1,6 @@
-import type { BerReader } from './ber/index.js';
-import type { ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
-import type { Filter } from './filters/Filter.js';
+import { type BerReader } from './ber/index.js';
+import { type ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
+import { type Filter } from './filters/Filter.js';
 import {
   AndFilter,
   ApproximateFilter,
