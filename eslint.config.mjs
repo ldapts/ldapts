@@ -8,6 +8,8 @@ export default [
     files: ['tests/**/*.ts'],
     rules: {
       '@typescript-eslint/no-confusing-void-expression': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
 ];
