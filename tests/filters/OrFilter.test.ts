@@ -1,13 +1,8 @@
-import * as chai from 'chai';
-import 'chai/register-should.js';
+import { describe, expect, it } from 'vitest';
 
 import { EqualityFilter, OrFilter } from '../../src/index.js';
 
 describe('OrFilter', () => {
-  before(() => {
-    chai.should();
-  });
-
   describe('#toString()', () => {
     it('should render sub filter toString values', () => {
       const displayNameFoo = new EqualityFilter({
@@ -25,7 +20,7 @@ describe('OrFilter', () => {
 
       const fooName = `(${displayNameFoo.escape(displayNameFoo.attribute)}=${displayNameFoo.escape(displayNameFoo.value)})`;
       const barName = `(${displayNameBar.escape(displayNameBar.attribute)}=${displayNameBar.escape(displayNameBar.value)})`;
-      filter.toString().should.equal(`(|${fooName}${barName})`);
+      expect(filter.toString()).toBe(`(|${fooName}${barName})`);
     });
   });
 });
