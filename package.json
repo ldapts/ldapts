@@ -25,7 +25,7 @@
   "scripts": {
     "build": "unbuild",
     "test": "npm run test:types && vitest run",
-    "test:types": "tsc --noEmit --skipLibCheck",
+    "test:types": "tsgo --noEmit --skipLibCheck",
     "test:imports": "node --no-experimental-require-module tests/import.tests.cjs && node tests/import.tests.mjs",
     "lint:markdown": "prettier --write '*.md' '!(node_modules|dist)/**/*.md' && markdownlint '*.md' '!(node_modules|dist)/**/*.md' --config=.github/linters/.markdown-lint.yml --fix",
     "lint:code": "eslint --fix",
@@ -79,6 +79,7 @@
     "@semantic-release/npm": "13.1.4",
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/node": ">=20",
+    "@typescript/native-preview": "7.0.0-dev.20260226.1",
     "eslint": "10.0.2",
     "eslint-config-decent": "4.0.0",
     "husky": "9.1.7",
