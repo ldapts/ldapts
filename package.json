@@ -79,7 +79,7 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/node": ">=20",
-    "@typescript/native-preview": "7.0.0-dev.20260317.1",
+    "@typescript/native-preview": "7.0.0-dev.20260318.1",
     "eslint": "10.0.3",
     "eslint-config-decent": "4.2.13",
     "husky": "9.1.7",
