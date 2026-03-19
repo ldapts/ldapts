@@ -81,7 +81,7 @@
     "@types/node": ">=20",
     "@typescript/native-preview": "7.0.0-dev.20260318.1",
     "eslint": "10.0.3",
-    "eslint-config-decent": "4.2.13",
+    "eslint-config-decent": "4.2.14",
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
     "markdownlint-cli": "0.48.0",
