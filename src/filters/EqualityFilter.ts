@@ -63,6 +63,6 @@ export class EqualityFilter extends Filter {
   }
 
   public override toString(): string {
-    return `(${this.escape(this.attribute)}=${this.escape(this.value)})`;
+    return `(${Filter.escape(this.attribute)}=${Filter.escape(this.value)})`;
   }
 }

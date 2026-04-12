@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EqualityFilter, NotFilter } from '../../src/index.js';
+import { EqualityFilter, Filter, NotFilter } from '../../src/index.js';
 
 describe('NotFilter', () => {
   describe('#toString()', () => {
@@ -14,7 +14,7 @@ describe('NotFilter', () => {
         filter: displayNameFoo,
       });
 
-      const fooName = `(${displayNameFoo.escape(displayNameFoo.attribute)}=${displayNameFoo.escape(displayNameFoo.value)})`;
+      const fooName = `(${Filter.escape(displayNameFoo.attribute)}=${Filter.escape(displayNameFoo.value)})`;
       expect(filter.toString()).toBe(`(!${fooName})`);
     });
   });
