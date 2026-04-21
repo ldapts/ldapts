@@ -28,7 +28,7 @@ export abstract class Filter {
    * @param {string|Buffer} input
    * @returns Escaped string
    */
-  public escape(input: Buffer | string): string {
+  public static escape(input: Buffer | string): string {
     let escapedResult = '';
     if (Buffer.isBuffer(input)) {
       for (const inputChar of input) {

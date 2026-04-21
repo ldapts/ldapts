@@ -433,6 +433,23 @@ Substrings are wildcard filters. They use `*` as the wildcard. You can put more
 than one wildcard for a given string. For example you could do `(email=*@*bar.com)`
 to match any email of @bar.com or its subdomains like "<example@foo.bar.com>".
 
+This also means that any search filter syntax characters, such as the wildcard
+character `*` or parentheses, must be escaped (RFC2254 §4 _String Search Filter
+Definition_) in order to search for them and to prevent such characters in a
+string from an untrusted source to be misinterpreted as syntax characters
+(preventing injection attacks).
+
+That can be done using the `Filter.escape()` utility function:
+
+```ts
+import { Filter } from 'ldapts';
+const value = 'x*x@foo.net';
+const filter = `(email=${Filter.escape(value)})`;
+```
+
+That'll create a search filter to search for an exact match of `x*x@foo.net`,
+not treating `*` as a wildcard character.
+
 Now, let's say we also want to set our filter to include a
 specification that either the employeeType _not_ be a manager nor a secretary:
 
