@@ -79,8 +79,8 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.0",
     "@types/node": ">=20",
-    "@typescript/native-preview": "7.0.0-dev.20260419.1",
-    "eslint": "10.2.1",
+    "@typescript/native-preview": "7.0.0-dev.20260506.1",
+    "eslint": "10.3.0",
     "eslint-config-decent": "4.2.37",
     "husky": "9.1.7",
     "lint-staged": "16.4.0",
@@ -92,6 +92,6 @@
     "semantic-release": "25.0.3",
     "typescript": "6.0.3",
     "unbuild": "3.6.1",
-    "vitest": "4.1.4"
+    "vitest": "4.1.5"
   }
 }
