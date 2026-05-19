@@ -1,11 +1,12 @@
 {
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
-  extends: ['config:recommended', ':semanticCommits', ':maintainLockFilesWeekly'],
+  extends: ['config:best-practices', ':semanticCommits'],
   timezone: 'America/Chicago',
   labels: ['dependencies'],
   rangeStrategy: 'pin',
   automerge: true,
   automergeType: 'pr',
+  osvVulnerabilityAlerts: true,
   packageRules: [
     {
       matchDepTypes: ['peerDependencies'],

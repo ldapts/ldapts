@@ -46,6 +46,7 @@ jobs:
           VALIDATE_JSCPD: false
           VALIDATE_JSON: false
           VALIDATE_JSONC: false
+          VALIDATE_JSONC_PRETTIER: false
           VALIDATE_JSON_PRETTIER: false
           VALIDATE_JAVASCRIPT_ES: false
           VALIDATE_JAVASCRIPT_PRETTIER: false
