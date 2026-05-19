@@ -79,8 +79,8 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
     "@types/node": ">=20",
-    "@typescript/native-preview": "7.0.0-dev.20260508.1",
-    "eslint": "10.3.0",
+    "@typescript/native-preview": "7.0.0-dev.20260516.1",
+    "eslint": "10.4.0",
     "eslint-config-decent": "4.2.37",
     "husky": "9.1.7",
     "lint-staged": "17.0.5",
@@ -92,7 +92,7 @@
     "semantic-release": "25.0.3",
     "typescript": "6.0.3",
     "unbuild": "3.6.1",
-    "vitest": "4.1.5"
+    "vitest": "4.1.6"
   },
   "overrides": {
     "unbuild": {
