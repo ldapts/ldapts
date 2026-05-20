@@ -66,6 +66,11 @@ export abstract class Filter {
     return escapedResult;
   }
 
+  /** @deprecated Use the static `Filter.escape()` instead. */
+  public escape(input: Buffer | string): string {
+    return Filter.escape(input);
+  }
+
   public abstract toString(): string;
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
