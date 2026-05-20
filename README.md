@@ -60,13 +60,13 @@ that this will not use the LDAP TLS extended operation, but literally an SSL
 connection to port 636, as in LDAP v2). The full set of options to create a
 client is:
 
-| Attribute      | Description                                                                                |
-| -------------- | ------------------------------------------------------------------------------------------ |
-| url            | A valid LDAP URL (proto/host/port only)                                                    |
-| timeout        | Milliseconds client should let operations live for before timing out (Default: Infinity)   |
-| connectTimeout | Milliseconds client should wait before timing out on TCP connections (Default: OS default) |
-| tlsOptions     | TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)  |
-| strictDN       | Force strict DN parsing for client methods (Default is true)                               |
+| Attribute        | Description                                                                                |
+| ---------------- | ------------------------------------------------------------------------------------------ |
+| `url`            | A valid LDAP URL (proto/host/port only)                                                    |
+| `timeout`        | Milliseconds client should let operations live for before timing out (Default: Infinity)   |
+| `connectTimeout` | Milliseconds client should wait before timing out on TCP connections (Default: OS default) |
+| `tlsOptions`     | TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)  |
+| `strictDN`       | Force strict DN parsing for client methods (Default is true)                               |
 
 ### Specifying Controls
 
@@ -418,7 +418,7 @@ for an attribute `email` with a value of `foo@bar.com`. The syntax would be:
 const filter = `(email=foo@bar.com)`;
 ```
 
-ldapts requires all filters to be surrounded by '()' blocks. Ok, that was easy.
+ldapts requires all filters to be surrounded by '()' blocks. OK, that was easy.
 Let's now assume that you want to find all records where the email is actually
 just anything in the "@bar.com" domain and the location attribute is set to
 Seattle:
@@ -584,7 +584,7 @@ try {
 }
 ```
 
-## `using` declaration with Typescript
+## `using` declaration with TypeScript
 
 For more details look have a look at [using Declarations and Explicit Resource Management](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-2.html)
 
