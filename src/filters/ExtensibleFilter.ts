@@ -86,17 +86,17 @@ export class ExtensibleFilter extends Filter {
   }
 
   public override toString(): string {
-    let result = `(${this.escape(this.matchType)}:`;
+    let result = `(${Filter.escape(this.matchType)}:`;
 
     if (this.dnAttributes) {
       result += 'dn:';
     }
 
     if (this.rule) {
-      result += `${this.escape(this.rule)}:`;
+      result += `${Filter.escape(this.rule)}:`;
     }
 
-    result += `=${this.escape(this.value)})`;
+    result += `=${Filter.escape(this.value)})`;
 
     return result;
   }

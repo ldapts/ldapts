@@ -36,6 +36,6 @@ export class PresenceFilter extends Filter {
   }
 
   public override toString(): string {
-    return `(${this.escape(this.attribute)}=*)`;
+    return `(${Filter.escape(this.attribute)}=*)`;
   }
 }

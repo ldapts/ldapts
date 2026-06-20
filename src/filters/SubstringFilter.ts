@@ -119,13 +119,13 @@ export class SubstringFilter extends Filter {
   }
 
   public override toString(): string {
-    let result = `(${this.escape(this.attribute)}=${this.escape(this.initial)}*`;
+    let result = `(${Filter.escape(this.attribute)}=${Filter.escape(this.initial)}*`;
 
     for (const anyItem of this.any) {
-      result += `${this.escape(anyItem)}*`;
+      result += `${Filter.escape(anyItem)}*`;
     }
 
-    result += `${this.escape(this.final)})`;
+    result += `${Filter.escape(this.final)})`;
 
     return result;
   }

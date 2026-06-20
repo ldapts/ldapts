@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { EqualityFilter, OrFilter } from '../../src/index.js';
+import { EqualityFilter, Filter, OrFilter } from '../../src/index.js';
 
 describe('OrFilter', () => {
   describe('#toString()', () => {
@@ -18,8 +18,8 @@ describe('OrFilter', () => {
         filters: [displayNameFoo, displayNameBar],
       });
 
-      const fooName = `(${displayNameFoo.escape(displayNameFoo.attribute)}=${displayNameFoo.escape(displayNameFoo.value)})`;
-      const barName = `(${displayNameBar.escape(displayNameBar.attribute)}=${displayNameBar.escape(displayNameBar.value)})`;
+      const fooName = `(${Filter.escape(displayNameFoo.attribute)}=${Filter.escape(displayNameFoo.value)})`;
+      const barName = `(${Filter.escape(displayNameBar.attribute)}=${Filter.escape(displayNameBar.value)})`;
       expect(filter.toString()).toBe(`(|${fooName}${barName})`);
     });
   });
