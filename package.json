@@ -86,7 +86,7 @@
     "lint-staged": "17.0.5",
     "markdownlint-cli": "0.48.0",
     "node-forge": "1.4.0",
-    "npm-run-all2": "8.0.4",
+    "npm-run-all2": "9.0.2",
     "pinst": "3.0.0",
     "prettier": "3.8.3",
     "semantic-release": "25.0.3",
