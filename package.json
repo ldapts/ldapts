@@ -79,20 +79,20 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
     "@types/node": ">=20",
-    "@typescript/native-preview": "7.0.0-dev.20260516.1",
-    "eslint": "10.4.0",
-    "eslint-config-decent": "4.2.37",
+    "@typescript/native-preview": "7.0.0-dev.20260629.1",
+    "eslint": "10.6.0",
+    "eslint-config-decent": "4.2.38",
     "husky": "9.1.7",
-    "lint-staged": "17.0.5",
-    "markdownlint-cli": "0.48.0",
+    "lint-staged": "17.0.8",
+    "markdownlint-cli": "0.49.0",
     "node-forge": "1.4.0",
     "npm-run-all2": "8.0.4",
     "pinst": "3.0.0",
-    "prettier": "3.8.3",
-    "semantic-release": "25.0.3",
+    "prettier": "3.9.3",
+    "semantic-release": "25.0.5",
     "typescript": "6.0.3",
     "unbuild": "3.6.1",
-    "vitest": "4.1.6"
+    "vitest": "4.1.9"
   },
   "overrides": {
     "unbuild": {
