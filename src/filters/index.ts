@@ -1,4 +1,5 @@
 export * from './Filter.js';
+export * from './escapeFilter.js';
 export * from './AndFilter.js';
 export * from './ApproximateFilter.js';
 export * from './EqualityFilter.js';

@@ -501,16 +501,27 @@ Definition_) in order to search for them and to prevent such characters in a
 string from an untrusted source to be misinterpreted as syntax characters
 (preventing injection attacks).
 
-That can be done using the `Filter.escape()` utility function:
+The easiest way to do that is the `escapeFilter` tagged template literal, which
+escapes every interpolated value while leaving the filter syntax itself alone:
+
+```ts
+import { escapeFilter } from 'ldapts';
+const value = 'x*x@foo.net';
+const filter = escapeFilter`(email=${value})`;
+```
+
+That'll create a search filter to search for an exact match of `x*x@foo.net`,
+not treating `*` as a wildcard character. Interpolated strings and Buffers are
+escaped; numbers and booleans are stringified.
+
+Individual values can also be escaped explicitly with the `Filter.escape()`
+utility function:
 
 ```ts
 import { Filter } from 'ldapts';
 const value = 'x*x@foo.net';
 const filter = `(email=${Filter.escape(value)})`;
 ```
-
-That'll create a search filter to search for an exact match of `x*x@foo.net`,
-not treating `*` as a wildcard character.
 
 Now, let's say we also want to set our filter to include a
 specification that either the employeeType _not_ be a manager nor a secretary:
