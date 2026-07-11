@@ -1,5 +1,7 @@
 import { promises as fs } from 'node:fs';
+import * as net from 'node:net';
 import * as path from 'node:path';
+import * as tls from 'node:tls';
 import { fileURLToPath } from 'node:url';
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
@@ -463,6 +465,71 @@ describe('Client', () => {
       });
 
       await client.startTLS();
+      await client.bind(BIND_DN, BIND_PW);
+      await expect(client.unbind()).resolves.toBeUndefined();
+    });
+  });
+
+  describe('custom connection factories', () => {
+    it('should use createConnection for ldap:// connections', async () => {
+      const createConnection = vi.fn<typeof net.connect>(net.connect);
+      const client = new Client({
+        url: LDAP_URI,
+        createConnection: createConnection as unknown as typeof net.connect,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+
+      expect(createConnection).toHaveBeenCalledTimes(1);
+      expect(createConnection).toHaveBeenCalledWith(389, 'localhost');
+
+      await client.unbind();
+    });
+
+    it('should support createConnection returning an already-established socket', async () => {
+      const socket = net.connect(389, 'localhost');
+      await new Promise<void>((resolve, reject) => {
+        socket.once('connect', () => {
+          resolve();
+        });
+        socket.once('error', reject);
+      });
+
+      const client = new Client({
+        url: LDAP_URI,
+        createConnection: () => socket,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+      await expect(client.unbind()).resolves.toBeUndefined();
+    });
+
+    it('should use createSecureConnection for ldaps:// connections', async () => {
+      const createSecureConnection = vi.fn<typeof tls.connect>(tls.connect);
+      const client = new Client({
+        url: SECURE_LDAP_URI,
+        createSecureConnection: createSecureConnection as unknown as typeof tls.connect,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+
+      expect(createSecureConnection).toHaveBeenCalledTimes(1);
+      expect(createSecureConnection).toHaveBeenCalledWith(636, 'localhost', undefined);
+
+      await client.unbind();
+    });
+
+    it('should use createSecureConnection for startTLS() upgrades', async () => {
+      const createSecureConnection = vi.fn<typeof tls.connect>(tls.connect);
+      const client = new Client({
+        url: LDAP_URI,
+        createSecureConnection: createSecureConnection as unknown as typeof tls.connect,
+      });
+
+      await client.startTLS();
+
+      expect(createSecureConnection).toHaveBeenCalledTimes(1);
+
       await client.bind(BIND_DN, BIND_PW);
       await expect(client.unbind()).resolves.toBeUndefined();
     });

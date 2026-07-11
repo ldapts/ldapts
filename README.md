@@ -60,13 +60,38 @@ that this will not use the LDAP TLS extended operation, but literally an SSL
 connection to port 636, as in LDAP v2). The full set of options to create a
 client is:
 
-| Attribute        | Description                                                                                |
-| ---------------- | ------------------------------------------------------------------------------------------ |
-| `url`            | A valid LDAP URL (proto/host/port only)                                                    |
-| `timeout`        | Milliseconds client should let operations live for before timing out (Default: Infinity)   |
-| `connectTimeout` | Milliseconds client should wait before timing out on TCP connections (Default: OS default) |
-| `tlsOptions`     | TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)  |
-| `strictDN`       | Force strict DN parsing for client methods (Default is true)                               |
+| Attribute                | Description                                                                                                 |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `url`                    | A valid LDAP URL (proto/host/port only)                                                                     |
+| `timeout`                | Milliseconds client should let operations live for before timing out (Default: Infinity)                    |
+| `connectTimeout`         | Milliseconds client should wait before timing out on TCP connections (Default: OS default)                  |
+| `tlsOptions`             | TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)                   |
+| `strictDN`               | Force strict DN parsing for client methods (Default is true)                                                |
+| `createConnection`       | Custom connection factory for `ldap://` urls. Called with the parsed port and host (Default: `net.connect`) |
+| `createSecureConnection` | Custom connection factory for `ldaps://` urls and `startTLS()` upgrades (Default: `tls.connect`)            |
+
+#### Custom connection factories
+
+If you need control over how the underlying socket is created — a proxied or tunneled
+connection, a unix socket, a pre-established socket, or a non-Node transport — pass a
+`createConnection` (for `ldap://`) and/or `createSecureConnection` (for `ldaps://` and
+`startTLS()`) function. When omitted, the client uses `net.connect`/`tls.connect` as before.
+
+```ts
+import * as net from 'node:net';
+import { Client } from 'ldapts';
+
+const socket = net.connect(389, '192.168.2.163');
+
+const client = new Client({
+  url: 'ldap://192.168.2.163:389',
+  createConnection: () => socket,
+});
+```
+
+Note that the client transparently reconnects when it is used after being unbound or after the
+server closes the connection, so the factory may be invoked more than once and should generally
+create a fresh connection per call.
 
 ### Specifying Controls
 

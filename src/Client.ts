@@ -72,6 +72,19 @@ export interface ClientOptions {
    * Force strict DN parsing for client methods (Default: true)
    */
   strictDN?: boolean;
+  /**
+   * Custom function used to create the connection when connecting via ldap://. Called with the
+   * parsed port and host from the url. Defaults to `net.connect`. Useful for supplying your own
+   * transport: a proxied or tunneled connection, a unix socket, or an existing socket
+   * (e.g. `createConnection: () => myExistingSocket`).
+   */
+  createConnection?: typeof net.connect;
+  /**
+   * Custom function used to create the connection when connecting via ldaps:// (called with the
+   * parsed port, host, and `tlsOptions`), and to upgrade the connection during `startTLS()`
+   * (called with the connection options for the existing socket). Defaults to `tls.connect`.
+   */
+  createSecureConnection?: typeof tls.connect;
 }
 
 interface MessageDetails {
@@ -249,7 +262,8 @@ export class Client {
     }
 
     this.socket = await new Promise((resolve: (value: SocketWithId) => void, reject: (reason: Error) => void) => {
-      const secureSocket = tls.connect(options);
+      const createSecureConnection = this.clientOptions.createSecureConnection ?? tls.connect;
+      const secureSocket = createSecureConnection(options);
       secureSocket.once('secureConnect', () => {
         secureSocket.removeAllListeners('error');
 
@@ -831,13 +845,15 @@ export class Client {
 
     return new Promise((resolve, reject) => {
       if (this.secure) {
-        this.socket = tls.connect(this.port, this.host, this.clientOptions.tlsOptions);
+        const createSecureConnection = this.clientOptions.createSecureConnection ?? tls.connect;
+        this.socket = createSecureConnection(this.port, this.host, this.clientOptions.tlsOptions);
         this.socket.id = crypto.randomUUID();
         this.socket.once('secureConnect', () => {
           this._onConnect(resolve);
         });
       } else {
-        this.socket = net.connect(this.port, this.host);
+        const createConnection = this.clientOptions.createConnection ?? net.connect;
+        this.socket = createConnection(this.port, this.host);
         this.socket.id = crypto.randomUUID();
         this.socket.once('connect', () => {
           this._onConnect(resolve);
@@ -848,6 +864,13 @@ export class Client {
         this._destroySocket(this.socket);
         reject(err);
       });
+
+      // A custom connection factory can return a socket that is already established, which will
+      // not emit another 'connect'/'secureConnect' event.
+      if (!this.socket.connecting && this.socket.readyState === 'open') {
+        this._onConnect(resolve);
+        return;
+      }
 
       if (this.clientOptions.connectTimeout) {
         this.connectTimer = setTimeout(() => {
