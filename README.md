@@ -67,14 +67,14 @@ client is:
 | `connectTimeout`         | Milliseconds client should wait before timing out on TCP connections (Default: OS default)                  |
 | `tlsOptions`             | TLS [connect() options](https://nodejs.org/api/tls.html#tls_tls_connect_options_callback)                   |
 | `strictDN`               | Force strict DN parsing for client methods (Default is true)                                                |
-| `createConnection`       | Custom connection factory for `ldap://` urls. Called with the parsed port and host (Default: `net.connect`) |
-| `createSecureConnection` | Custom connection factory for `ldaps://` urls and `startTLS()` upgrades (Default: `tls.connect`)            |
+| `createConnection`       | Custom connection factory for `ldap://` URLs. Called with the parsed port and host (Default: `net.connect`) |
+| `createSecureConnection` | Custom connection factory for `ldaps://` URLs and `startTLS()` upgrades (Default: `tls.connect`)            |
 | `autoRebind`             | Automatically replay the last successful bind after the connection is re-established (Default: false)       |
 
 #### Custom connection factories
 
 If you need control over how the underlying socket is created — a proxied or tunneled
-connection, a unix socket, a pre-established socket, or a non-Node transport — pass a
+connection, a Unix socket, a pre-established socket, or a non-Node transport — pass a
 `createConnection` (for `ldap://`) and/or `createSecureConnection` (for `ldaps://` and
 `startTLS()`) function. When omitted, the client uses `net.connect`/`tls.connect` as before.
 
