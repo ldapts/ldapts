@@ -7,6 +7,7 @@
   automerge: true,
   automergeType: 'pr',
   osvVulnerabilityAlerts: true,
+  postUpdateOptions: ['pnpmDedupe'],
   packageRules: [
     {
       matchDepTypes: ['peerDependencies'],

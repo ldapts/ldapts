@@ -2,7 +2,8 @@
   "name": "ldapts",
   "features": {
     "ghcr.io/devcontainers/features/node:2": {
-      "version": "lts"
+      "version": "lts",
+      "pnpmVersion": "latest"
     }
   },
   "customizations": {
@@ -12,5 +13,5 @@
       ]
     }
   },
-  "postCreateCommand": "npm install"
+  "postCreateCommand": "pnpm install"
 }

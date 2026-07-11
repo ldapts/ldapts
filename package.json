@@ -22,9 +22,10 @@
     "dist",
     "src"
   ],
+  "packageManager": "pnpm@11.11.0",
   "scripts": {
     "build": "unbuild",
-    "test": "npm run test:types && vitest run",
+    "test": "pnpm run test:types && vitest run",
     "test:types": "tsgo --noEmit --skipLibCheck",
     "test:imports": "node --no-experimental-require-module tests/import.tests.cjs && node tests/import.tests.mjs",
     "lint:markdown": "prettier --write '*.md' '!(node_modules|dist)/**/*.md' && markdownlint '*.md' '!(node_modules|dist)/**/*.md' --config=.github/linters/.markdown-lint.yml --fix",
@@ -33,7 +34,7 @@
     "lint-staged": "lint-staged",
     "docker:up": "docker compose up -d --wait",
     "docker:down": "docker compose down",
-    "beta": "npm publish --tag beta",
+    "beta": "pnpm publish --tag beta",
     "prepublishOnly": "pinst --disable",
     "postpublish": "pinst --enable",
     "prepare": "husky"
@@ -75,28 +76,30 @@
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/commit-analyzer": "13.0.1",
     "@semantic-release/git": "10.0.1",
-    "@semantic-release/github": "12.0.8",
+    "@semantic-release/github": "12.0.9",
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
+    "@stylistic/eslint-plugin": "5.10.0",
     "@types/node": ">=20",
-    "@typescript/native-preview": "7.0.0-dev.20260516.1",
-    "eslint": "10.4.0",
-    "eslint-config-decent": "4.2.37",
+    "@typescript/native-preview": "7.0.0-dev.20260707.2",
+    "@vitest/eslint-plugin": "1.6.16",
+    "eslint": "10.6.0",
+    "eslint-config-decent": "4.2.38",
+    "eslint-plugin-jsdoc": "62.9.0",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-security": "4.0.0",
+    "eslint-plugin-testing-library": "7.16.2",
+    "eslint-plugin-unicorn": "64.0.0",
     "husky": "9.1.7",
-    "lint-staged": "17.0.5",
-    "markdownlint-cli": "0.48.0",
+    "lint-staged": "17.0.8",
+    "markdownlint-cli": "0.49.0",
     "node-forge": "1.4.0",
-    "npm-run-all2": "8.0.4",
+    "npm-run-all2": "9.0.2",
     "pinst": "3.0.0",
-    "prettier": "3.8.3",
-    "semantic-release": "25.0.3",
+    "prettier": "3.9.5",
+    "semantic-release": "25.0.5",
     "typescript": "6.0.3",
     "unbuild": "3.6.1",
-    "vitest": "4.1.6"
-  },
-  "overrides": {
-    "unbuild": {
-      "typescript": "$typescript"
-    }
+    "vitest": "4.1.10"
   }
 }
