@@ -10,6 +10,7 @@
     "rootDir": ".",
 
     "declaration": true,
+    "isolatedDeclarations": true,
     "sourceMap": true,
     "sourceRoot": ".",
 
@@ -25,13 +26,6 @@
 
     "types": ["node"]
   },
-  "include": [
-    "src/**/*",
-    "tests/**/*",
-    "vitest.config.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "include": ["src/**/*", "tests/**/*", "vite.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

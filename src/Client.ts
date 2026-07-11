@@ -1008,15 +1008,6 @@ export class Client {
 
     const messageContentBuffer = message.write();
 
-    const messageTimeoutId = this.clientOptions.timeout
-      ? setTimeout(() => {
-          const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
-          if (messageDetails) {
-            this._destroySocket(messageDetails.socket);
-            messageReject(new Error(`${message.constructor.name}: Operation timed out`));
-          }
-        }, this.clientOptions.timeout)
-      : null;
     // eslint-disable-next-line func-style
     let messageResolve: (messageResponse?: TMessageResponse) => void = () => {
       // Ignore this as a NOOP
@@ -1026,6 +1017,16 @@ export class Client {
     let messageReject: (err: Error) => void = () => {
       // Ignore this as a NOOP
     };
+
+    const messageTimeoutId = this.clientOptions.timeout
+      ? setTimeout(() => {
+          const messageDetails = this.messageDetailsByMessageId.get(message.messageId.toString());
+          if (messageDetails) {
+            this._destroySocket(messageDetails.socket);
+            messageReject(new Error(`${message.constructor.name}: Operation timed out`));
+          }
+        }, this.clientOptions.timeout)
+      : null;
 
     const sendPromise = new Promise<TMessageResponse | undefined>((resolve, reject) => {
       messageResolve = resolve;
@@ -1099,7 +1100,7 @@ export class Client {
         }
 
         this.messageDetailsByMessageId.delete(message.messageId.toString());
-        messageDetails.resolve(message as MessageResponse);
+        messageDetails.resolve(message);
       } else {
         this.messageDetailsByMessageId.delete(message.messageId.toString());
         messageDetails.resolve(message as MessageResponse);
