@@ -1,3 +1,5 @@
+Release notes for versions after 8.1.8 are published on [GitHub Releases](https://github.com/ldapts/ldapts/releases).
+
 ## [8.1.8](https://github.com/ldapts/ldapts/compare/v8.1.7...v8.1.8) (2026-05-19)
 
 ## [8.1.7](https://github.com/ldapts/ldapts/compare/v8.1.6...v8.1.7) (2026-02-27)
