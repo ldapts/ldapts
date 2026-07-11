@@ -66,7 +66,12 @@ export abstract class Filter {
     return escapedResult;
   }
 
-  /** @deprecated Use the static `Filter.escape()` instead. */
+  /**
+   * Escapes the provided value so it can safely be embedded in a filter string.
+   * @param {Buffer|string} input - Value to escape
+   * @returns {string} Escaped value
+   * @deprecated Use the static `Filter.escape()` instead.
+   */
   public escape(input: Buffer | string): string {
     return Filter.escape(input);
   }

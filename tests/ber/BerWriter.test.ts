@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { Ber, BerReader, BerWriter } from '../../src/ber/index.js';
 

@@ -17,7 +17,9 @@ interface MessageParserEvents {
 
 type MessageParserEmitter = StrictEventEmitter<EventEmitter, MessageParserEvents>;
 
-export class MessageParser extends (EventEmitter as new () => MessageParserEmitter) {
+const TypedEventEmitter: new () => MessageParserEmitter = EventEmitter;
+
+export class MessageParser extends TypedEventEmitter {
   private buffer?: Buffer;
 
   public read(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): void {

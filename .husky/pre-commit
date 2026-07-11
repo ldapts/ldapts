@@ -1,4 +1,4 @@
 PATH=$PATH:/usr/local/bin:/opt/homebrew/bin
 
-echo 'NOTE: If node or npm is not found, you may need to run brew link for your specific node version'
-npm run lint-staged
+echo 'NOTE: If node or pnpm is not found, you may need to run brew link for your specific node version'
+pnpm run lint-staged

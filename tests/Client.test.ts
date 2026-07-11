@@ -2,7 +2,7 @@ import { promises as fs } from 'node:fs';
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 
 import { type BerReader, type BerWriter } from '../src/ber/index.js';
 import { type AddRequest, type ModifyDNRequest } from '../src/index.js';
@@ -1141,7 +1141,7 @@ describe('Client', () => {
 
   describe('#disposable', () => {
     it('should unbind after disposed', async () => {
-      const spy = vi.fn();
+      const spy = vi.fn<(client: Client, method: string) => void>();
 
       try {
         await using client = new Client({

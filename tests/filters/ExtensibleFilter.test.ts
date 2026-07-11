@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { type BerWriter } from '../../src/ber/index.js';
 import { ExtensibleFilter } from '../../src/index.js';
@@ -13,8 +13,8 @@ describe('ExtensibleFilter', () => {
       });
 
       const berWriter = {
-        writeString: vi.fn(),
-        writeBoolean: vi.fn(),
+        writeString: vi.fn<(value: string) => void>(),
+        writeBoolean: vi.fn<(value: boolean) => void>(),
       } as unknown as BerWriter;
 
       filter.writeFilter(berWriter);

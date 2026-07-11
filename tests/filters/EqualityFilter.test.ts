@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vite-plus/test';
 
 import { type BerWriter } from '../../src/ber/index.js';
 import { EqualityFilter } from '../../src/index.js';
@@ -11,7 +11,7 @@ describe('EqualityFilter', () => {
         value: 'Parens R Us (for all your parenthetical needs)',
       });
 
-      const berWriter = { writeString: vi.fn() } as unknown as BerWriter;
+      const berWriter = { writeString: vi.fn<(value: string) => void>() } as unknown as BerWriter;
 
       filter.writeFilter(berWriter);
 
@@ -28,7 +28,7 @@ describe('EqualityFilter', () => {
         value: 'My group (something)',
       });
 
-      const berWriter = { writeString: vi.fn() } as unknown as BerWriter;
+      const berWriter = { writeString: vi.fn<(value: string) => void>() } as unknown as BerWriter;
 
       filter.writeFilter(berWriter);
 

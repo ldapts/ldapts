@@ -1,5 +1,5 @@
 /* eslint-disable no-useless-concat */
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from 'vite-plus/test';
 
 import { Ber, BerReader } from '../../src/ber/index.js';
 
