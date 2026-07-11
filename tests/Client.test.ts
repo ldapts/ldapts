@@ -535,6 +535,85 @@ describe('Client', () => {
     });
   });
 
+  describe('#autoRebind', () => {
+    const WHO_AM_I_OID = '1.3.6.1.4.1.4203.1.11.3';
+
+    it('should expose bind state via isBound', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+      });
+
+      expect(client.isBound).toBe(false);
+
+      await client.bind(BIND_DN, BIND_PW);
+      expect(client.isBound).toBe(true);
+
+      await client.unbind();
+      expect(client.isBound).toBe(false);
+    });
+
+    it('should rebind automatically when the connection is re-established', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+        autoRebind: true,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+
+      // Simulate the server unexpectedly dropping the connection
+      // @ts-expect-error - private field
+      client.socket.destroy();
+      await vi.waitFor(() => {
+        expect(client.isConnected).toBe(false);
+      });
+
+      const result = await client.exop(WHO_AM_I_OID);
+
+      expect(client.isBound).toBe(true);
+      expect(result.value).toContain('cn=admin');
+
+      await client.unbind();
+    });
+
+    it('should reconnect anonymously when autoRebind is not enabled', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+
+      // @ts-expect-error - private field
+      client.socket.destroy();
+      await vi.waitFor(() => {
+        expect(client.isConnected).toBe(false);
+      });
+
+      const result = await client.exop(WHO_AM_I_OID);
+
+      expect(client.isBound).toBe(false);
+      expect(result.value ?? '').not.toContain('cn=admin');
+
+      await client.unbind();
+    });
+
+    it('should not rebind after an explicit unbind', async () => {
+      const client = new Client({
+        url: LDAP_URI,
+        autoRebind: true,
+      });
+
+      await client.bind(BIND_DN, BIND_PW);
+      await client.unbind();
+
+      const result = await client.exop(WHO_AM_I_OID);
+
+      expect(client.isBound).toBe(false);
+      expect(result.value ?? '').not.toContain('cn=admin');
+
+      await client.unbind();
+    });
+  });
+
   describe('#unbind()', () => {
     it('should succeed on basic unbind after successful bind', async () => {
       const client = new Client({
