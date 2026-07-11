@@ -92,7 +92,7 @@
       "vp lint --fix"
     ],
     "*.{json,json5,yml,yaml}": [
-      "vp fmt"
+      "vp fmt --no-error-on-unmatched-pattern"
     ]
   },
   "engines": {
