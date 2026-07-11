@@ -65,7 +65,7 @@
     "@semantic-release/npm": "13.1.5",
     "@semantic-release/release-notes-generator": "14.1.1",
     "@stylistic/eslint-plugin": "5.10.0",
-    "@types/node": ">=20",
+    "@types/node": ">=22",
     "eslint-config-decent": "4.2.38",
     "eslint-plugin-jsdoc": "62.9.0",
     "eslint-plugin-security": "4.0.1",
@@ -96,7 +96,7 @@
     ]
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "packageManager": "pnpm@11.11.0"
 }

@@ -168,9 +168,6 @@ export interface SearchResult {
   searchReferences: string[];
 }
 
-// @ts-expect-error - Polyfill Symbol.asyncDispose for Node < 22
-Symbol.asyncDispose ??= Symbol('Symbol.asyncDispose');
-
 export class Client {
   private clientOptions: ClientOptions;
 

@@ -43,7 +43,7 @@ importers:
         specifier: 5.10.0
         version: 5.10.0(eslint@10.6.0)
       '@types/node':
-        specifier: '>=20'
+        specifier: '>=22'
         version: 26.1.1
       eslint-config-decent:
         specifier: 4.2.38
