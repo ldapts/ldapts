@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "8.2.0",
+  "version": "9.0.0",
   "description": "LDAP client",
   "keywords": [
     "active",

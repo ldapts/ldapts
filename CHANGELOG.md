@@ -1,3 +1,20 @@
+# [9.0.0](https://github.com/ldapts/ldapts/compare/v8.2.0...v9.0.0) (2026-07-11)
+
+- chore!: require Node.js 22 or newer and remove deprecated Filter#escape shim ([#439](https://github.com/ldapts/ldapts/issues/439)) ([bc1b4d4](https://github.com/ldapts/ldapts/commit/bc1b4d4b9052ed930f1d9cc6010e1f41cd6d160d)), closes [Filter#escape](https://github.com/Filter/issues/escape) [Filter#escape](https://github.com/Filter/issues/escape) [#269](https://github.com/ldapts/ldapts/issues/269) [#348](https://github.com/ldapts/ldapts/issues/348) [#141](https://github.com/ldapts/ldapts/issues/141) [Filter#escape](https://github.com/Filter/issues/escape) [#401](https://github.com/ldapts/ldapts/issues/401) [#437](https://github.com/ldapts/ldapts/issues/437)
+
+### BREAKING CHANGES
+
+- Node.js >= 22 is now required.
+- The deprecated `Filter#escape` instance method has been removed. Use the static `Filter.escape()` instead.
+
+- docs: fix terminology in connection factory docs
+
+- fix: allow lint-staged to commit ignored yaml files like pnpm-lock.yaml
+
+oxfmt exits non-zero when every file passed on the command line is excluded
+by ignore rules, which made any commit that staged pnpm-lock.yaml fail the
+pre-commit hook.
+
 # [8.2.0](https://github.com/ldapts/ldapts/compare/v8.1.8...v8.2.0) (2026-07-11)
 
 ### Bug Fixes
