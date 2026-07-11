@@ -1,3 +1,16 @@
+# [8.2.0](https://github.com/ldapts/ldapts/compare/v8.1.8...v8.2.0) (2026-07-11)
+
+### Bug Fixes
+
+- make Filter.escape() work as intended and document it ([#141](https://github.com/ldapts/ldapts/issues/141)) ([#401](https://github.com/ldapts/ldapts/issues/401)) ([eb17d99](https://github.com/ldapts/ldapts/commit/eb17d9952c0b5212a043d2d05cd2592633a2e6f3))
+- release with a GitHub App token so the changelog commit can push to main ([#440](https://github.com/ldapts/ldapts/issues/440)) ([379a1aa](https://github.com/ldapts/ldapts/commit/379a1aafde30672f05bfe4c1d53d6dd69a3b6b64))
+
+### Features
+
+- add escapeFilter tagged template literal ([#141](https://github.com/ldapts/ldapts/issues/141)) ([#436](https://github.com/ldapts/ldapts/issues/436)) ([8b36980](https://github.com/ldapts/ldapts/commit/8b36980816a65014c110038c3554821a91832f32)), closes [Filter#escape](https://github.com/Filter/issues/escape) [#269](https://github.com/ldapts/ldapts/issues/269) [#348](https://github.com/ldapts/ldapts/issues/348)
+- allow custom connection factories ([#269](https://github.com/ldapts/ldapts/issues/269)) ([#434](https://github.com/ldapts/ldapts/issues/434)) ([952aa6c](https://github.com/ldapts/ldapts/commit/952aa6cde969c98cd41aa727c082a1a86cbd263b)), closes [Filter#escape](https://github.com/Filter/issues/escape)
+- optionally rebind automatically after reconnecting ([#348](https://github.com/ldapts/ldapts/issues/348)) ([#435](https://github.com/ldapts/ldapts/issues/435)) ([a02278d](https://github.com/ldapts/ldapts/commit/a02278d85c6d86a86338e42d2040698606754207)), closes [Filter#escape](https://github.com/Filter/issues/escape) [#269](https://github.com/ldapts/ldapts/issues/269)
+
 ## [8.1.8](https://github.com/ldapts/ldapts/compare/v8.1.7...v8.1.8) (2026-05-19)
 
 ## [8.1.7](https://github.com/ldapts/ldapts/compare/v8.1.6...v8.1.7) (2026-02-27)
