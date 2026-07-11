@@ -69,6 +69,7 @@ client is:
 | `strictDN`               | Force strict DN parsing for client methods (Default is true)                                                |
 | `createConnection`       | Custom connection factory for `ldap://` URLs. Called with the parsed port and host (Default: `net.connect`) |
 | `createSecureConnection` | Custom connection factory for `ldaps://` URLs and `startTLS()` upgrades (Default: `tls.connect`)            |
+| `autoRebind`             | Automatically replay the last successful bind after the connection is re-established (Default: false)       |
 
 #### Custom connection factories
 
@@ -92,6 +93,42 @@ const client = new Client({
 Note that the client transparently reconnects when it is used after being unbound or after the
 server closes the connection, so the factory may be invoked more than once and should generally
 create a fresh connection per call.
+
+#### Automatic rebind
+
+The client transparently reconnects when an operation is issued after the server closed the
+connection (idle timeout, restart, network hiccup). By default that new connection is
+**unauthenticated**, which historically required this workaround before every operation:
+
+```ts
+if (!client.isConnected) {
+  await client.bind(bindDN, password);
+}
+```
+
+With `autoRebind: true`, the client remembers the last successful `bind()` and replays it
+automatically after reconnecting:
+
+```ts
+const client = new Client({
+  url: 'ldap://localhost:389',
+  autoRebind: true,
+});
+
+await client.bind(bindDN, password);
+// ...hours later, after the server dropped the connection...
+const result = await client.search(searchDN); // reconnects and rebinds automatically
+```
+
+You can also check the current authentication state with `client.isBound`, which becomes `false`
+whenever the connection is closed or re-established.
+
+Things to be aware of:
+
+- The bind credentials are kept in memory for the lifetime of the client. `unbind()` clears them.
+- Sessions upgraded with `startTLS()` are not automatically rebound: the replayed bind would be
+  sent before the fresh connection could be upgraded again, so credentials bound after a
+  `startTLS()` upgrade are never cached.
 
 ### Specifying Controls
 

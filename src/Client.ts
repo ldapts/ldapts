@@ -85,6 +85,17 @@ export interface ClientOptions {
    * (called with the connection options for the existing socket). Defaults to `tls.connect`.
    */
   createSecureConnection?: typeof tls.connect;
+  /**
+   * When true, the client remembers the last successful bind and automatically replays it after
+   * the connection is transparently re-established (e.g. when the server closed an idle
+   * connection). Without this, operations that trigger a reconnect run on an unauthenticated
+   * connection. (Default: false)
+   *
+   * Note: the last bind credentials are retained in memory for the lifetime of the client (they
+   * are cleared by `unbind()`), and rebinding is not applied to sessions upgraded with
+   * `startTLS()` since the replayed bind would occur before the connection is upgraded again.
+   */
+  autoRebind?: boolean;
 }
 
 interface MessageDetails {
@@ -173,6 +184,12 @@ export class Client {
 
   private connected = false;
 
+  private bound = false;
+
+  private startTLSUpgraded = false;
+
+  private rebind?: () => Promise<void>;
+
   private socket?: SocketWithId;
 
   private connectTimer?: NodeJS.Timeout;
@@ -246,6 +263,16 @@ export class Client {
     return !!this.socket && this.connected;
   }
 
+  /**
+   * True when the current connection has successfully bound. Becomes false when the connection
+   * is closed or re-established, which makes it possible to detect a connection that was
+   * transparently reconnected but is no longer authenticated.
+   * @returns {boolean} True if the current connection is authenticated
+   */
+  public get isBound(): boolean {
+    return this.isConnected && this.bound;
+  }
+
   public async startTLS(options: tls.ConnectionOptions = {}, controls?: Control | Control[]): Promise<void> {
     if (!this.isConnected) {
       await this._connect();
@@ -286,6 +313,8 @@ export class Client {
       // Allows pending messages and unbind responses to be handled and cleaned up
       this.socket.id = originalSocket.id;
     }
+
+    this.startTLSUpgraded = true;
   }
 
   /**
@@ -312,6 +341,7 @@ export class Client {
       controls,
     });
     await this._sendBind(req);
+    this._onBindSuccess(() => this.bind(dnOrSaslMechanism, password, controls));
   }
 
   /**
@@ -333,6 +363,7 @@ export class Client {
       controls,
     });
     await this._sendBind(req);
+    this._onBindSuccess(() => this.bindSASL(mechanism, password, controls));
   }
 
   /**
@@ -342,9 +373,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async add(dn: DN | string, attributes: Attribute[] | Record<string, string[] | string>, controls?: Control | Control[]): Promise<void> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -398,9 +427,7 @@ export class Client {
    * @returns true if attribute and value match; otherwise false
    */
   public async compare(dn: DN | string, attribute: string, value: string, controls?: Control | Control[]): Promise<boolean> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -432,9 +459,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async del(dn: DN | string, controls?: Control | Control[]): Promise<void> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -460,9 +485,7 @@ export class Client {
    * @returns exop result
    */
   public async exop(oid: string, value?: Buffer | string, controls?: Control | Control[]): Promise<{ oid?: string; value?: string }> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -493,9 +516,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async modify(dn: DN | string, changes: Change | Change[], controls?: Control | Control[]): Promise<void> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (!Array.isArray(changes)) {
       changes = [changes];
@@ -525,9 +546,7 @@ export class Client {
    * @param {Control|Control[]} [controls]
    */
   public async modifyDN(dn: DN | string, newDN: DN | string, controls?: Control | Control[]): Promise<void> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls && !Array.isArray(controls)) {
       controls = [controls];
@@ -580,9 +599,7 @@ export class Client {
    * @returns {Promise<SearchResult>}
    */
   public async search(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): Promise<SearchResult> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls) {
       if (Array.isArray(controls)) {
@@ -657,9 +674,7 @@ export class Client {
   }
 
   public async *searchPaginated(baseDN: DN | string, options: SearchOptions = {}, controls?: Control | Control[]): AsyncGenerator<SearchResult> {
-    if (!this.isConnected) {
-      await this._connect();
-    }
+    await this._ensureConnected();
 
     if (controls) {
       if (Array.isArray(controls)) {
@@ -737,6 +752,8 @@ export class Client {
    */
   public async unbind(): Promise<void> {
     try {
+      this.rebind = undefined;
+
       if (!this.connected || !this.socket) {
         return;
       }
@@ -831,6 +848,40 @@ export class Client {
     }
 
     return this.messageId;
+  }
+
+  /**
+   * Records a successful bind and, when autoRebind is enabled, remembers how to replay it after
+   * a transparent reconnect. Binds on a startTLS-upgraded session are not replayed: the rebind
+   * happens before the fresh connection could be upgraded again, so replaying would downgrade
+   * the security of the credentials.
+   * @param {Function} rebind - Replays the bind that just succeeded
+   * @private
+   */
+  private _onBindSuccess(rebind: () => Promise<void>): void {
+    this.bound = true;
+
+    if (this.clientOptions.autoRebind && !this.startTLSUpgraded) {
+      this.rebind = rebind;
+    }
+  }
+
+  /**
+   * Ensures the socket connection is established and, when autoRebind is enabled, replays the
+   * last successful bind on a freshly re-established connection.
+   * @returns {Promise<void>}
+   * @private
+   */
+  private async _ensureConnected(): Promise<void> {
+    if (this.isConnected) {
+      return;
+    }
+
+    await this._connect();
+
+    if (this.rebind && !this.bound) {
+      await this.rebind();
+    }
   }
 
   /**
@@ -953,6 +1004,8 @@ export class Client {
 
       if (this === clientInstance.socket) {
         clientInstance.connected = false;
+        clientInstance.bound = false;
+        clientInstance.startTLSUpgraded = false;
         delete clientInstance.socket;
 
         if (clientInstance.connectTimer) {
@@ -1012,6 +1065,8 @@ export class Client {
 
       if (socket === this.socket) {
         this.connected = false;
+        this.bound = false;
+        this.startTLSUpgraded = false;
         this.socket = undefined;
       }
     }
