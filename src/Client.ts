@@ -75,7 +75,7 @@ export interface ClientOptions {
   /**
    * Custom function used to create the connection when connecting via ldap://. Called with the
    * parsed port and host from the url. Defaults to `net.connect`. Useful for supplying your own
-   * transport: a proxied or tunneled connection, a unix socket, or an existing socket
+   * transport: a proxied or tunneled connection, a Unix socket, or an existing socket
    * (e.g. `createConnection: () => myExistingSocket`).
    */
   createConnection?: typeof net.connect;
