@@ -31,6 +31,11 @@ const config: UserConfig = defineConfig({
       // Every switch in this codebase handles the remaining union members in a
       // default clause; treat that as exhaustive.
       'typescript/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
+      // Since v66 this rule requires error constructors to be shaped as
+      // (message, options). The published error classes here take other
+      // signatures, e.g. (code, message) and (response); complying would be a
+      // breaking API change. The rule has no configuration to relax this.
+      'unicorn-compat/custom-error-definition': 'off',
     },
     overrides: [
       ...(baseLintConfig.overrides ?? [])
@@ -68,9 +73,6 @@ const config: UserConfig = defineConfig({
     entry: ['src/index.ts'],
     format: ['esm', 'cjs'],
     dts: { oxc: true },
-    // Match the historical unbuild output layout referenced by package.json
-    // (index.mjs + index.d.ts for ESM, index.cjs + index.d.cts for CJS).
-    outExtensions: ({ format }) => (format === 'es' ? { js: '.mjs', dts: '.d.ts' } : { js: '.cjs', dts: '.d.cts' }),
   },
 });
 
