@@ -67,7 +67,7 @@
     "@stylistic/eslint-plugin": "5.10.0",
     "@types/node": ">=22",
     "eslint-config-decent": "4.2.38",
-    "eslint-plugin-jsdoc": "63.1.0",
+    "eslint-plugin-jsdoc": "63.2.0",
     "eslint-plugin-security": "4.0.1",
     "eslint-plugin-unicorn": "72.0.0",
     "husky": "9.1.7",
