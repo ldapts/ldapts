@@ -3,8 +3,8 @@ allowBuilds:
   unrs-resolver: true
 savePrefix: ''
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.4
-  vite-plus: 0.2.4
+  vite: npm:@voidzero-dev/vite-plus-core@0.3.0
+  vite-plus: 0.3.0
 overrides:
   vite: 'catalog:'
 peerDependencyRules:
