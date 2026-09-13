@@ -1,22 +1,18 @@
-import { oxlintConfig } from 'eslint-config-decent/oxlint';
+import { oxlintConfig } from 'oxlint-config-decent';
 import { type UserConfig } from 'vite';
 import { defineConfig } from 'vite-plus';
 
 type LintConfig = ReturnType<typeof oxlintConfig>;
-type LintRules = NonNullable<LintConfig['rules']>;
 
-const baseLintConfig: LintConfig = oxlintConfig({ enableReact: false, enableTestingLibrary: false, enableVitest: true });
-
-// These compat plugins import @typescript-eslint/typescript-estree, which cannot
-// load alongside typescript 7 (it supports typescript <6.1 only). Drop them and
-// their rules (member-ordering, explicit-member-accessibility, and a few vitest
-// padding/style rules) until typescript-eslint supports typescript 7.
-const estreeDependentPlugins = new Set(['@typescript-eslint/eslint-plugin', '@vitest/eslint-plugin']);
-const estreeDependentRulePrefixes = ['typescript-compat/', 'vitest-compat/'];
-
-function withoutEstreeDependentRules(rules: LintRules | undefined): LintRules {
-  return Object.fromEntries(Object.entries(rules ?? {}).filter(([ruleName]) => !estreeDependentRulePrefixes.some((prefix) => ruleName.startsWith(prefix))));
-}
+// The typescript-compat and vitest-compat plugins need the TypeScript JS API,
+// which TypeScript 7 no longer ships. Opt out of them (and their rules) instead
+// of carrying the @typescript/typescript6 side-by-side alias.
+const baseLintConfig: LintConfig = oxlintConfig({
+  enableReact: false,
+  enableTestingLibrary: false,
+  enableTypeScriptEstreePlugins: false,
+  enableVitest: true,
+});
 
 const config: UserConfig = defineConfig({
   fmt: {
@@ -25,9 +21,8 @@ const config: UserConfig = defineConfig({
   },
   lint: {
     ...baseLintConfig,
-    jsPlugins: (baseLintConfig.jsPlugins ?? []).filter((plugin) => !estreeDependentPlugins.has(typeof plugin === 'string' ? plugin : plugin.specifier)),
     rules: {
-      ...withoutEstreeDependentRules(baseLintConfig.rules),
+      ...baseLintConfig.rules,
       // Every switch in this codebase handles the remaining union members in a
       // default clause; treat that as exhaustive.
       'typescript/switch-exhaustiveness-check': ['error', { considerDefaultExhaustiveForUnions: true }],
@@ -38,12 +33,7 @@ const config: UserConfig = defineConfig({
       'unicorn-compat/custom-error-definition': 'off',
     },
     overrides: [
-      ...(baseLintConfig.overrides ?? [])
-        .map((override) => ({
-          ...override,
-          rules: withoutEstreeDependentRules(override.rules),
-        }))
-        .filter((override) => Object.keys(override.rules).length > 0 || override.jsPlugins),
+      ...(baseLintConfig.overrides ?? []),
       {
         // Plain JavaScript helper scripts have no type annotations, so the
         // type-aware unsafe-* rules only produce noise for untyped imports.
