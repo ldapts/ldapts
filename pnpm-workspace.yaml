@@ -12,3 +12,5 @@ peerDependencyRules:
     - vite
   allowedVersions:
     vite: '*'
+minimumReleaseAgeExclude:
+  - oxlint-config-decent@5.0.0
