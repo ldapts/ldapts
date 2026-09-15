@@ -33,8 +33,8 @@ export class ServerSideSortingRequestControl extends Control {
   public values: ServerSideSortingRequestValue[];
 
   /**
-   * Sort result reported by the server (RFC 2891 SortResult). Populated on the instance sent with the search once the
-   * search settles.
+   * Sort result reported by the server (RFC 2891 SortResult). Set on the instance sent with the search once the search
+   * settles, cleared whenever the control is written again, and left undefined when the server sends no sort response.
    */
   public result?: ServerSideSortingResult;
 

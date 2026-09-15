@@ -166,11 +166,6 @@ class MyControl extends Control {
 }
 ```
 
-`ServerSideSortingRequestControl` uses this to expose the server's sort result. After a sorted search, `result` on the
-instance you sent holds the `sortResult` code (`0` when the entries came back sorted) and, when the server names it, the
-`attributeType` it could not sort by.
-The result is cleared when the control is sent again and remains `undefined` if the server omits the sort response.
-
 #### Password policy
 
 `PasswordPolicyControl` implements the [password policy control](https://datatracker.ietf.org/doc/html/draft-behera-ldap-password-policy-10#section-6.2)

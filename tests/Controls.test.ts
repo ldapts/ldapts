@@ -1,8 +1,18 @@
 import { describe, expect, it } from 'vite-plus/test';
 
 import { Ber, BerReader, BerWriter } from '../src/ber/index.js';
-import { Attribute, Change, Client, Control, ControlParser, PasswordPolicyControl, PasswordPolicyError, type PasswordPolicyValue, ServerSideSortingRequestControl } from '../src/index.js';
-import { SearchResponse } from '../src/messages/SearchResponse.js';
+import {
+  Attribute,
+  Change,
+  Client,
+  Control,
+  ControlParser,
+  PasswordPolicyControl,
+  PasswordPolicyError,
+  type PasswordPolicyValue,
+  SearchResponse,
+  ServerSideSortingRequestControl,
+} from '../src/index.js';
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
