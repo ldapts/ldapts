@@ -51,9 +51,10 @@ export class ControlParser {
         });
         break;
       default:
-        // Parse into the caller's own instance. Do not add a case above for controls that are only read back this way
-        // (e.g. PasswordPolicyControl on bind/modify, which return void): a fresh instance would be dropped unseen.
-        control = requestControls.find((requestControl) => requestControl.type === type);
+        // Parse into the caller's own instance, matched on responseType. Do not add a case above for controls that are
+        // only read back this way (e.g. PasswordPolicyControl on bind/modify, which return void): a fresh instance would
+        // be dropped unseen.
+        control = requestControls.find((requestControl) => requestControl.responseType === type);
         break;
     }
 
