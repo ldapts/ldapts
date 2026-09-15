@@ -83,6 +83,8 @@ export class ServerSideSortingRequestControl extends Control {
   }
 
   public override writeControl(writer: BerWriter): void {
+    this.result = undefined;
+
     if (!this.values.length) {
       return;
     }

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vite-plus/test';
 
 import { Ber, BerReader, BerWriter } from '../src/ber/index.js';
 import { Attribute, Change, Client, Control, ControlParser, PasswordPolicyControl, PasswordPolicyError, type PasswordPolicyValue, ServerSideSortingRequestControl } from '../src/index.js';
+import { SearchResponse } from '../src/messages/SearchResponse.js';
 
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
@@ -79,6 +80,24 @@ describe('Controls', () => {
       ControlParser.parse(writeResponseControl(ServerSideSortingRequestControl.responseType, [0x30, 0x08, 0x0a, 0x01, 0x35, 0x80, 0x03, 0x75, 0x69, 0x64]), [control]);
 
       expect(control.result).toStrictEqual({ sortResult: 53, attributeType: 'uid' });
+    });
+
+    it.each([true, false])('should clear a previous sort result when reused (has sort keys: %s)', (hasSortKeys) => {
+      const control = new ServerSideSortingRequestControl({ value: hasSortKeys ? { attributeType: 'uid' } : [] });
+      const originalWriter = new BerWriter();
+      control.write(originalWriter);
+      ControlParser.parse(writeResponseControl(ServerSideSortingRequestControl.responseType, [0x30, 0x03, 0x0a, 0x01, 0x00]), [control]);
+      expect(control.result).toStrictEqual({ sortResult: 0 });
+
+      const reusedWriter = new BerWriter();
+      control.write(reusedWriter);
+      const response = new SearchResponse({ messageId: 2 });
+      response.parse(new BerReader(Buffer.from([0x0a, 0x01, 0x00, 0x04, 0x00, 0x04, 0x00])), [control]);
+
+      expect(response.status).toBe(0);
+      expect(response.controls).toStrictEqual([]);
+      expect(control.result).toBeUndefined();
+      expect(reusedWriter.buffer).toStrictEqual(originalWriter.buffer);
     });
 
     it('should still parse a request value', () => {
