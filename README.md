@@ -11,6 +11,7 @@ Providing an API to access LDAP directory servers from Node.js programs.
 - [API Details](#api-details)
   - [Create a client](#create-a-client)
   - [Specifying Controls](#specifying-controls)
+    - [Password policy](#password-policy)
   - [bind](#bind)
   - [startTLS](#starttls)
   - [add](#add)
@@ -148,6 +149,39 @@ const { searchEntries, searchReferences } = await client.search(
 
 You can also subclass `Control` for finer control over how data is parsed and written.
 Look at [PagedResultsControl](src/controls/PagedResultsControl.ts) for an example.
+
+Response controls are parsed into the `Control` instance sent with the request, so keep a reference to it and read it
+once the operation settles.
+
+#### Password policy
+
+`PasswordPolicyControl` implements the [password policy control](https://datatracker.ietf.org/doc/html/draft-behera-ldap-password-policy-10#section-6.2)
+(OID `1.3.6.1.4.1.42.2.27.8.5.1`). Send an instance with `bind()` or `modify()`, then read `value` from that instance.
+The server fills it in whether or not the operation succeeds, so read it after catching any error:
+
+```ts
+import { PasswordPolicyControl, PasswordPolicyError } from 'ldapts';
+
+const control = new PasswordPolicyControl();
+try {
+  await client.bind('cn=root', 'secret', control);
+
+  // `graceAuthNsRemaining` and `timeBeforeExpiration` are only set when the server warns about the password
+  if (control.value?.graceAuthNsRemaining != null) {
+    console.log(`${control.value.graceAuthNsRemaining} grace logins left`);
+  }
+} catch (ex) {
+  if (control.value?.error === PasswordPolicyError.AccountLocked) {
+    console.log('Account is locked');
+  }
+
+  throw ex;
+}
+```
+
+`value.error` is one of the `PasswordPolicyError` codes: `PasswordExpired`, `AccountLocked`, `ChangeAfterReset`,
+`PasswordModNotAllowed`, `MustSupplyOldPassword`, `InsufficientPasswordQuality`, `PasswordTooShort`,
+`PasswordTooYoung`, or `PasswordInHistory`. Servers may send codes outside of that list.
 
 ### bind
 
