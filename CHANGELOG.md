@@ -1,3 +1,9 @@
+# [9.2.0](https://github.com/ldapts/ldapts/compare/v9.1.0...v9.2.0) (2026-09-15)
+
+### Features
+
+- add Control.responseType, expose the server-side sort result, and clear controls before reuse ([b9d9139](https://github.com/ldapts/ldapts/commit/b9d9139e4e27c537e18c67b1276572aef1cb756a))
+
 # [9.1.0](https://github.com/ldapts/ldapts/compare/v9.0.0...v9.1.0) (2026-09-15)
 
 ### Features
