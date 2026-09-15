@@ -1,3 +1,9 @@
+# [9.1.0](https://github.com/ldapts/ldapts/compare/v9.0.0...v9.1.0) (2026-09-15)
+
+### Features
+
+- add PasswordPolicyControl to read password policy responses ([90c0a77](https://github.com/ldapts/ldapts/commit/90c0a777d94c811d87ac711573a23543a95f4007)), closes [#106](https://github.com/ldapts/ldapts/issues/106) [#137](https://github.com/ldapts/ldapts/issues/137)
+
 # [9.0.0](https://github.com/ldapts/ldapts/compare/v8.2.0...v9.0.0) (2026-07-11)
 
 - chore!: require Node.js 22 or newer and remove deprecated Filter#escape shim ([#439](https://github.com/ldapts/ldapts/issues/439)) ([bc1b4d4](https://github.com/ldapts/ldapts/commit/bc1b4d4b9052ed930f1d9cc6010e1f41cd6d160d)), closes [Filter#escape](https://github.com/Filter/issues/escape) [Filter#escape](https://github.com/Filter/issues/escape) [#269](https://github.com/ldapts/ldapts/issues/269) [#348](https://github.com/ldapts/ldapts/issues/348) [#141](https://github.com/ldapts/ldapts/issues/141) [Filter#escape](https://github.com/Filter/issues/escape) [#401](https://github.com/ldapts/ldapts/issues/401) [#437](https://github.com/ldapts/ldapts/issues/437)
