@@ -205,6 +205,16 @@ describe('Controls', () => {
       }
     });
 
+    it('should clear a previous value when reused', () => {
+      const control = new PasswordPolicyControl();
+      ControlParser.parse(writeResponseControl(PasswordPolicyControl.type, [0x30, 0x03, 0x81, 0x01, 0x01]), [control]);
+      expect(control.value).toStrictEqual({ error: PasswordPolicyError.AccountLocked });
+
+      control.write(new BerWriter());
+
+      expect(control.value).toBeUndefined();
+    });
+
     it('should be populated from a bind response', async () => {
       const client = new Client({
         url: LDAP_URI,
