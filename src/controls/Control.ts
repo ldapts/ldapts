@@ -2,6 +2,10 @@ import { type BerReader, type BerWriter } from '../ber/index.js';
 
 export interface ControlOptions {
   critical?: boolean;
+  /**
+   * OID the server uses for this control's response when it differs from the request OID. Defaults to `type`.
+   */
+  responseType?: string;
 }
 
 export class Control {
@@ -9,9 +13,12 @@ export class Control {
 
   public critical: boolean;
 
+  public responseType: string;
+
   public constructor(type: string, options: ControlOptions = {}) {
     this.type = type;
     this.critical = options.critical === true;
+    this.responseType = options.responseType ?? type;
   }
 
   public write(writer: BerWriter): void {

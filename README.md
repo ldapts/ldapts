@@ -153,6 +153,19 @@ Look at [PagedResultsControl](src/controls/PagedResultsControl.ts) for an exampl
 Response controls are parsed into the `Control` instance sent with the request, so keep a reference to it and read it
 once the operation settles.
 
+When the server answers under a different OID than the request, pass `responseType` so the response is still routed
+to your instance:
+
+```ts
+class MyControl extends Control {
+  public constructor() {
+    super('1.2.3.4', { responseType: '1.2.3.5' });
+  }
+
+  // writeControl() encodes the request; parseControl() decodes the response
+}
+```
+
 #### Password policy
 
 `PasswordPolicyControl` implements the [password policy control](https://datatracker.ietf.org/doc/html/draft-behera-ldap-password-policy-10#section-6.2)

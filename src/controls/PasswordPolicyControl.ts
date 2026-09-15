@@ -42,7 +42,8 @@ export interface PasswordPolicyControlOptions extends ControlOptions {
 /**
  * Password policy control (draft-behera-ldap-password-policy). Send an instance without a value along with a `bind()`
  * or `modify()` request, then read `value` from that same instance once the operation settles - it is populated from
- * the server response, including when the operation throws.
+ * the server response, including when the operation throws. Sending the control again clears `value` first, so a
+ * reused instance only ever shows the latest response.
  */
 export class PasswordPolicyControl extends Control {
   public static type = '1.3.6.1.4.1.42.2.27.8.5.1';
@@ -80,25 +81,29 @@ export class PasswordPolicyControl extends Control {
   }
 
   public override writeControl(writer: BerWriter): void {
-    if (!this.value) {
+    const { value } = this;
+    // The response lands in `value`, so drop whatever the previous operation left there
+    this.value = undefined;
+
+    if (!value) {
       return;
     }
 
     const controlWriter = new BerWriter();
     controlWriter.startSequence();
 
-    if (typeof this.value.timeBeforeExpiration === 'number') {
+    if (typeof value.timeBeforeExpiration === 'number') {
       controlWriter.startSequence(0xa0);
-      controlWriter.writeInt(this.value.timeBeforeExpiration, 0x80);
+      controlWriter.writeInt(value.timeBeforeExpiration, 0x80);
       controlWriter.endSequence();
-    } else if (typeof this.value.graceAuthNsRemaining === 'number') {
+    } else if (typeof value.graceAuthNsRemaining === 'number') {
       controlWriter.startSequence(0xa0);
-      controlWriter.writeInt(this.value.graceAuthNsRemaining, 0x81);
+      controlWriter.writeInt(value.graceAuthNsRemaining, 0x81);
       controlWriter.endSequence();
     }
 
-    if (typeof this.value.error === 'number') {
-      controlWriter.writeEnumeration(this.value.error, 0x81);
+    if (typeof value.error === 'number') {
+      controlWriter.writeEnumeration(value.error, 0x81);
     }
 
     controlWriter.endSequence();
