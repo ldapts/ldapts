@@ -213,8 +213,8 @@ importers:
         specifier: 4.0.1
         version: 4.0.1
       eslint-plugin-unicorn:
-        specifier: 75.0.0
-        version: 75.0.0(eslint@10.11.0(supports-color@7.2.0))
+        specifier: 76.0.0
+        version: 76.0.0(eslint@10.11.0(supports-color@7.2.0))
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -232,7 +232,7 @@ importers:
         version: 9.0.3
       oxlint-config-decent:
         specifier: 5.0.0
-        version: 5.0.0(@stylistic/eslint-plugin@5.10.0(eslint@10.11.0(supports-color@7.2.0)))(@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-jsdoc@64.5.3(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-security@4.0.1)(eslint-plugin-unicorn@75.0.0(eslint@10.11.0(supports-color@7.2.0)))(eslint@10.11.0(supports-color@7.2.0))(oxlint-plugin-eslint@1.83.0)(oxlint-tsgolint@7.0.2001)(oxlint@1.72.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0)))(typescript@7.0.2)
+        version: 5.0.0(@stylistic/eslint-plugin@5.10.0(eslint@10.11.0(supports-color@7.2.0)))(@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-jsdoc@64.5.3(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-security@4.0.1)(eslint-plugin-unicorn@76.0.0(eslint@10.11.0(supports-color@7.2.0)))(eslint@10.11.0(supports-color@7.2.0))(oxlint-plugin-eslint@1.83.0)(oxlint-tsgolint@7.0.2001)(oxlint@1.72.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0)))(typescript@7.0.2)
       oxlint-plugin-eslint:
         specifier: 1.83.0
         version: 1.83.0
@@ -1834,8 +1834,8 @@ packages:
     resolution: {integrity: sha512-/lZCkOxPOWaf1jXAqgICrS8St3BMBccIPvhOSUYuV6VCr1o5nFVG998FnTLt6w2Nxb8Uo0nM8fzmnhp+GY/aEg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  eslint-plugin-unicorn@75.0.0:
-    resolution: {integrity: sha512-72I7eSn+/z5CpgValFBl9mp2JE5UPD+nUUyB/VIGUMF1rCP1i37mA05zfIAVIU312A+qCZ38T8tSZr3oaMv4Mw==}
+  eslint-plugin-unicorn@76.0.0:
+    resolution: {integrity: sha512-3ywJrCMHKYhcBP5yFzGaOOX3dY7+iR3hvpuoS/0EnhRFgVWLejly+t4fOdJvWQxJdHZl1C+QBW7hybXPDld4Pw==}
     engines: {node: '>=22'}
     peerDependencies:
       eslint: '>=10.4'
@@ -4768,7 +4768,7 @@ snapshots:
     dependencies:
       safe-regex: 2.1.1
 
-  eslint-plugin-unicorn@75.0.0(eslint@10.11.0(supports-color@7.2.0)):
+  eslint-plugin-unicorn@76.0.0(eslint@10.11.0(supports-color@7.2.0)):
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.11.0(supports-color@7.2.0))
       '@eslint/css-tree': 4.1.0
@@ -5671,14 +5671,14 @@ snapshots:
       '@oxfmt/binding-win32-x64-msvc': 0.68.0
       vite-plus: 0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0)
 
-  oxlint-config-decent@5.0.0(@stylistic/eslint-plugin@5.10.0(eslint@10.11.0(supports-color@7.2.0)))(@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-jsdoc@64.5.3(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-security@4.0.1)(eslint-plugin-unicorn@75.0.0(eslint@10.11.0(supports-color@7.2.0)))(eslint@10.11.0(supports-color@7.2.0))(oxlint-plugin-eslint@1.83.0)(oxlint-tsgolint@7.0.2001)(oxlint@1.72.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0)))(typescript@7.0.2):
+  oxlint-config-decent@5.0.0(@stylistic/eslint-plugin@5.10.0(eslint@10.11.0(supports-color@7.2.0)))(@typescript-eslint/eslint-plugin@8.58.2(@typescript-eslint/parser@8.58.2(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-jsdoc@64.5.3(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-plugin-security@4.0.1)(eslint-plugin-unicorn@76.0.0(eslint@10.11.0(supports-color@7.2.0)))(eslint@10.11.0(supports-color@7.2.0))(oxlint-plugin-eslint@1.83.0)(oxlint-tsgolint@7.0.2001)(oxlint@1.72.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0)))(typescript@7.0.2):
     dependencies:
       '@stylistic/eslint-plugin': 5.10.0(eslint@10.11.0(supports-color@7.2.0))
       '@typescript-eslint/eslint-plugin': 8.58.2(@typescript-eslint/parser@8.58.2(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint: 10.11.0(supports-color@7.2.0)
       eslint-plugin-jsdoc: 64.5.3(eslint@10.11.0(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-security: 4.0.1
-      eslint-plugin-unicorn: 75.0.0(eslint@10.11.0(supports-color@7.2.0))
+      eslint-plugin-unicorn: 76.0.0(eslint@10.11.0(supports-color@7.2.0))
       oxlint-plugin-eslint: 1.83.0
     optionalDependencies:
       oxlint: 1.72.0(oxlint-tsgolint@7.0.2001)(vite-plus@0.3.3(@types/node@26.4.1)(typescript@7.0.2)(yaml@2.9.0))
