@@ -76,7 +76,7 @@
     "node-forge": "1.4.0",
     "npm-run-all2": "9.0.3",
     "oxlint-config-decent": "5.0.0",
-    "oxlint-plugin-eslint": "1.86.0",
+    "oxlint-plugin-eslint": "1.87.0",
     "pinst": "3.0.0",
     "semantic-release": "25.0.9",
     "typescript": "7.0.2",
