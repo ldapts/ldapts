@@ -72,7 +72,7 @@
     "eslint-plugin-unicorn": "79.0.0",
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
-    "markdownlint-cli": "0.49.1",
+    "markdownlint-cli": "0.50.0",
     "node-forge": "1.4.0",
     "npm-run-all2": "9.0.4",
     "oxlint-config-decent": "5.0.0",
