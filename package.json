@@ -73,7 +73,7 @@
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "markdownlint-cli": "0.50.0",
-    "node-forge": "1.4.0",
+    "node-forge": "1.4.1",
     "npm-run-all2": "9.0.4",
     "oxlint-config-decent": "5.0.0",
     "oxlint-plugin-eslint": "1.89.0",
