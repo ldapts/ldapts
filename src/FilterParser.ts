@@ -331,40 +331,64 @@ export class FilterParser {
     return new ExtensibleFilter(options);
   }
 
-  private static _unescapeHexValues(input: string): string {
+  // An `\xx` escape is an octet, not a character (RFC 4515, section 3). A value whose escapes all
+  // stay within ASCII is kept as a UTF-8 string, exactly as before. As soon as an octet above 0x7f
+  // appears, the value switches to a Buffer so no octet is re-encoded: building it from a string
+  // (`String.fromCharCode(0xfe)` -> U+00FE) and writing it back as UTF-8 would turn that one octet
+  // into two, so a binary attribute such as `objectGUID` reached the server as a different byte
+  // sequence and could never match.
+  private static _unescapeHexValues(input: string): Buffer | string {
     let index = 0;
     const end = input.length;
+
+    // Accumulate as a string while every octet is ASCII; switch to a byte list on the first octet
+    // above 0x7f. The byte list is built in one pass and converted to a Buffer once, instead of
+    // re-concatenating a Buffer for every token.
     let result = '';
+    let bytes: number[] | undefined;
 
     while (index < end) {
       const char = input[index];
 
-      switch (char) {
-        case '(':
-          throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
-        case '\\': {
-          const value = input.slice(index + 1, index + 3);
-          if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
-            throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
-          }
+      if (char === '(') {
+        throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
+      }
 
-          result += String.fromCharCode(Number.parseInt(value, 16));
-          index += 3;
-
-          break;
+      if (char === '\\') {
+        const value = input.slice(index + 1, index + 3);
+        if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
+          throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
         }
 
-        default:
-          if (char) {
+        const byte = Number.parseInt(value, 16);
+        if (byte > 0x7f && !bytes) {
+          // Everything collected so far is UTF-8, exactly what BerWriter.writeString would have
+          // produced for it, so fold it into the byte list unchanged.
+          bytes = [...Buffer.from(result, 'utf8')];
+        }
+
+        if (bytes) {
+          bytes.push(byte);
+        } else {
+          result += String.fromCharCode(byte);
+        }
+
+        index += 3;
+      } else {
+        if (char) {
+          if (bytes) {
+            // A literal character after an escaped octet keeps its UTF-8 encoding and position.
+            bytes.push(...Buffer.from(char, 'utf8'));
+          } else {
             result += char;
           }
+        }
 
-          index += 1;
-          break;
+        index += 1;
       }
     }
 
-    return result;
+    return bytes ? Buffer.from(bytes) : result;
   }
 
   private static _unescapeSubstring(input: string): Substring {
@@ -374,10 +398,16 @@ export class FilterParser {
     }
 
     return {
-      initial: FilterParser._unescapeHexValues(fields.shift() ?? ''),
-      final: FilterParser._unescapeHexValues(fields.pop() ?? ''),
-      any: fields.map((field) => FilterParser._unescapeHexValues(field)),
+      initial: FilterParser._unescapeText(FilterParser._unescapeHexValues(fields.shift() ?? '')),
+      final: FilterParser._unescapeText(FilterParser._unescapeHexValues(fields.pop() ?? '')),
+      any: fields.map((field) => FilterParser._unescapeText(FilterParser._unescapeHexValues(field))),
     };
+  }
+
+  // Substring components are matched as strings, so a binary component keeps the previous behaviour
+  // of mapping each octet to a character (latin1) instead of silently re-encoding it.
+  private static _unescapeText(value: Buffer | string): string {
+    return Buffer.isBuffer(value) ? value.toString('latin1') : value;
   }
 
   private static _parseSet(reader: BerReader): Filter[] {

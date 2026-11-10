@@ -7,7 +7,7 @@ import { Filter } from './Filter.js';
 export interface ExtensibleFilterOptions {
   rule?: string;
   matchType?: string;
-  value?: string;
+  value?: Buffer | string;
   dnAttributes?: boolean;
   initial?: string;
   any?: string[];
@@ -17,7 +17,7 @@ export interface ExtensibleFilterOptions {
 export class ExtensibleFilter extends Filter {
   public type: SearchFilterValues = SearchFilter.extensibleMatch;
 
-  public value: string;
+  public value: Buffer | string;
 
   public rule: string;
 
@@ -47,7 +47,7 @@ export class ExtensibleFilter extends Filter {
           this.matchType = reader.readString(tag) ?? '';
           break;
         case 0x83:
-          this.value = reader.readString(tag) ?? '';
+          this.value = Filter.readValue(reader, tag);
           break;
         case 0x84:
           this.dnAttributes = reader.readBoolean() ?? false;
@@ -73,7 +73,11 @@ export class ExtensibleFilter extends Filter {
       writer.writeString(this.matchType, 0x82);
     }
 
-    writer.writeString(this.value, 0x83);
+    if (Buffer.isBuffer(this.value)) {
+      writer.writeBuffer(this.value, 0x83);
+    } else {
+      writer.writeString(this.value, 0x83);
+    }
 
     if (this.dnAttributes) {
       writer.writeBoolean(this.dnAttributes, 0x84);

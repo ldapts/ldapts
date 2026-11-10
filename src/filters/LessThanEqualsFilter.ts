@@ -1,4 +1,5 @@
 import { type BerReader, type BerWriter } from '../ber/index.js';
+import { Ber } from '../ber/index.js';
 import { type SearchFilterValues } from '../SearchFilter.js';
 import { SearchFilter } from '../SearchFilter.js';
 
@@ -6,7 +7,7 @@ import { Filter } from './Filter.js';
 
 export interface LessThanEqualsFilterOptions {
   attribute?: string;
-  value?: string;
+  value?: Buffer | string;
 }
 
 export class LessThanEqualsFilter extends Filter {
@@ -14,7 +15,7 @@ export class LessThanEqualsFilter extends Filter {
 
   public attribute: string;
 
-  public value: string;
+  public value: Buffer | string;
 
   public constructor(options: LessThanEqualsFilterOptions = {}) {
     super();
@@ -25,23 +26,29 @@ export class LessThanEqualsFilter extends Filter {
 
   public override parseFilter(reader: BerReader): void {
     this.attribute = reader.readString()?.toLowerCase() ?? '';
-    this.value = reader.readString() ?? '';
+    this.value = Filter.readValue(reader);
   }
 
   public override writeFilter(writer: BerWriter): void {
     writer.writeString(this.attribute);
-    writer.writeString(this.value);
+    if (Buffer.isBuffer(this.value)) {
+      writer.writeBuffer(this.value, Ber.OctetString);
+    } else {
+      writer.writeString(this.value);
+    }
   }
 
   public override matches(objectToCheck: Record<string, string> = {}, strictAttributeCase?: boolean): boolean {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {
+      const stringValue = Buffer.isBuffer(this.value) ? this.value.toString('utf8') : this.value;
+
       if (strictAttributeCase) {
-        return objectToCheckValue <= this.value;
+        return objectToCheckValue <= stringValue;
       }
 
-      return objectToCheckValue.toLowerCase() <= this.value.toLowerCase();
+      return objectToCheckValue.toLowerCase() <= stringValue.toLowerCase();
     }
 
     return false;

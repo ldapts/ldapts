@@ -1,4 +1,5 @@
 import { type BerReader, type BerWriter } from '../ber/index.js';
+import { Ber } from '../ber/index.js';
 import { type SearchFilterValues } from '../SearchFilter.js';
 import { SearchFilter } from '../SearchFilter.js';
 
@@ -6,7 +7,7 @@ import { Filter } from './Filter.js';
 
 export interface ApproximateFilterOptions {
   attribute?: string;
-  value?: string;
+  value?: Buffer | string;
 }
 
 export class ApproximateFilter extends Filter {
@@ -14,7 +15,7 @@ export class ApproximateFilter extends Filter {
 
   public attribute: string;
 
-  public value: string;
+  public value: Buffer | string;
 
   public constructor(options: ApproximateFilterOptions = {}) {
     super();
@@ -24,12 +25,16 @@ export class ApproximateFilter extends Filter {
 
   public override parseFilter(reader: BerReader): void {
     this.attribute = (reader.readString() ?? '').toLowerCase();
-    this.value = reader.readString() ?? '';
+    this.value = Filter.readValue(reader);
   }
 
   public override writeFilter(writer: BerWriter): void {
     writer.writeString(this.attribute);
-    writer.writeString(this.value);
+    if (Buffer.isBuffer(this.value)) {
+      writer.writeBuffer(this.value, Ber.OctetString);
+    } else {
+      writer.writeString(this.value);
+    }
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
