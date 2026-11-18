@@ -1,3 +1,9 @@
+# [9.3.0](https://github.com/ldapts/ldapts/compare/v9.2.1...v9.3.0) (2026-11-18)
+
+### Features
+
+- keep escaped octets in filter values as bytes ([#616](https://github.com/ldapts/ldapts/issues/616)) ([a4c520f](https://github.com/ldapts/ldapts/commit/a4c520f19efb0036fc283462b72f8cf05e313090)), closes [#104](https://github.com/ldapts/ldapts/issues/104)
+
 ## [9.2.1](https://github.com/ldapts/ldapts/compare/v9.2.0...v9.2.1) (2026-11-18)
 
 ### Bug Fixes
