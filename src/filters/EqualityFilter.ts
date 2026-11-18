@@ -26,9 +26,9 @@ export class EqualityFilter extends Filter {
 
   public override parseFilter(reader: BerReader): void {
     this.attribute = (reader.readString() ?? '').toLowerCase();
-    this.value = reader.readString() ?? '';
+    this.value = Filter.readValue(reader);
 
-    if (this.attribute === 'objectclass') {
+    if (this.attribute === 'objectclass' && typeof this.value === 'string') {
       this.value = this.value.toLowerCase();
     }
   }
@@ -46,10 +46,6 @@ export class EqualityFilter extends Filter {
     const objectToCheckValue = this.getObjectValue(objectToCheck, this.attribute, strictAttributeCase);
 
     if (typeof objectToCheckValue !== 'undefined') {
-      if (Buffer.isBuffer(this.value) && Buffer.isBuffer(objectToCheckValue)) {
-        return this.value === objectToCheckValue;
-      }
-
       const stringValue = Buffer.isBuffer(this.value) ? this.value.toString('utf8') : this.value;
 
       if (strictAttributeCase) {

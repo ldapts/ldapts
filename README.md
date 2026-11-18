@@ -570,6 +570,18 @@ const value = 'x*x@foo.net';
 const filter = `(email=${Filter.escape(value)})`;
 ```
 
+A value that carries arbitrary octets - an `objectGUID` in Active Directory, for
+example - is written with `\xx` escapes and reaches the server as those exact
+bytes. Note that the octets of a binary attribute are not the bytes of its
+human-readable form: a GUID, for instance, is stored with its first three groups
+in little-endian order, so it has to be turned into those 16 octets first.
+
+```ts
+import { escapeFilter } from 'ldapts';
+const guidAsOctets = Buffer.from('4ecec2f4081f5843abdcfe3f035af4cd', 'hex');
+const filter = escapeFilter`(objectGUID=${guidAsOctets})`;
+```
+
 Now, let's say we also want to set our filter to include a
 specification that either the employeeType _not_ be a manager nor a secretary:
 

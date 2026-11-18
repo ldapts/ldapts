@@ -1,4 +1,5 @@
 import { type BerReader } from './ber/index.js';
+import { decodeAssertionValue } from './filters/assertionValue.js';
 import { type ExtensibleFilterOptions } from './filters/ExtensibleFilter.js';
 import { type Filter } from './filters/Filter.js';
 import {
@@ -24,6 +25,12 @@ interface Substring {
   initial: string;
   any: string[];
   final: string;
+}
+
+interface UnescapedValue {
+  octets: Buffer;
+  // Each escaped octet mapped to the character with that code
+  text: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
@@ -331,40 +338,11 @@ export class FilterParser {
     return new ExtensibleFilter(options);
   }
 
-  private static _unescapeHexValues(input: string): string {
-    let index = 0;
-    const end = input.length;
-    let result = '';
-
-    while (index < end) {
-      const char = input[index];
-
-      switch (char) {
-        case '(':
-          throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
-        case '\\': {
-          const value = input.slice(index + 1, index + 3);
-          if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
-            throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
-          }
-
-          result += String.fromCharCode(Number.parseInt(value, 16));
-          index += 3;
-
-          break;
-        }
-
-        default:
-          if (char) {
-            result += char;
-          }
-
-          index += 1;
-          break;
-      }
-    }
-
-    return result;
+  // An `\xx` escape is an octet, not a character (RFC 4515, section 3), and a literal character stands for
+  // its UTF-8 octets. The value is a string when those octets are valid UTF-8 and a Buffer when they are not,
+  // so a binary value such as `objectGUID` reaches the server as the octets that were written.
+  private static _unescapeHexValues(input: string): Buffer | string {
+    return decodeAssertionValue(FilterParser._unescape(input).octets);
   }
 
   private static _unescapeSubstring(input: string): Substring {
@@ -374,9 +352,63 @@ export class FilterParser {
     }
 
     return {
-      initial: FilterParser._unescapeHexValues(fields.shift() ?? ''),
-      final: FilterParser._unescapeHexValues(fields.pop() ?? ''),
-      any: fields.map((field) => FilterParser._unescapeHexValues(field)),
+      initial: FilterParser._unescapeSubstringValue(fields.shift() ?? ''),
+      final: FilterParser._unescapeSubstringValue(fields.pop() ?? ''),
+      any: fields.map((field) => FilterParser._unescapeSubstringValue(field)),
+    };
+  }
+
+  // SubstringFilter only holds strings. A component that is not valid UTF-8 keeps the older behavior of
+  // mapping each escaped octet to the character with that code.
+  private static _unescapeSubstringValue(input: string): string {
+    const { octets, text } = FilterParser._unescape(input);
+    const value = decodeAssertionValue(octets);
+    return typeof value === 'string' ? value : text;
+  }
+
+  private static _unescape(input: string): UnescapedValue {
+    let index = 0;
+    const end = input.length;
+    const octets: number[] = [];
+    let text = '';
+    let literal = '';
+
+    while (index < end) {
+      const char = input[index];
+
+      if (char === '(') {
+        throw new Error(`Illegal unescaped character: ${char} in value: ${input}`);
+      }
+
+      if (char === '\\') {
+        const value = input.slice(index + 1, index + 3);
+        if (/^[\dA-Fa-f]{2}$/.exec(value) === null) {
+          throw new Error(`Invalid escaped hex character: ${value} in value: ${input}`);
+        }
+
+        // Encode literal characters a run at a time, so a surrogate pair is never split
+        octets.push(...Buffer.from(literal, 'utf8'));
+        literal = '';
+
+        const octet = Number.parseInt(value, 16);
+        octets.push(octet);
+        text += String.fromCharCode(octet);
+        index += 3;
+      } else {
+        if (char) {
+          literal += char;
+          text += char;
+        }
+
+        index += 1;
+      }
+    }
+
+    octets.push(...Buffer.from(literal, 'utf8'));
+
+    return {
+      octets: Buffer.from(octets),
+      text,
     };
   }
 

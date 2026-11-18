@@ -1,5 +1,7 @@
-import { type BerReader, type BerWriter } from '../ber/index.js';
+import { Ber, type BerReader, type BerWriter } from '../ber/index.js';
 import { type SearchFilterValues } from '../SearchFilter.js';
+
+import { decodeAssertionValue } from './assertionValue.js';
 
 export abstract class Filter {
   public abstract type: SearchFilterValues;
@@ -76,6 +78,24 @@ export abstract class Filter {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   protected writeFilter(_: BerWriter): void {
     // Do nothing as the default action
+  }
+
+  /**
+   * Read an attribute/value assertion value from the wire. The value is returned as a string when
+   * it decodes cleanly as UTF-8 and as a Buffer when it does not, so binary assertions (for example
+   * an Active Directory `objectGUID`) survive a parse -> write round-trip without being mangled by
+   * `toString('utf8')`.
+   * @param {BerReader} reader - The reader positioned at the value.
+   * @param {number} [tag] - The expected tag of the value; defaults to `Ber.OctetString`.
+   * @returns {Buffer|string} The decoded value as a string, or the raw octets as a Buffer when not valid UTF-8.
+   */
+  protected static readValue(reader: BerReader, tag?: number): Buffer | string {
+    const buffer = reader.readString(tag ?? Ber.OctetString, true);
+    if (buffer === null) {
+      return '';
+    }
+
+    return decodeAssertionValue(buffer);
   }
 
   protected getObjectValue(objectToCheck: Record<string, string>, key: string, strictAttributeCase?: boolean): string | undefined {
