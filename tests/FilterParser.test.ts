@@ -73,6 +73,77 @@ describe('FilterParser', () => {
       );
     });
 
+    describe('attribute descriptions', () => {
+      it('should allow an attribute option', () => {
+        expect(FilterParser.parseString('(cn;lang-de=Müller)')).toStrictEqual(
+          new EqualityFilter({
+            attribute: 'cn;lang-de',
+            value: 'Müller',
+          }),
+        );
+      });
+
+      it('should allow more than one attribute option', () => {
+        expect(FilterParser.parseString('(cn;lang-de;lang-en>=a)')).toStrictEqual(
+          new GreaterThanEqualsFilter({
+            attribute: 'cn;lang-de;lang-en',
+            value: 'a',
+          }),
+        );
+      });
+
+      it('should allow an attribute option in a presence filter', () => {
+        expect(FilterParser.parseString('(userCertificate;binary=*)')).toStrictEqual(
+          new PresenceFilter({
+            attribute: 'userCertificate;binary',
+          }),
+        );
+      });
+
+      it('should allow an attribute option in a substring filter', () => {
+        expect(FilterParser.parseString('(cn;lang-de=Mü*)')).toStrictEqual(
+          new SubstringFilter({
+            attribute: 'cn;lang-de',
+            initial: 'Mü',
+          }),
+        );
+      });
+
+      it('should allow a numeric OID', () => {
+        expect(FilterParser.parseString('(2.5.4.3=foo)')).toStrictEqual(
+          new EqualityFilter({
+            attribute: '2.5.4.3',
+            value: 'foo',
+          }),
+        );
+      });
+
+      it('should allow a numeric OID with an attribute option', () => {
+        expect(FilterParser.parseString('(2.5.4.3;lang-de~=foo)')).toStrictEqual(
+          new ApproximateFilter({
+            attribute: '2.5.4.3;lang-de',
+            value: 'foo',
+          }),
+        );
+      });
+
+      it('should allow a numeric OID in an extensible filter', () => {
+        expect(FilterParser.parseString('(2.5.4.3:caseExactMatch:=foo)')).toStrictEqual(
+          new ExtensibleFilter({
+            matchType: '2.5.4.3',
+            rule: 'caseExactMatch',
+            value: 'foo',
+          }),
+        );
+      });
+
+      it('should keep the attribute description when the filter is converted back to a string', () => {
+        for (const filter of ['(cn;lang-de=Müller)', '(userCertificate;binary=*)', '(2.5.4.3=foo)', '(2.5.4.3:caseExactMatch:=foo)']) {
+          expect(FilterParser.parseString(filter).toString()).toBe(filter);
+        }
+      });
+    });
+
     describe('Special characters in filter string', () => {
       it('should allow = in filter string', () => {
         const result = FilterParser.parseString('(uniquemember=uuid=930896af-bf8c-48d4-885c-6573a94b1853, ou=users, o=smartdc)');
