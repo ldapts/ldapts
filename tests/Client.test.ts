@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vite-plus/test';
 
 import { type BerReader, type BerWriter } from '../src/ber/index.js';
-import { type AddRequest, type ModifyDNRequest } from '../src/index.js';
+import { type AddRequest, type ModifyDNRequest, type SearchRequest } from '../src/index.js';
 import {
   AddResponse,
   AndFilter,
@@ -21,6 +21,8 @@ import {
   ModifyDNResponse,
   NoSuchObjectError,
   PagedResultsControl,
+  SearchEntry,
+  SearchResponse,
   UndefinedTypeError,
 } from '../src/index.js';
 
@@ -1282,6 +1284,99 @@ describe('Client', () => {
 
       expect(iterateCount).toBeGreaterThanOrEqual(1);
       expect(totalResults / iterateCount).toBeLessThanOrEqual(pageSize);
+    });
+  });
+
+  describe('paged search with an empty page', () => {
+    // RFC 2696: only an empty cookie ends the result set. A server may return a page with no
+    // entries and a cookie, for example when every entry on that page is hidden from the caller.
+    function pageResponse(entryNames: string[], cookie: string): SearchResponse {
+      return new SearchResponse({
+        messageId: 123,
+        searchEntries: entryNames.map((name) => new SearchEntry({ messageId: 123, name })),
+        controls: [
+          new PagedResultsControl({
+            value: {
+              size: 0,
+              cookie: Buffer.from(cookie),
+            },
+          }),
+        ],
+      });
+    }
+
+    function stubPages(client: Client, pages: SearchResponse[]): string[] {
+      const sentCookies: string[] = [];
+      let pageIndex = 0;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      vi.spyOn(client as any, '_ensureConnected').mockResolvedValue(undefined);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-misused-promises
+      vi.spyOn(client as any, '_send').mockImplementation((request: unknown): Promise<SearchResponse> => {
+        // The client reuses one control across requests, so read the cookie when the request is sent
+        const control = (request as SearchRequest).controls?.find((item) => item instanceof PagedResultsControl);
+        sentCookies.push(control?.value?.cookie?.toString() ?? '');
+
+        const page = pages[pageIndex];
+        pageIndex += 1;
+        if (!page) {
+          return Promise.reject(new Error(`Unexpected search request #${pageIndex}`));
+        }
+
+        return Promise.resolve(page);
+      });
+
+      return sentCookies;
+    }
+
+    it('should keep searching when a page has no entries but the server returns a cookie', async () => {
+      const client = new Client({ url: LDAP_URI });
+      const sentCookies = stubPages(client, [pageResponse(['cn=one'], 'page-2'), pageResponse([], 'page-3'), pageResponse(['cn=two'], '')]);
+
+      const searchResult = await client.search(BASE_DN, {
+        paged: {
+          pageSize: 1,
+        },
+      });
+
+      expect(searchResult.searchEntries.map((entry) => entry.dn)).toStrictEqual(['cn=one', 'cn=two']);
+      expect(sentCookies).toStrictEqual(['', 'page-2', 'page-3']);
+    });
+
+    it('should keep searching when the first page has no entries', async () => {
+      const client = new Client({ url: LDAP_URI });
+      const sentCookies = stubPages(client, [pageResponse([], 'page-2'), pageResponse(['cn=one'], '')]);
+
+      const searchResult = await client.search(BASE_DN, {
+        paged: true,
+      });
+
+      expect(searchResult.searchEntries.map((entry) => entry.dn)).toStrictEqual(['cn=one']);
+      expect(sentCookies).toStrictEqual(['', 'page-2']);
+    });
+
+    it('should stop when the server returns an empty cookie', async () => {
+      const client = new Client({ url: LDAP_URI });
+      const sentCookies = stubPages(client, [pageResponse([], '')]);
+
+      const searchResult = await client.search(BASE_DN, {
+        paged: true,
+      });
+
+      expect(searchResult.searchEntries).toStrictEqual([]);
+      expect(sentCookies).toStrictEqual(['']);
+    });
+
+    it('should yield the empty page and keep paginating in searchPaginated', async () => {
+      const client = new Client({ url: LDAP_URI });
+      const sentCookies = stubPages(client, [pageResponse(['cn=one'], 'page-2'), pageResponse([], 'page-3'), pageResponse(['cn=two'], '')]);
+
+      const pages: string[][] = [];
+      for await (const searchResult of client.searchPaginated(BASE_DN, { paged: { pageSize: 1 } })) {
+        pages.push(searchResult.searchEntries.map((entry) => entry.dn));
+      }
+
+      expect(pages).toStrictEqual([['cn=one'], [], ['cn=two']]);
+      expect(sentCookies).toStrictEqual(['', 'page-2', 'page-3']);
     });
   });
 

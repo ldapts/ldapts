@@ -805,7 +805,7 @@ export class Client {
     }
 
     // Recursively search if paging is specified
-    if (paged && (result.searchEntries.length || result.searchReferences.length) && pagedResultsControl) {
+    if (paged && pagedResultsControl) {
       let pagedResultsFromResponse: PagedResultsControl | undefined;
       for (const control of result.controls ?? []) {
         if (control instanceof PagedResultsControl) {
