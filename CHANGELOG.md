@@ -1,3 +1,9 @@
+## [9.2.1](https://github.com/ldapts/ldapts/compare/v9.2.0...v9.2.1) (2026-11-18)
+
+### Bug Fixes
+
+- keep paging until the server returns an empty cookie ([#604](https://github.com/ldapts/ldapts/issues/604)) ([e04287a](https://github.com/ldapts/ldapts/commit/e04287a00fe76fa3a0feddda757416f783f5a951))
+
 # [9.2.0](https://github.com/ldapts/ldapts/compare/v9.1.0...v9.2.0) (2026-09-15)
 
 ### Features
