@@ -1,3 +1,9 @@
+## [9.3.1](https://github.com/ldapts/ldapts/compare/v9.3.0...v9.3.1) (2026-11-18)
+
+### Bug Fixes
+
+- accept attribute options and numeric OIDs in filter strings ([#626](https://github.com/ldapts/ldapts/issues/626)) ([764162f](https://github.com/ldapts/ldapts/commit/764162f82756595e7ad9fce77f027f27127e70ad)), closes [#620](https://github.com/ldapts/ldapts/issues/620)
+
 # [9.3.0](https://github.com/ldapts/ldapts/compare/v9.2.1...v9.3.0) (2026-11-18)
 
 ### Features
