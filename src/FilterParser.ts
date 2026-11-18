@@ -232,7 +232,8 @@ export class FilterParser {
       attribute = '';
       remainingExpression = filterString;
     } else {
-      const matches = /^[\w-]+/.exec(filterString);
+      // An attribute description is a name or numeric OID, followed by any options: cn;lang-de, 2.5.4.3 (RFC 4512, section 2.5)
+      const matches = /^[\w.;-]+/.exec(filterString);
       if (matches?.length) {
         [attribute] = matches;
         remainingExpression = filterString.slice(attribute.length);
