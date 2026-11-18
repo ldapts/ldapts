@@ -1,6 +1,17 @@
 import { describe, expect, it } from 'vite-plus/test';
 
-import { ApproximateFilter, BerReader, BerWriter, EqualityFilter, ExtensibleFilter, type Filter, FilterParser, GreaterThanEqualsFilter, LessThanEqualsFilter } from '../../src/index.js';
+import {
+  ApproximateFilter,
+  BerReader,
+  BerWriter,
+  EqualityFilter,
+  ExtensibleFilter,
+  type Filter,
+  FilterParser,
+  GreaterThanEqualsFilter,
+  LessThanEqualsFilter,
+  SubstringFilter,
+} from '../../src/index.js';
 
 // An Active Directory objectGUID in its stored form, as RFC 4515 escapes. The wire format compares
 // the assertion as an octet string, so every escape has to come out as exactly one byte.
@@ -136,6 +147,72 @@ describe('binary filter values', () => {
 
         expect(encodedFilterBytes(reparsed)).toStrictEqual(BINARY_VALUE_BYTES);
       }
+    });
+  });
+
+  describe('values that mix literal characters and escaped octets', () => {
+    it('should keep a character outside the Basic Multilingual Plane after an escaped octet', () => {
+      const filter = FilterParser.parseString('(cn=\\ff😀)');
+
+      expect(encodedFilterBytes(filter)).toStrictEqual(Buffer.concat([Buffer.from([0xff]), Buffer.from('😀', 'utf8')]));
+    });
+
+    it('should keep a non-ASCII character before and after an escaped octet', () => {
+      const filter = FilterParser.parseString('(cn=Mü\\ffü)');
+
+      expect(encodedFilterBytes(filter)).toStrictEqual(Buffer.concat([Buffer.from('Mü', 'utf8'), Buffer.from([0xff]), Buffer.from('ü', 'utf8')]));
+    });
+
+    it('should parse escaped octets that form valid UTF-8 as a string', () => {
+      const filter = FilterParser.parseString('(cn=M\\c3\\bcller)');
+
+      expect(filter).toStrictEqual(new EqualityFilter({ attribute: 'cn', value: 'Müller' }));
+      expect(encodedFilterBytes(filter)).toStrictEqual(Buffer.from('Müller', 'utf8'));
+    });
+  });
+
+  describe('substring filters', () => {
+    function encodedFilter(filter: Filter): string {
+      const writer = new BerWriter();
+      filter.write(writer);
+      return writer.buffer.toString('hex');
+    }
+
+    it('should parse escaped octets that form valid UTF-8 as a string', () => {
+      const filter = FilterParser.parseString('(cn=M\\c3\\bc*)');
+
+      expect(filter).toStrictEqual(new SubstringFilter({ attribute: 'cn', initial: 'Mü' }));
+    });
+
+    it('should encode a non-ASCII character next to an escaped octet as UTF-8', () => {
+      const filter = FilterParser.parseString('(cn=\\ffMü*)');
+
+      // Substring components are strings, so the escaped octet 0xff is still sent as the character U+00FF
+      expect(filter).toStrictEqual(new SubstringFilter({ attribute: 'cn', initial: 'ÿMü' }));
+      expect(encodedFilter(filter)).toBe(encodedFilter(new SubstringFilter({ attribute: 'cn', initial: 'ÿMü' })));
+    });
+
+    it('should keep a character outside the Basic Multilingual Plane', () => {
+      const filter = FilterParser.parseString('(cn=\\ff😀*)');
+
+      expect(filter).toStrictEqual(new SubstringFilter({ attribute: 'cn', initial: 'ÿ😀' }));
+    });
+  });
+
+  describe('byte-order mark', () => {
+    it('should keep a leading byte-order mark when parsed from a string', () => {
+      const filter = FilterParser.parseString('(cn=\\ef\\bb\\bfabc)');
+
+      expect(encodedFilterBytes(filter)).toStrictEqual(Buffer.from('efbbbf616263', 'hex'));
+    });
+
+    it('should keep a leading byte-order mark across a parse -> write round-trip', () => {
+      const writer = new BerWriter();
+      new EqualityFilter({ attribute: 'cn', value: Buffer.from('efbbbf616263', 'hex') }).write(writer);
+
+      const parsed = FilterParser.parse(new BerReader(writer.buffer));
+
+      expect(encodedFilterBytes(parsed)).toStrictEqual(Buffer.from('efbbbf616263', 'hex'));
     });
   });
 });

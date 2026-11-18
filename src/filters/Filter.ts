@@ -1,9 +1,7 @@
-import { TextDecoder } from 'node:util';
-
 import { Ber, type BerReader, type BerWriter } from '../ber/index.js';
 import { type SearchFilterValues } from '../SearchFilter.js';
 
-const utf8Decoder = new TextDecoder('utf8', { fatal: true });
+import { decodeAssertionValue } from './assertionValue.js';
 
 export abstract class Filter {
   public abstract type: SearchFilterValues;
@@ -97,12 +95,7 @@ export abstract class Filter {
       return '';
     }
 
-    try {
-      return utf8Decoder.decode(buffer);
-    } catch {
-      // Not valid UTF-8: keep the octets, mirroring Attribute.parse's binary fallback.
-      return buffer;
-    }
+    return decodeAssertionValue(buffer);
   }
 
   protected getObjectValue(objectToCheck: Record<string, string>, key: string, strictAttributeCase?: boolean): string | undefined {
