@@ -69,7 +69,7 @@
     "eslint": "10.15.0",
     "eslint-plugin-jsdoc": "65.4.7",
     "eslint-plugin-security": "4.2.1",
-    "eslint-plugin-unicorn": "79.0.0",
+    "eslint-plugin-unicorn": "80.0.0",
     "husky": "9.1.7",
     "lint-staged": "17.6.0",
     "markdownlint-cli": "0.50.0",
@@ -78,7 +78,7 @@
     "oxlint-config-decent": "5.0.0",
     "oxlint-plugin-eslint": "1.93.0",
     "pinst": "3.0.0",
-    "semantic-release": "25.0.9",
+    "semantic-release": "26.0.1",
     "typescript": "7.0.2",
     "vite": "catalog:",
     "vite-plus": "catalog:"
