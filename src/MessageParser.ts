@@ -23,79 +23,81 @@ export class MessageParser extends TypedEventEmitter {
   private buffer?: Buffer;
 
   public read(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): void {
-    let nextMessage: Buffer | undefined;
+    // Iterate rather than recurse: how many messages share one chunk is decided
+    // by TCP, so recursion would make the call depth depend on the network.
+    let nextMessage: Buffer | undefined = data;
 
-    if (this.buffer) {
-      this.buffer = Buffer.concat([this.buffer, data]);
-    } else {
-      this.buffer = data;
-    }
-
-    const reader = new BerReader(this.buffer);
-    let foundSequence: number | null = null;
-
-    try {
-      foundSequence = reader.readSequence();
-    } catch (ex) {
-      this.emit('error', ex as Error);
-    }
-
-    if (!foundSequence || reader.remain < reader.length) {
-      // Have not received enough data to successfully parse
-      return;
-    }
-
-    if (reader.remain > reader.length) {
-      // Received too much data - extract next message and limit current reader
-      nextMessage = this.buffer.subarray(reader.offset + reader.length);
-      reader.setBufferSize(reader.offset + reader.length);
-    }
-
-    // Free up space since `ber` holds the current message and `nextMessage` is temporarily pointing
-    // at the next sequence of data (if it exists)
-    delete this.buffer;
-
-    let messageId: number | null | undefined;
-    let protocolOperation: number | null | undefined;
-
-    try {
-      messageId = reader.readInt();
-      if (messageId == null) {
-        throw new Error(`Unable to read message id`);
+    while (nextMessage) {
+      if (this.buffer) {
+        this.buffer = Buffer.concat([this.buffer, nextMessage]);
+      } else {
+        this.buffer = nextMessage;
       }
 
-      protocolOperation = reader.readSequence();
+      nextMessage = undefined;
 
-      if (protocolOperation == null) {
-        throw new Error(`Unable to read protocol operation sequence for message: ${messageId}`);
+      const reader = new BerReader(this.buffer);
+      let foundSequence: number | null = null;
+
+      try {
+        foundSequence = reader.readSequence();
+      } catch (ex) {
+        this.emit('error', ex as Error);
       }
 
-      const messageDetails = messageDetailsByMessageId.get(`${messageId}`);
-
-      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader, messageDetails?.message);
-
-      this.emit('message', message);
-    } catch (ex) {
-      if (messageId) {
-        const errorWithMessageDetails = ex as MessageParserError;
-        errorWithMessageDetails.messageDetails = {
-          messageId,
-        };
-
-        if (protocolOperation) {
-          errorWithMessageDetails.messageDetails.protocolOperation = protocolOperation;
-        }
-
-        this.emit('error', errorWithMessageDetails);
+      if (!foundSequence || reader.remain < reader.length) {
+        // Have not received enough data to successfully parse
         return;
       }
 
-      this.emit('error', ex as Error);
-      return;
-    }
+      if (reader.remain > reader.length) {
+        // Received too much data - extract next message and limit current reader
+        nextMessage = this.buffer.subarray(reader.offset + reader.length);
+        reader.setBufferSize(reader.offset + reader.length);
+      }
 
-    if (nextMessage) {
-      this.read(nextMessage, messageDetailsByMessageId);
+      // Free up space since `ber` holds the current message and `nextMessage` is temporarily pointing
+      // at the next sequence of data (if it exists)
+      delete this.buffer;
+
+      let messageId: number | null | undefined;
+      let protocolOperation: number | null | undefined;
+
+      try {
+        messageId = reader.readInt();
+        if (messageId == null) {
+          throw new Error(`Unable to read message id`);
+        }
+
+        protocolOperation = reader.readSequence();
+
+        if (protocolOperation == null) {
+          throw new Error(`Unable to read protocol operation sequence for message: ${messageId}`);
+        }
+
+        const messageDetails = messageDetailsByMessageId.get(`${messageId}`);
+
+        const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader, messageDetails?.message);
+
+        this.emit('message', message);
+      } catch (ex) {
+        if (messageId) {
+          const errorWithMessageDetails = ex as MessageParserError;
+          errorWithMessageDetails.messageDetails = {
+            messageId,
+          };
+
+          if (protocolOperation) {
+            errorWithMessageDetails.messageDetails.protocolOperation = protocolOperation;
+          }
+
+          this.emit('error', errorWithMessageDetails);
+          return;
+        }
+
+        this.emit('error', ex as Error);
+        return;
+      }
     }
   }
 
