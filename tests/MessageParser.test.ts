@@ -61,9 +61,13 @@ describe('MessageParser', () => {
       expect(errors[0]).toBeInstanceOf(InvalidAsn1Error);
     });
 
-    it('should drop invalid framing so later data is parsed fresh', () => {
+    it.each([
       // Outer sequence uses an indefinite length, which is not supported
-      const { messages, errors } = parse([0x30, 0x80], searchEntry);
+      ['an indefinite length', [0x30, 0x80]],
+      // Outer element is not a SEQUENCE
+      ['a non-sequence tag', [0x00, 0x00]],
+    ])('should drop framing with %s so later data is parsed fresh', (_, framing) => {
+      const { messages, errors } = parse(framing, searchEntry);
       expect(errors).toHaveLength(1);
       expect(messages).toHaveLength(1);
     });

@@ -35,7 +35,7 @@ export class MessageParser extends TypedEventEmitter {
     let foundSequence: number | null = null;
 
     try {
-      foundSequence = reader.readSequence();
+      foundSequence = reader.readSequence(0x30);
     } catch (ex) {
       // The framing itself is invalid, so later data cannot be parsed against it. Drop it rather than keep appending.
       delete this.buffer;
@@ -43,7 +43,7 @@ export class MessageParser extends TypedEventEmitter {
       return;
     }
 
-    if (!foundSequence || reader.remain < reader.length) {
+    if (foundSequence === null || reader.remain < reader.length) {
       // Have not received enough data to successfully parse
       return;
     }
