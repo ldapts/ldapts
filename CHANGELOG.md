@@ -1,3 +1,9 @@
+## [9.3.3](https://github.com/ldapts/ldapts/compare/v9.3.2...v9.3.3) (2026-11-24)
+
+### Bug Fixes
+
+- reject malformed lengths when parsing responses ([#650](https://github.com/ldapts/ldapts/issues/650)) ([b957feb](https://github.com/ldapts/ldapts/commit/b957feb7657d10cacfa565c24faad479f94cd01d))
+
 ## [9.3.2](https://github.com/ldapts/ldapts/compare/v9.3.1...v9.3.2) (2026-11-24)
 
 ## [9.3.1](https://github.com/ldapts/ldapts/compare/v9.3.0...v9.3.1) (2026-11-18)
