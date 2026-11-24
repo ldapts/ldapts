@@ -1,3 +1,5 @@
+## [9.3.2](https://github.com/ldapts/ldapts/compare/v9.3.1...v9.3.2) (2026-11-24)
+
 ## [9.3.1](https://github.com/ldapts/ldapts/compare/v9.3.0...v9.3.1) (2026-11-18)
 
 ### Bug Fixes
