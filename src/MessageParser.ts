@@ -37,7 +37,10 @@ export class MessageParser extends TypedEventEmitter {
     try {
       foundSequence = reader.readSequence();
     } catch (ex) {
+      // The framing itself is invalid, so later data cannot be parsed against it. Drop it rather than keep appending.
+      delete this.buffer;
       this.emit('error', ex as Error);
+      return;
     }
 
     if (!foundSequence || reader.remain < reader.length) {
@@ -45,13 +48,18 @@ export class MessageParser extends TypedEventEmitter {
       return;
     }
 
+    const messageEnd = reader.offset + reader.length;
     if (reader.remain > reader.length) {
-      // Received too much data - extract next message and limit current reader
-      nextMessage = this.buffer.subarray(reader.offset + reader.length);
-      reader.setBufferSize(reader.offset + reader.length);
+      // Received too much data - extract next message
+      nextMessage = this.buffer.subarray(messageEnd);
     }
 
-    // Free up space since `ber` holds the current message and `nextMessage` is temporarily pointing
+    // The whole message is buffered now, so an inner element that runs past its end is malformed. Read it strictly:
+    // returning null for a short read would leave parse loops that never advance.
+    const messageReader = new BerReader(this.buffer.subarray(0, messageEnd), { strict: true });
+    messageReader.offset = reader.offset;
+
+    // Free up space since `messageReader` holds the current message and `nextMessage` is temporarily pointing
     // at the next sequence of data (if it exists)
     delete this.buffer;
 
@@ -59,12 +67,12 @@ export class MessageParser extends TypedEventEmitter {
     let protocolOperation: number | null | undefined;
 
     try {
-      messageId = reader.readInt();
+      messageId = messageReader.readInt();
       if (messageId == null) {
         throw new Error(`Unable to read message id`);
       }
 
-      protocolOperation = reader.readSequence();
+      protocolOperation = messageReader.readSequence();
 
       if (protocolOperation == null) {
         throw new Error(`Unable to read protocol operation sequence for message: ${messageId}`);
@@ -72,7 +80,7 @@ export class MessageParser extends TypedEventEmitter {
 
       const messageDetails = messageDetailsByMessageId.get(`${messageId}`);
 
-      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, reader, messageDetails?.message);
+      const message = this._getMessageFromProtocolOperation(messageId, protocolOperation, messageReader, messageDetails?.message);
 
       this.emit('message', message);
     } catch (ex) {

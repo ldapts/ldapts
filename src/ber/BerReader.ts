@@ -2,8 +2,18 @@
 import { Ber } from './Ber.js';
 import { InvalidAsn1Error } from './InvalidAsn1Error.js';
 
+export interface BerReaderOptions {
+  /**
+   * Throw `InvalidAsn1Error` when an element runs past the end of the data, instead of returning `null`. Use when the
+   * buffer holds a complete message, so a short read means the message is malformed rather than not fully received.
+   */
+  strict?: boolean;
+}
+
 export class BerReader {
   private size: number;
+
+  private readonly strict: boolean;
 
   private currentLength = 0;
 
@@ -11,13 +21,14 @@ export class BerReader {
 
   public readonly buffer: Buffer;
 
-  public constructor(data: Buffer) {
+  public constructor(data: Buffer, options: BerReaderOptions = {}) {
     if (!Buffer.isBuffer(data)) {
       throw new TypeError('data must be a Buffer');
     }
 
     this.buffer = data;
     this.size = data.length;
+    this.strict = options.strict ?? false;
   }
 
   public get length(): number {
@@ -46,7 +57,7 @@ export class BerReader {
 
   public readByte(peek = false): number | null {
     if (this.size - this.currentOffset < 1) {
-      return null;
+      return peek ? null : this.truncated();
     }
 
     const byte = this.buffer.readUInt8(this.currentOffset);
@@ -66,7 +77,7 @@ export class BerReader {
     let offset = startOffset ?? this.currentOffset;
 
     if (offset >= this.size) {
-      return null;
+      return this.truncated();
     }
 
     const lengthByte = this.buffer.readUInt8(offset);
@@ -84,12 +95,13 @@ export class BerReader {
       }
 
       if (this.size - offset < numLengthBytes) {
-        return null;
+        return this.truncated();
       }
 
       this.currentLength = 0;
       for (let i = 0; i < numLengthBytes; i++) {
-        this.currentLength = (this.currentLength << 8) + this.buffer.readUInt8(offset);
+        // Multiply rather than shift: `<<` is signed 32-bit, so a 4-byte length with the high bit set would go negative
+        this.currentLength = this.currentLength * 0x100 + this.buffer.readUInt8(offset);
         offset += 1;
       }
     } else {
@@ -102,7 +114,7 @@ export class BerReader {
   public readSequence(expectedTag?: number): number | null {
     const tag = this.peek();
     if (tag === null) {
-      return null;
+      return this.truncated();
     }
 
     if (expectedTag !== undefined && expectedTag !== tag) {
@@ -112,6 +124,10 @@ export class BerReader {
     const newOffset = this.readLength(this.currentOffset + 1);
     if (newOffset === null) {
       return null;
+    }
+
+    if (this.strict && this.currentLength > this.size - newOffset) {
+      return this.truncated();
     }
 
     this.currentOffset = newOffset;
@@ -140,7 +156,7 @@ export class BerReader {
   public readString(tag: number = Ber.OctetString, asBuffer = false): Buffer | string | null {
     const currentTag = this.peek();
     if (currentTag === null) {
-      return null;
+      return this.truncated();
     }
 
     if (currentTag !== tag) {
@@ -153,7 +169,7 @@ export class BerReader {
     }
 
     if (this.currentLength > this.size - newOffset) {
-      return null;
+      return this.truncated();
     }
 
     this.currentOffset = newOffset;
@@ -193,7 +209,7 @@ export class BerReader {
     const currentTag = this.peek();
 
     if (currentTag === null) {
-      return null;
+      return this.truncated();
     }
 
     if (currentTag !== tag) {
@@ -210,7 +226,7 @@ export class BerReader {
     }
 
     if (this.currentLength > this.size - newOffset) {
-      return null;
+      return this.truncated();
     }
 
     this.currentOffset = newOffset;
@@ -228,5 +244,13 @@ export class BerReader {
     }
 
     return value >> 0;
+  }
+
+  private truncated(): null {
+    if (this.strict) {
+      throw new InvalidAsn1Error('Element runs past the end of the data');
+    }
+
+    return null;
   }
 }

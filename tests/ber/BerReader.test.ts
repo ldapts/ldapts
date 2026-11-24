@@ -1,7 +1,7 @@
 /* eslint-disable no-useless-concat */
 import { describe, expect, it } from 'vite-plus/test';
 
-import { Ber, BerReader } from '../../src/ber/index.js';
+import { Ber, BerReader, InvalidAsn1Error } from '../../src/ber/index.js';
 
 describe('BerReader', () => {
   describe('constructor', () => {
@@ -12,6 +12,49 @@ describe('BerReader', () => {
     it('should accept a Buffer', () => {
       const reader = new BerReader(Buffer.from([0x01]));
       expect(reader).toBeInstanceOf(BerReader);
+    });
+  });
+
+  describe('strict mode', () => {
+    it('should still return null when peeking past the end', () => {
+      const reader = new BerReader(Buffer.from([]), { strict: true });
+      expect(reader.peek()).toBeNull();
+    });
+
+    it('should throw when reading a byte past the end', () => {
+      const reader = new BerReader(Buffer.from([]), { strict: true });
+      expect(() => reader.readByte()).toThrow(InvalidAsn1Error);
+    });
+
+    it('should throw when a sequence runs past the end', () => {
+      const reader = new BerReader(Buffer.from([0x30, 0x05, 0x04, 0x00]), { strict: true });
+      expect(() => reader.readSequence()).toThrow(InvalidAsn1Error);
+    });
+
+    it('should throw when a string runs past the end', () => {
+      const reader = new BerReader(Buffer.from([0x04, 0x05, 0x61]), { strict: true });
+      expect(() => reader.readString()).toThrow(InvalidAsn1Error);
+    });
+
+    it('should throw when an integer runs past the end', () => {
+      const reader = new BerReader(Buffer.from([0x02, 0x02, 0x01]), { strict: true });
+      expect(() => reader.readInt()).toThrow(InvalidAsn1Error);
+    });
+
+    it('should throw when the length is missing', () => {
+      const reader = new BerReader(Buffer.from([0x04]), { strict: true });
+      expect(() => reader.readString()).toThrow(InvalidAsn1Error);
+    });
+
+    it('should decode a 4-byte length with the high bit set as unsigned', () => {
+      const reader = new BerReader(Buffer.from([0x04, 0x84, 0xff, 0xff, 0xff, 0xfa]));
+      expect(reader.readLength(1)).toBe(6);
+      expect(reader.length).toBe(0xfffffffa);
+    });
+
+    it('should return null for the same data when not strict', () => {
+      expect(new BerReader(Buffer.from([0x04, 0x05, 0x61])).readString()).toBeNull();
+      expect(new BerReader(Buffer.from([0x30, 0x05, 0x04, 0x00])).readSequence()).toBe(0x30);
     });
   });
 
