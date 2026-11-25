@@ -1,3 +1,9 @@
+## [9.3.5](https://github.com/ldapts/ldapts/compare/v9.3.4...v9.3.5) (2026-11-25)
+
+### Bug Fixes
+
+- parse messages iteratively in MessageParser.read ([#641](https://github.com/ldapts/ldapts/issues/641)) ([186d307](https://github.com/ldapts/ldapts/commit/186d307f5487321637f31916af2f7af550fbff9b))
+
 ## [9.3.4](https://github.com/ldapts/ldapts/compare/v9.3.3...v9.3.4) (2026-11-25)
 
 ## [9.3.3](https://github.com/ldapts/ldapts/compare/v9.3.2...v9.3.3) (2026-11-24)
