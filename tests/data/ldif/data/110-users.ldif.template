@@ -1,4 +1,4 @@
-dn: uid=user,{{ LDAP_BASE_DN }}
+dn: uid=user,${OPENLDAP_BOOTSTRAP_SUFFIX}
 uid: user
 cn: user
 sn: 3
@@ -12,7 +12,7 @@ gidNumber: 14564100
 mail: user@ldap.local
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=user1,{{ LDAP_BASE_DN }}
+dn: uid=user1,${OPENLDAP_BOOTSTRAP_SUFFIX}
 uid: user1
 cn: user1
 sn: SURNAME
@@ -26,7 +26,7 @@ gidNumber: 14564100
 mail: user1@ldap.local
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=user2,{{ LDAP_BASE_DN }}
+dn: uid=user2,${OPENLDAP_BOOTSTRAP_SUFFIX}
 uid: user2
 cn: user2
 sn: SURNAME
@@ -40,7 +40,7 @@ gidNumber: 14564100
 mail: user2@ldap.local
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=user3,{{ LDAP_BASE_DN }}
+dn: uid=user3,${OPENLDAP_BOOTSTRAP_SUFFIX}
 uid: user3
 cn: user3
 sn: SURNAME
@@ -54,7 +54,7 @@ gidNumber: 14564100
 mail: user3@ldap.local
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=user4,{{ LDAP_BASE_DN }}
+dn: uid=user4,${OPENLDAP_BOOTSTRAP_SUFFIX}
 uid: user4
 cn: user4
 sn: SURNAME
@@ -67,13 +67,14 @@ uidNumber: 14583104
 gidNumber: 14564100
 mail: user4@ldap.local
 userPassword: {SSHA}UpZ0zp8NRV/2AmED0TnDtpaEhjLQyXA9
+pwdPolicySubentry: cn=passwordSpecial,ou=pwpolicies,${OPENLDAP_BOOTSTRAP_SUFFIX}
 
-dn: ou=People,{{ LDAP_BASE_DN }}
+dn: ou=People,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: top
 objectClass: organizationalUnit
 ou: People
 
-dn: cn=UserGroup1,{{ LDAP_BASE_DN }}
+dn: cn=UserGroup1,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: posixGroup
 objectClass: top
 cn: UserGroup1
@@ -81,7 +82,7 @@ gidNumber: 49701
 memberUid: user3
 memberUid: user4
 
-dn: uid=person1,ou=People,{{ LDAP_BASE_DN }}
+dn: uid=person1,ou=People,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: posixAccount
 objectClass: top
 objectClass: inetOrgPerson
@@ -94,7 +95,7 @@ cn: person1
 uidNumber: 59547
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=person2,ou=People,{{ LDAP_BASE_DN }}
+dn: uid=person2,ou=People,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: posixAccount
 objectClass: top
 objectClass: inetOrgPerson
@@ -107,7 +108,7 @@ cn: person2
 uidNumber: 60743
 userPassword: {SHA}cRDtpNCeBiql5KOQsKVyrA0sAiA=
 
-dn: uid=asd,ou=pwpolicies,{{ LDAP_BASE_DN }}
+dn: uid=asd,ou=pwpolicies,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: posixAccount
 objectClass: top
 objectClass: inetOrgPerson
@@ -120,11 +121,10 @@ cn: asd
 uidNumber: 7108
 userPassword: {SSHA}3fd6xNG4GN5hsPhWmR8CT4JOJOGB7DNh
 
-dn: cn=UserGroup2 (Test),{{ LDAP_BASE_DN }}
+dn: cn=UserGroup2 (Test),${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: posixGroup
 objectClass: top
 cn: UserGroup2 (Test)
 memberUid: user3
 memberUid: user2
 gidNumber: 2539
-

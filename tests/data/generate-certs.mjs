@@ -22,8 +22,10 @@ async function writePem(filename, pem) {
   await fs.writeFile(path.join(certsDir, filename), pem.replace(/\r\n/g, '\n')); // Force LF
   if (filename.endsWith('-key.pem')) {
     try {
+      // The openldap container runs slapd as its own unprivileged user, so it must be able to read the server key
+      const mode = filename === 'server-key.pem' ? '644' : '600';
       // eslint-disable-next-line security/detect-non-literal-fs-filename
-      await fs.chmod(path.join(certsDir, filename), '600');
+      await fs.chmod(path.join(certsDir, filename), mode);
     } catch {
       // Ignore on Windows
     }

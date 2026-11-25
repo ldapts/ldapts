@@ -1,10 +1,9 @@
-#load password policy module
-dn: ou=pwpolicies,{{ LDAP_BASE_DN }}
+dn: ou=pwpolicies,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: organizationalUnit
 objectClass: top
 ou: pwpolicies
 
-dn: cn=default,ou=pwpolicies,{{ LDAP_BASE_DN }}
+dn: cn=default,ou=pwpolicies,${OPENLDAP_BOOTSTRAP_SUFFIX}
 objectClass: top
 objectClass: device
 objectClass: pwdPolicy
