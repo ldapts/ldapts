@@ -1,28 +1,32 @@
 services:
   openldap:
-    image: osixia/openldap:1.5.0@sha256:18742e9c449c9c1afe129d3f2f3ee15fb34cc43e5f940a20f3399728f41d7c28
+    image: osixia/openldap:2.6.15@sha256:b804ae8b3f3e50be7315916e929ad7b21897a2f7eb3a482096967f509c61d264
+    # libldap checks a localhost URL's certificate against the container hostname
+    hostname: ldap.local
     ports:
-      - '389:389'
-      - '636:636'
-    command: --copy-service -l=debug
+      - '389:3890'
+      - '636:6360'
     volumes:
-      - ./tests/data/ldif/:/container/service/slapd/assets/config/bootstrap/ldif/custom/
-      - ./tests/data/certs/:/container/service/slapd/assets/certs
+      - ./tests/data/ldif/config/:/container/services/openldap-bootstrap/assets/ldif/config/custom/
+      - ./tests/data/ldif/data/:/container/services/openldap-bootstrap/assets/ldif/data/custom/
+      - ./tests/data/certs/:/container/services/openldap/assets/certs/
     environment:
-      KEEP_EXISTING_CONFIG: false
-      LDAP_DOMAIN: ldap.local
-      LDAP_TLS: true
-      LDAP_TLS_ENFORCE: false
-      LDAP_ADMIN_PASSWORD: 1234
-      LDAP_CONFIG_PASSWORD: 1234
-      LDAP_REMOVE_CONFIG_AFTER_SETUP: false
-      LDAP_TLS_CRT_FILENAME: server.pem
-      LDAP_TLS_KEY_FILENAME: server-key.pem
-      LDAP_TLS_CA_CRT_FILENAME: ca.pem
-      LDAP_TLS_VERIFY_CLIENT: allow
-      LDAP_TLS_CIPHER_SUITE: 'NORMAL'
+      OPENLDAP_BOOTSTRAP_ORGANIZATION: ldap.local
+      OPENLDAP_BOOTSTRAP_SUFFIX: dc=ldap,dc=local
+      OPENLDAP_BOOTSTRAP_SCHEMAS: core.ldif cosine.ldif inetorgperson.ldif nis.ldif
+      OPENLDAP_BOOTSTRAP_MODULES: back_mdb.so ppolicy.so sssvlv.so
+      OPENLDAP_BOOTSTRAP_FRONTEND_PASSWORD_HASH: '{SSHA}'
+      # 1234
+      OPENLDAP_BOOTSTRAP_DATA_ROOT_PASSWORD_HASHED: '{SSHA}deF9wfMzChtry+z7ZelF5wtHAJGZ2npJ'
+      OPENLDAP_BOOTSTRAP_CONFIG_ROOT_PASSWORD_HASHED: '{SSHA}deF9wfMzChtry+z7ZelF5wtHAJGZ2npJ'
+      OPENLDAP_BOOTSTRAP_TLS: true
+      OPENLDAP_BOOTSTRAP_TLS_CERT: /container/services/openldap/assets/certs/server.pem
+      OPENLDAP_BOOTSTRAP_TLS_CERT_KEY: /container/services/openldap/assets/certs/server-key.pem
+      OPENLDAP_BOOTSTRAP_TLS_CA_CERT: /container/services/openldap/assets/certs/ca.pem
+      OPENLDAP_BOOTSTRAP_TLS_VERIFY_CLIENT: allow
+      OPENLDAP_BOOTSTRAP_TLS_PROTOCOL_MIN: '3.3'
     healthcheck:
-      test: ldapsearch -x -H ldaps://localhost:636 -b dc=ldap,dc=local -D "cn=admin,dc=ldap,dc=local" -w 1234 -s base objectclass=* || exit 1
+      test: LDAPTLS_CACERT=/container/services/openldap/assets/certs/ca.pem ldapsearch -x -H ldaps://localhost:6360 -b dc=ldap,dc=local -D "cn=admin,dc=ldap,dc=local" -w 1234 -s base objectclass=* || exit 1
       interval: 60s
       retries: 60
       start_period: 5s
