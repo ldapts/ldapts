@@ -23,6 +23,19 @@ export class MessageParser extends TypedEventEmitter {
   private buffer?: Buffer;
 
   public read(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): void {
+    // Iterate rather than recurse: how many messages share one chunk is decided
+    // by TCP, so recursion would make the call depth depend on the network.
+    let remaining: Buffer | undefined = data;
+    while (remaining) {
+      remaining = this._readMessage(remaining, messageDetailsByMessageId);
+    }
+  }
+
+  /**
+   * Parses the first complete message in the buffered data.
+   * @returns Data received after that message, which still needs parsing
+   */
+  private _readMessage(data: Buffer, messageDetailsByMessageId: Map<string, { message: Message }>): Buffer | undefined {
     let nextMessage: Buffer | undefined;
 
     if (this.buffer) {
@@ -40,12 +53,12 @@ export class MessageParser extends TypedEventEmitter {
       // The framing itself is invalid, so later data cannot be parsed against it. Drop it rather than keep appending.
       delete this.buffer;
       this.emit('error', ex as Error);
-      return;
+      return undefined;
     }
 
     if (foundSequence === null || reader.remain < reader.length) {
       // Have not received enough data to successfully parse
-      return;
+      return undefined;
     }
 
     const messageEnd = reader.offset + reader.length;
@@ -95,16 +108,14 @@ export class MessageParser extends TypedEventEmitter {
         }
 
         this.emit('error', errorWithMessageDetails);
-        return;
+        return undefined;
       }
 
       this.emit('error', ex as Error);
-      return;
+      return undefined;
     }
 
-    if (nextMessage) {
-      this.read(nextMessage, messageDetailsByMessageId);
-    }
+    return nextMessage;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
