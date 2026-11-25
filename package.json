@@ -1,6 +1,6 @@
 {
   "name": "ldapts",
-  "version": "9.3.1",
+  "version": "9.3.3",
   "description": "LDAP client",
   "keywords": [
     "active",
@@ -70,11 +70,12 @@
     "eslint-plugin-jsdoc": "65.5.0",
     "eslint-plugin-security": "4.2.1",
     "eslint-plugin-unicorn": "80.0.0",
+    "fast-check": "4.11.0",
     "husky": "9.1.7",
     "lint-staged": "17.6.1",
     "markdownlint-cli": "0.50.0",
     "node-forge": "1.4.3",
-    "npm-run-all2": "9.0.4",
+    "npm-run-all2": "9.1.0",
     "oxlint-config-decent": "5.0.0",
     "oxlint-plugin-eslint": "1.94.0",
     "pinst": "3.0.0",
@@ -99,5 +100,5 @@
   "engines": {
     "node": ">=22"
   },
-  "packageManager": "pnpm@12.21.0"
+  "packageManager": "pnpm@12.22.0"
 }
