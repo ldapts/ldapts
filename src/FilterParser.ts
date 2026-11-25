@@ -47,7 +47,7 @@ export class FilterParser {
 
     const parseResult = FilterParser._parseString(filterString, 0, filterString);
     const end = filterString.length - 1;
-    if (parseResult.end < end) {
+    if (parseResult.end !== end) {
       throw new Error(`Unbalanced parens in filter string: ${filterString}`);
     }
 
@@ -215,6 +215,11 @@ export class FilterParser {
         filter = FilterParser._parseExpressionFilterFromString(filterString.substring(cursor, end));
         cursor = end;
       }
+    }
+
+    // Require a closing paren for the current filter
+    if (filterString[cursor] !== ')') {
+      throw new Error(`Unbalanced parens: ${filterString}. Full string: ${fullString}`);
     }
 
     return {
