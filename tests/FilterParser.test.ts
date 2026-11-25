@@ -28,6 +28,12 @@ describe('FilterParser', () => {
       }).toThrow('Unbalanced parens');
     });
 
+    it.each(['(|(cn=x)', '(&(a=b)', '(!(cn=x)', '(!(cn=x)Z', '(&(a=b)(|(c=d)(e=f))'])('should throw if %s is not closed', (filterString) => {
+      expect((): void => {
+        FilterParser.parseString(filterString);
+      }).toThrow('Unbalanced parens');
+    });
+
     it('should throw for invalid filter', () => {
       expect((): void => {
         FilterParser.parseString('foo>bar');
