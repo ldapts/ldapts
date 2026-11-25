@@ -1,3 +1,10 @@
+## [9.3.6](https://github.com/ldapts/ldapts/compare/v9.3.5...v9.3.6) (2026-11-25)
+
+### Bug Fixes
+
+- reject unterminated and, or and not filters ([#655](https://github.com/ldapts/ldapts/issues/655)) ([9359d20](https://github.com/ldapts/ldapts/commit/9359d20a1fcb56333d5b8d503697941af366c172))
+- split modifyDN newDN at the first unescaped comma outside quotes ([#654](https://github.com/ldapts/ldapts/issues/654)) ([08f85e2](https://github.com/ldapts/ldapts/commit/08f85e2e643bda4c7bde5ea0d08c78ce800f4777))
+
 ## [9.3.5](https://github.com/ldapts/ldapts/compare/v9.3.4...v9.3.5) (2026-11-25)
 
 ### Bug Fixes
