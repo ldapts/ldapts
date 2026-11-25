@@ -28,6 +28,12 @@
       semanticCommitType: 'chore',
     },
     {
+      // vite-plus pins an exact @voidzero-dev/vite-plus-core, which the `vite` catalog alias must match
+      matchPackageNames: ['vite-plus', '@voidzero-dev/vite-plus-core'],
+      groupName: 'vite-plus',
+      separateMajorMinor: false,
+    },
+    {
       matchDepTypes: ['dependencies'],
       groupName: 'all dependencies',
       semanticCommitType: 'fix',
