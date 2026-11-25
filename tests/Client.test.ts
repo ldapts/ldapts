@@ -920,6 +920,50 @@ describe('Client', () => {
       stub.mockRestore();
     });
 
+    it.each([
+      // A value ending in an escaped backslash: the comma after it is a separator. Issue #642
+      ['uid=alice\\\\', 'ou=users,dc=ex,dc=com'],
+      // A comma inside a quoted value is part of the value
+      ['cn="a,b"', 'ou=x,dc=y'],
+      // An escaped quote inside a quoted value, in a multi-valued RDN
+      ['cn="a\\",b"+uid=x', 'ou=x,dc=y'],
+      // A hex-escaped backslash
+      ['cn=a\\5c', 'ou=x,dc=y'],
+      // An escaped comma inside the value
+      ['cn=a\\,b', 'ou=x,dc=y'],
+    ])('should split %s from newSuperior %s', async (newRdn, newSuperior) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
+        new ModifyDNResponse({
+          messageId: 123,
+        }),
+      );
+
+      await client.modifyDN('uid=groot,ou=Users,dc=foo,dc=com', `${newRdn},${newSuperior}`);
+
+      expect(stub).toHaveBeenCalledOnce();
+      const args = stub.mock.calls[0]![0] as ModifyDNRequest;
+      expect(args.newRdn).toBe(newRdn);
+      expect(args.newSuperior).toBe(newSuperior);
+      stub.mockRestore();
+    });
+
+    it('should not set newSuperior when newDN is a single RDN', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const stub = vi.spyOn(client as any, '_send').mockResolvedValue(
+        new ModifyDNResponse({
+          messageId: 123,
+        }),
+      );
+
+      await client.modifyDN('uid=groot,ou=Users,dc=foo,dc=com', 'cn=a\\,b');
+
+      const args = stub.mock.calls[0]![0] as ModifyDNRequest;
+      expect(args.newRdn).toBe('cn=a\\,b');
+      expect(args.newSuperior).toBe('');
+      stub.mockRestore();
+    });
+
     it('should handle newSuperior with the long form', async () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const stub = vi.spyOn(client as any, '_send').mockResolvedValue(

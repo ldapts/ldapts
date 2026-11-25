@@ -168,6 +168,27 @@ export interface SearchResult {
   searchReferences: string[];
 }
 
+/**
+ * Finds the comma that ends the first RDN of a DN string (RFC 4514): skips escaped characters and quoted values.
+ * @returns The index of that comma, or -1 when the DN has a single RDN
+ */
+function findFirstRdnSeparator(dn: string): number {
+  let quoted = false;
+
+  for (let i = 0; i < dn.length; i += 1) {
+    const char = dn[i];
+    if (char === '\\') {
+      i += 1;
+    } else if (char === '"') {
+      quoted = !quoted;
+    } else if (char === ',' && !quoted) {
+      return i;
+    }
+  }
+
+  return -1;
+}
+
 export class Client {
   private clientOptions: ClientOptions;
 
@@ -550,10 +571,12 @@ export class Client {
     }
 
     let newSuperior: string | undefined;
-    if (typeof newDN === 'string' && /[^\\],/.test(newDN)) {
-      const parseIndex = newDN.search(/[^\\],/);
-      newSuperior = newDN.slice(parseIndex + 2);
-      newDN = newDN.slice(0, parseIndex + 1);
+    if (typeof newDN === 'string') {
+      const separator = findFirstRdnSeparator(newDN);
+      if (separator !== -1) {
+        newSuperior = newDN.slice(separator + 1);
+        newDN = newDN.slice(0, separator);
+      }
     }
 
     const req = new ModifyDNRequest({
