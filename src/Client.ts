@@ -306,9 +306,15 @@ export class Client {
       options.socket = originalSocket;
     }
 
+    // RFC 4513 section 3.1.3 requires the server identity check. TLS with an existing socket does not receive
+    // the host as a separate argument, so pass it as the SNI and hostname-verification name, as the ldaps://
+    // path does. Caller-provided values win.
+    const hostname = this.host.startsWith('[') && this.host.endsWith(']') ? this.host.slice(1, -1) : this.host;
+    const servername = options.servername ?? hostname;
+
     this.socket = await new Promise((resolve: (value: SocketWithId) => void, reject: (reason: Error) => void) => {
       const createSecureConnection = this.clientOptions.createSecureConnection ?? tls.connect;
-      const secureSocket = createSecureConnection(options);
+      const secureSocket = createSecureConnection({ ...options, servername });
       secureSocket.once('secureConnect', () => {
         secureSocket.removeAllListeners('error');
 

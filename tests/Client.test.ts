@@ -531,8 +531,33 @@ describe('Client', () => {
       await client.startTLS();
 
       expect(createSecureConnection).toHaveBeenCalledTimes(1);
+      expect(createSecureConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          servername: 'localhost',
+        }),
+      );
 
       await client.bind(BIND_DN, BIND_PW);
+      await expect(client.unbind()).resolves.toBeUndefined();
+    });
+
+    it('should keep a caller-provided servername for startTLS()', async () => {
+      const createSecureConnection = vi.fn<typeof tls.connect>(tls.connect);
+      const client = new Client({
+        url: LDAP_URI,
+        createSecureConnection: createSecureConnection as unknown as typeof tls.connect,
+      });
+
+      await client.startTLS({
+        servername: 'ldap.local',
+      });
+
+      expect(createSecureConnection).toHaveBeenCalledWith(
+        expect.objectContaining({
+          servername: 'ldap.local',
+        }),
+      );
+
       await expect(client.unbind()).resolves.toBeUndefined();
     });
   });
